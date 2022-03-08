@@ -1,11 +1,11 @@
-package com.example.TFSandroid.CustomViews
+package com.example.tinkoff.CustomViews
 
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ViewGroup
-import com.example.TFSandroid.R
+import com.example.tinkoff.R
 import timber.log.Timber
 import kotlin.math.max
 
@@ -48,6 +48,7 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
     }
 
 
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         Timber.d("child count: $childCount")
         var currentWidth = 0
@@ -56,6 +57,11 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         var maxHeight = 0
         for (i in 0 until childCount) {
             val child = getChildAt(i)
+            if (i + 1 < childCount) {
+                (child as EmojiView).setOnClickListener {
+                    it.isSelected = !it.isSelected
+                }
+            }
             measureChild(child, widthMeasureSpec, heightMeasureSpec)
             if (currentWidth + child.measuredWidth + marginHorizontal <=
                 MeasureSpec.getSize(widthMeasureSpec)

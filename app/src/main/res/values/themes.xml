@@ -22,6 +22,6 @@
         <item name="android:paddingTop">@dimen/vertical_padding_emoji_view</item>
         <item name="text">😂 2</item>
         <item name="textSize">@dimen/text_size</item>
-        <item name="textColor">@color/text_color</item>
+        <item name="textColor">@color/state_color_selector</item>
     </style>
 </resources>

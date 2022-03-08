@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">TFS android</string>
     <string name="plus_add_description">Картинка добавление плюсика</string>
+    <string name="nickname_textview">Darrell Steward</string>
+    <string name="message_textview">Привет! lorem ipsum test message dalshe zabil</string>
+    <string name="avatar_description">Test image</string>
 </resources>

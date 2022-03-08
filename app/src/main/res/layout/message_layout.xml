@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/avatar_icon"
+        android:layout_width="@dimen/icon_width_height"
+        android:layout_height="@dimen/icon_width_height"
+        android:layout_marginStart="@dimen/icon_start_margin"
+        android:src="@drawable/icon_preview"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/avatar_description" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/message_content"
+        android:layout_width="@dimen/message_width"
+        android:layout_height="wrap_content"
+        android:background="@drawable/emoji_not_selected"
+        android:layout_marginBottom="@dimen/content_margin_bottom"
+        android:layout_marginStart="@dimen/margin_from_avatar">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/nickname_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nickname_textview"
+            android:textColor="@color/nickname_color"
+            android:layout_marginStart="@dimen/content_start_margin"
+            android:layout_marginTop="@dimen/header_top_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/message_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/message_textview"
+            android:textColor="@color/message_color"
+            android:layout_marginBottom="@dimen/message_bottom_margin"
+            android:layout_marginTop="@dimen/message_top_margin"
+            android:layout_marginStart="@dimen/content_start_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nickname_textview"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.example.tinkoff.CustomViews.FlexBoxLayout
+        android:id="@+id/flex_box_layout"
+        android:layout_width="@dimen/message_width"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_from_avatar"
+        />
+</merge>

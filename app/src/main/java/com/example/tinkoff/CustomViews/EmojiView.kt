@@ -1,12 +1,18 @@
-package com.example.TFSandroid.CustomViews
+package com.example.tinkoff.CustomViews
+
 
 import android.content.Context
 import android.content.res.TypedArray
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.PointF
+import android.graphics.Rect
 import android.text.TextPaint
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
-import com.example.TFSandroid.R
+import com.example.tinkoff.R
+
 
 class EmojiView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     View(context, attrs) {
@@ -22,13 +28,21 @@ class EmojiView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
 
 
     init {
+        val defaultTextSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_SP,
+            TEXT_SIZE,
+            resources.displayMetrics
+        )
         val typedArray: TypedArray =
             context.obtainStyledAttributes(attrs, R.styleable.EmojiView)
         text = typedArray.getString(R.styleable.EmojiView_text).orEmpty()
         textPaint.textSize =
-            typedArray.getDimension(R.styleable.EmojiView_textSize, 30f)
+            typedArray.getDimension(R.styleable.EmojiView_textSize, defaultTextSize)
         textPaint.color =
-            typedArray.getColor(R.styleable.EmojiView_textColor, Color.WHITE)
+            typedArray.getColor(
+                R.styleable.EmojiView_textColor,
+                Color.WHITE
+            )
         typedArray.recycle()
     }
 
@@ -49,8 +63,8 @@ class EmojiView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
 
     }
 
+
     override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
         canvas?.drawText(text, tempViewPoint.x, tempViewPoint.y, textPaint)
     }
 
@@ -68,7 +82,7 @@ class EmojiView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
     }
 
     companion object {
-        private const val TEXT_SIZE = 10f
+        private const val TEXT_SIZE = 15f
         private val SUPPORTED_DRAWABLE_STATE = intArrayOf(android.R.attr.state_selected)
     }
 

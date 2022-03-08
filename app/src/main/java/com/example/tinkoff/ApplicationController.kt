@@ -1,4 +1,4 @@
-package com.example.TFSandroid
+package com.example.tinkoff
 
 import android.app.Application
 import timber.log.Timber
