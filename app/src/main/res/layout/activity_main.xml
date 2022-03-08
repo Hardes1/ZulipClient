@@ -7,9 +7,9 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.example.homework1.CustomViews.FlexBoxLayout
-        android:layout_marginTop="100dp"
-        android:layout_width="100dp"
+    <com.example.TFSandroid.CustomViews.FlexBoxLayout
+        android:layout_marginTop="150dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         />
 

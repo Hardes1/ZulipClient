@@ -5,4 +5,8 @@
         <attr name="text" format="string" />
         <attr name="textSize" format="dimension" />
     </declare-styleable>
+    <declare-styleable name="FlexBoxLayout">
+        <attr name="marginHorizontal" format="dimension" />
+        <attr name="marginVertical" format="dimension" />
+    </declare-styleable>
 </resources>

@@ -4,28 +4,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.homework1.CustomViews.EmojiView
-        android:id="@+id/my_emoji_1"
+    <com.example.TFSandroid.CustomViews.EmojiView
         style="@style/emoji_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <com.example.homework1.CustomViews.EmojiView
-        android:id="@+id/my_emoji_2"
+    <com.example.TFSandroid.CustomViews.EmojiView
+        style="@style/emoji_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:text="😂 200"/>
+
+    <com.example.TFSandroid.CustomViews.EmojiView
         style="@style/emoji_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <com.example.homework1.CustomViews.EmojiView
-        android:id="@+id/my_emoji_3"
+    <com.example.TFSandroid.CustomViews.EmojiView
+        style="@style/emoji_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:text="😂 20"/>
+
+    <com.example.TFSandroid.CustomViews.EmojiView
         style="@style/emoji_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <com.example.homework1.CustomViews.EmojiView
-        android:id="@+id/my_emoji_4"
-        style="@style/emoji_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <ImageView
+        android:layout_width="@dimen/image_view_width"
+        android:layout_height="@dimen/image_view_height"
+        android:background="@drawable/emoji_not_selected"
+        android:src="@drawable/ic_add"
+        android:contentDescription="@string/plus_add_description"
+        android:scaleType="center"/>
 
 </merge>

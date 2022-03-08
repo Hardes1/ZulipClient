@@ -1,4 +1,4 @@
-package com.example.homework1.CustomViews
+package com.example.TFSandroid.CustomViews
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -6,7 +6,7 @@ import android.graphics.*
 import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.View
-import com.example.homework1.R
+import com.example.TFSandroid.R
 
 class EmojiView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     View(context, attrs) {
@@ -68,7 +68,7 @@ class EmojiView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
     }
 
     companion object {
-
+        private const val TEXT_SIZE = 10f
         private val SUPPORTED_DRAWABLE_STATE = intArrayOf(android.R.attr.state_selected)
     }
 

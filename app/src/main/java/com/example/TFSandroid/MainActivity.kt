@@ -1,9 +1,7 @@
-package com.example.homework1
+package com.example.TFSandroid
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.homework1.databinding.ActivityMainBinding
-import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {/*
     private var _binding: ActivityMainBinding? = null
