@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.Homework1" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
@@ -12,5 +12,16 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+    </style>
+
+    <style name="emoji_view">
+        <item name="android:background">@drawable/emoji_state_selector</item>
+        <item name="android:paddingStart">@dimen/horizontal_padding_emoji_view</item>
+        <item name="android:paddingEnd">@dimen/horizontal_padding_emoji_view</item>
+        <item name="android:paddingBottom">@dimen/vertical_padding_emoji_view</item>
+        <item name="android:paddingTop">@dimen/vertical_padding_emoji_view</item>
+        <item name="text">😂 2</item>
+        <item name="textSize">@dimen/text_size</item>
+        <item name="textColor">@color/text_color</item>
     </style>
 </resources>
