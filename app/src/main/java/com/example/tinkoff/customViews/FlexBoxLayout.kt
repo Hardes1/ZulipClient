@@ -1,4 +1,4 @@
-package com.example.tinkoff.CustomViews
+package com.example.tinkoff.customViews
 
 import android.content.Context
 import android.content.res.TypedArray

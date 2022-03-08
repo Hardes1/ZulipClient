@@ -4,29 +4,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.tinkoff.CustomViews.EmojiView
+    <com.example.tinkoff.customViews.EmojiView
         style="@style/emoji_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <com.example.tinkoff.CustomViews.EmojiView
+    <com.example.tinkoff.customViews.EmojiView
         style="@style/emoji_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:text="😂 200"/>
 
-    <com.example.tinkoff.CustomViews.EmojiView
+    <com.example.tinkoff.customViews.EmojiView
         style="@style/emoji_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <com.example.tinkoff.CustomViews.EmojiView
+    <com.example.tinkoff.customViews.EmojiView
         style="@style/emoji_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:text="😂 20"/>
 
-    <com.example.tinkoff.CustomViews.EmojiView
+    <com.example.tinkoff.customViews.EmojiView
         style="@style/emoji_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
