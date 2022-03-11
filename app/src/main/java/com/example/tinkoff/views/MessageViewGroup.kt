@@ -1,4 +1,4 @@
-package com.example.tinkoff.customViews
+package com.example.tinkoff.views
 
 import android.content.Context
 import android.util.AttributeSet
@@ -45,7 +45,6 @@ class MessageViewGroup @JvmOverloads constructor(context: Context, attrs: Attrib
             imageView.measuredWidthWithMargins + flexBoxLayout.measuredWidthWithMargins
         val contentHeight =
             flexBoxLayout.measuredHeightWithMargins + messageContent.measuredHeightWithMargins
-        println("width: ${messageContent.measuredWidth} height: ${messageContent.measuredHeight}")
         setMeasuredDimension(
             resolveSize(contentWidth, widthMeasureSpec),
             resolveSize(contentHeight, heightMeasureSpec)

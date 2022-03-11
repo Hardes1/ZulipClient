@@ -1,13 +1,14 @@
-package com.example.tinkoff.customViews
+package com.example.tinkoff.views
 
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ViewGroup
+import android.widget.ImageView
 import com.example.tinkoff.R
-import timber.log.Timber
 import kotlin.math.max
+import kotlin.random.Random
 
 class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ViewGroup(context, attrs) {
@@ -47,21 +48,45 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         typedArray.recycle()
     }
 
-
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        Timber.d("child count: $childCount")
-        var currentWidth = 0
-        var currentHeight = 0
-        var maxWidth = 0
-        var maxHeight = 0
-        for (i in 0 until childCount) {
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        var i = 0
+        val randomSmile = arrayOf("\uD83D\uDE02", "\uD83D\uDE05", "\uD83D\uDE0A", "\uD83D\uDE0D")
+        val bound = 1337
+        val random = Random(bound)
+        while (i < childCount) {
             val child = getChildAt(i)
             if (i + 1 < childCount) {
                 (child as EmojiView).setOnClickListener {
                     it.isSelected = !it.isSelected
                 }
+            } else {
+                (child as ImageView).setOnClickListener {
+                    addView(
+                        EmojiView.builder(
+                            context,
+                            resources,
+                            "${random.nextInt(bound)} ${randomSmile.random()}"
+                        ),
+                        childCount - 1
+                    )
+                    requestLayout()
+                }
             }
+            i++
+        }
+
+    }
+
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        var currentWidth = 0
+        var currentHeight = 0
+        var maxWidth = 0
+        var maxHeight = 0
+        var i = 0
+        while (i < childCount) {
+            val child = getChildAt(i)
             measureChild(child, widthMeasureSpec, heightMeasureSpec)
             if (currentWidth + child.measuredWidth + marginHorizontal <=
                 MeasureSpec.getSize(widthMeasureSpec)
@@ -75,6 +100,7 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
                 maxWidth = max(currentWidth, maxWidth)
                 maxHeight = max(currentHeight, maxHeight)
             }
+            i++
         }
         maxWidth += paddingLeft + paddingRight
         maxHeight += paddingTop + paddingBottom
@@ -89,7 +115,8 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         var currentWidth = 0
         var currentHeight = 0
-        for (i in 0 until childCount) {
+        var i = 0
+        while (i < childCount) {
             val child = getChildAt(i)
             if (currentWidth + child.measuredWidth <= measuredWidth) {
                 child.layout(
@@ -108,15 +135,8 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
                     currentHeight + child.measuredHeight
                 )
             }
-            Timber.d(
-                "childLocation: l = %d, t = %d, r = %d, b = %d".format(
-                    currentWidth,
-                    currentHeight,
-                    currentWidth + child.measuredWidth,
-                    currentHeight + measuredHeight
-                )
-            )
             currentWidth += child.measuredWidth + marginHorizontal
+            i++
         }
     }
 

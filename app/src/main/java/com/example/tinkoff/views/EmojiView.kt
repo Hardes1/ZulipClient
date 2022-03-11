@@ -1,7 +1,8 @@
-package com.example.tinkoff.customViews
+package com.example.tinkoff.views
 
 
 import android.content.Context
+import android.content.res.Resources
 import android.content.res.TypedArray
 import android.graphics.Canvas
 import android.graphics.Color
@@ -11,13 +12,17 @@ import android.text.TextPaint
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import com.example.tinkoff.R
 
 
-class EmojiView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+class EmojiView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+) :
     View(context, attrs) {
 
-    private var text: String = ""
+    private var text: String = "228"
 
     private val textPaint = TextPaint().apply {
         isAntiAlias = true
@@ -35,7 +40,7 @@ class EmojiView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         )
         val typedArray: TypedArray =
             context.obtainStyledAttributes(attrs, R.styleable.EmojiView)
-        text = typedArray.getString(R.styleable.EmojiView_text).orEmpty()
+        text = typedArray.getString(R.styleable.EmojiView_text) ?: text
         textPaint.textSize =
             typedArray.getDimension(R.styleable.EmojiView_textSize, defaultTextSize)
         textPaint.color =
@@ -76,14 +81,37 @@ class EmojiView @JvmOverloads constructor(context: Context, attrs: AttributeSet?
         return drawableState
     }
 
-    override fun setOnClickListener(l: OnClickListener?) {
-        super.setOnClickListener(l)
-        isSelected = !isSelected
-    }
+
 
     companion object {
         private const val TEXT_SIZE = 15f
         private val SUPPORTED_DRAWABLE_STATE = intArrayOf(android.R.attr.state_selected)
+
+        fun builder(context: Context, resources: Resources, str : String): EmojiView {
+            val newView = EmojiView(context, null)
+            val horizontalPadding =
+                resources.getDimension(R.dimen.horizontal_padding_emoji_view).toInt()
+            val verticalPadding =
+                resources.getDimension(R.dimen.vertical_padding_emoji_view).toInt()
+            newView.setBackgroundResource(R.drawable.emoji_state_selector)
+            newView.setPadding(
+                horizontalPadding,
+                verticalPadding,
+                horizontalPadding,
+                verticalPadding
+            )
+            newView.layoutParams =
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            newView.setOnClickListener {
+                it.isSelected = !it.isSelected
+            }
+            newView.text = str
+            return newView
+        }
+
     }
 
 }

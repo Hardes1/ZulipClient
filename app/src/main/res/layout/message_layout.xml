@@ -47,7 +47,7 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.example.tinkoff.customViews.FlexBoxLayout
+    <com.example.tinkoff.views.FlexBoxLayout
         android:id="@+id/flex_box_layout"
         android:layout_width="@dimen/message_width"
         android:layout_height="wrap_content"
