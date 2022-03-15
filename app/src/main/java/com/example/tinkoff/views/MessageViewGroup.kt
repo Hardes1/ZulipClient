@@ -15,7 +15,6 @@ class MessageViewGroup @JvmOverloads constructor(context: Context, attrs: Attrib
         inflate(context, R.layout.message_layout, this)
     }
 
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val imageView = findViewById<ImageView>(R.id.avatar_icon)
         val flexBoxLayout = findViewById<FlexBoxLayout>(R.id.flex_box_layout)
@@ -45,9 +44,11 @@ class MessageViewGroup @JvmOverloads constructor(context: Context, attrs: Attrib
             imageView.measuredWidthWithMargins + flexBoxLayout.measuredWidthWithMargins
         val contentHeight =
             flexBoxLayout.measuredHeightWithMargins + messageContent.measuredHeightWithMargins
+        val resultWidth = resolveSize(contentWidth, widthMeasureSpec)
+        val resultHeight = resolveSize(contentHeight, heightMeasureSpec)
         setMeasuredDimension(
-            resolveSize(contentWidth, widthMeasureSpec),
-            resolveSize(contentHeight, heightMeasureSpec)
+            resultWidth,
+            resultHeight
         )
     }
 

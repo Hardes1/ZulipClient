@@ -22,6 +22,8 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         private const val MARGIN_VERTICAL = 6f
     }
 
+    private var iteration = 0
+
     init {
         val defaultHorizontalMargin = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -70,7 +72,7 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
                         ),
                         childCount - 1
                     )
-                    requestLayout()
+                    forceLayout()
                 }
             }
             i++
@@ -88,28 +90,38 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         while (i < childCount) {
             val child = getChildAt(i)
             measureChild(child, widthMeasureSpec, heightMeasureSpec)
-            if (currentWidth + child.measuredWidth + marginHorizontal <=
-                MeasureSpec.getSize(widthMeasureSpec)
-            ) {
-                currentWidth += child.measuredWidth + marginHorizontal
-                maxWidth = max(currentWidth, maxWidth)
-                maxHeight = max(currentHeight, maxHeight)
-            } else {
-                currentWidth = child.measuredWidth + marginVertical
-                currentHeight += child.measuredHeight
-                maxWidth = max(currentWidth, maxWidth)
-                maxHeight = max(currentHeight, maxHeight)
+            when {
+                currentWidth + child.measuredWidth + marginHorizontal <=
+                        MeasureSpec.getSize(widthMeasureSpec) -> {
+                    currentWidth += child.measuredWidth + marginHorizontal
+                }
+                currentWidth + child.measuredWidth <= MeasureSpec.getSize(widthMeasureSpec) -> {
+                    currentWidth += child.measuredWidth
+                }
+                else -> {
+                    currentWidth = child.measuredWidth + marginHorizontal
+                    currentHeight += child.measuredHeight + marginVertical
+                }
             }
+            if (i + 1 == childCount) {
+                currentHeight += child.measuredHeight
+            }
+            maxWidth = max(currentWidth, maxWidth)
+            maxHeight = max(currentHeight, maxHeight)
             i++
+
+
         }
+
         maxWidth += paddingLeft + paddingRight
         maxHeight += paddingTop + paddingBottom
+        val resultWidth = resolveSize(maxWidth, widthMeasureSpec)
+        val resultHeight = resolveSize(maxHeight, heightMeasureSpec)
         setMeasuredDimension(
-            resolveSize(maxWidth, widthMeasureSpec),
-            resolveSize(maxHeight, heightMeasureSpec)
+            resultWidth,
+            resultHeight
         )
-
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        iteration++
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

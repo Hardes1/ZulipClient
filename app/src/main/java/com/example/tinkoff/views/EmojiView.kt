@@ -14,6 +14,7 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import com.example.tinkoff.R
+import timber.log.Timber
 
 
 class EmojiView @JvmOverloads constructor(
@@ -30,8 +31,7 @@ class EmojiView @JvmOverloads constructor(
 
     private val tempBounds = Rect()
     private val tempViewPoint = PointF()
-
-
+    private var iteration = 0
     init {
         val defaultTextSize = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP,
@@ -60,6 +60,7 @@ class EmojiView @JvmOverloads constructor(
         val resultWidth = resolveSize(sumWidth, widthMeasureSpec)
         val resultHeight = resolveSize(sumHeight, heightMeasureSpec)
         setMeasuredDimension(resultWidth, resultHeight)
+        iteration++
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -84,7 +85,7 @@ class EmojiView @JvmOverloads constructor(
 
 
     companion object {
-        private const val TEXT_SIZE = 15f
+        private const val TEXT_SIZE = 14f
         private val SUPPORTED_DRAWABLE_STATE = intArrayOf(android.R.attr.state_selected)
 
         fun builder(context: Context, resources: Resources, str : String): EmojiView {

@@ -3,20 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="../../../../layout/custom_preview.xml" value="0.20833333333333334" />
-        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
-        <entry key="app/src/main/res/drawable/custom_emoji_view_selector.xml" value="0.182" />
-        <entry key="app/src/main/res/drawable/emoji_not_selected.xml" value="0.1" />
-        <entry key="app/src/main/res/drawable/emoji_selected.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/emoji_state_selector.xml" value="0.1" />
-        <entry key="app/src/main/res/drawable/ic_add.xml" value="0.1" />
-        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.12" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.15" />
-        <entry key="app/src/main/res/layout/flexbox_layout.xml" value="0.67" />
-        <entry key="app/src/main/res/layout/message_layout.xml" value="0.26992753623188404" />
-        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
-        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/flexbox_layout.xml" value="0.21331521739130435" />
+        <entry key="app/src/main/res/layout/message_layout.xml" value="0.75" />
       </map>
     </option>
   </component>
