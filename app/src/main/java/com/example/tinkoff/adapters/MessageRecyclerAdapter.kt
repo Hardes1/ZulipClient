@@ -3,6 +3,7 @@ package com.example.tinkoff.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff.R
 import com.example.tinkoff.data.Date
@@ -14,11 +15,15 @@ import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
 import com.google.android.material.textview.MaterialTextView
 
-class MessageRecyclerAdapter(private val list: List<MessageContentInterface>) :
+class MessageRecyclerAdapter :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
 
 
-    private val sizeList = list.size
+    private val differ = AsyncListDiffer(this, CustomDiffUtil())
+
+    var list: List<MessageContentInterface>
+        set(value) = differ.submitList(value)
+        get() = differ.currentList
 
 
     sealed class MessageContentViewHolder(itemView: View) :
@@ -89,14 +94,14 @@ class MessageRecyclerAdapter(private val list: List<MessageContentInterface>) :
     }
 
     override fun onBindViewHolder(contentViewHolder: MessageContentViewHolder, position: Int) {
-        contentViewHolder.bind(list[sizeList - position - 1])
+        contentViewHolder.bind(differ.currentList[differ.currentList.size - position - 1])
     }
 
-    override fun getItemCount(): Int = list.size
+    override fun getItemCount(): Int = differ.currentList.size
 
 
     override fun getItemViewType(position: Int): Int {
-        val item = list[sizeList - position - 1]
+        val item = differ.currentList[differ.currentList.size - position - 1]
         return if (item is Date) {
             DATE
         } else {
