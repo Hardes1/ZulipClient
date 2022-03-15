@@ -4,4 +4,5 @@
     <string name="nickname_textview">Darrell Steward</string>
     <string name="message_textview">Привет! lorem ipsum test message dalshe zabil</string>
     <string name="avatar_description">Test image</string>
+    <string name="write_hint_text">Написать…</string>
 </resources>

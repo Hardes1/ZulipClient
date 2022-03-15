@@ -13,4 +13,11 @@
     <color name="text_color_selected">#EAEAEA</color>
     <color name="message_color">#FAFAFA</color>
     <color name="nickname_color">#2A9D8F</color>
+    <color name="content_layout_bg_color">#1E1E1E</color>
+    <color name="input_text_bg_color">#282828</color>
+    <color name="date_bg_color">#070707</color>
+    <color name="date_text_color">#999999</color>
+    <color name="color_bg_black">#121212</color>
+    <color name="message_own_start_bg_color">#2A9D8F</color>
+    <color name="message_own_end_bg_color">#006153</color>
 </resources>

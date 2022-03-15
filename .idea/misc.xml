@@ -3,11 +3,22 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/date_text_shape.xml" value="0.22" />
+        <entry key="app/src/main/res/drawable/edit_text_shape.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/emoji_not_selected.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/emoji_state_selector.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="app/src/main/res/drawable/ic_add.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_add_content.xml" value="0.222" />
+        <entry key="app/src/main/res/drawable/message_own_bg.xml" value="0.22" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.15" />
+        <entry key="app/src/main/res/layout/date_item.xml" value="1.705592105263158" />
         <entry key="app/src/main/res/layout/flexbox_layout.xml" value="0.21331521739130435" />
+        <entry key="app/src/main/res/layout/message_content.xml" value="0.718816067653277" />
+        <entry key="app/src/main/res/layout/message_item.xml" value="0.290625" />
         <entry key="app/src/main/res/layout/message_layout.xml" value="0.75" />
+        <entry key="app/src/main/res/layout/message_other_item.xml" value="0.5592105263157895" />
+        <entry key="app/src/main/res/layout/message_own_item.xml" value="0.67" />
       </map>
     </option>
   </component>

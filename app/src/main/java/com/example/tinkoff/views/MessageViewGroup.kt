@@ -12,7 +12,7 @@ class MessageViewGroup @JvmOverloads constructor(context: Context, attrs: Attrib
     ViewGroup(context, attrs) {
 
     init {
-        inflate(context, R.layout.message_layout, this)
+        inflate(context, R.layout.message_content, this)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

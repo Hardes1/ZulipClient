@@ -2,7 +2,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/avatar_icon"
@@ -50,7 +50,6 @@
     <com.example.tinkoff.views.FlexBoxLayout
         android:id="@+id/flex_box_layout"
         android:layout_width="@dimen/message_width"
-        android:background="@color/design_default_color_primary_dark"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_from_avatar"
         />
