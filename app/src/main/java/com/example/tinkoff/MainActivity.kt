@@ -2,7 +2,6 @@ package com.example.tinkoff
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
 import android.text.SpannableStringBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -41,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         messagesList = generateData()
         layoutManager = LinearLayoutManager(baseContext, LinearLayoutManager.VERTICAL, true)
         recyclerAdapter = MessageRecyclerAdapter()
-        recyclerAdapter.list = messagesList
+        recyclerAdapter.list = messagesList.reversed()
         binding.recyclerView.adapter = recyclerAdapter
         binding.recyclerView.addItemDecoration(decorator)
         binding.recyclerView.layoutManager = layoutManager
@@ -101,8 +100,8 @@ class MainActivity : AppCompatActivity() {
                 SenderType.OWN
             )
         )
-        list.add(Date(1, "2 Feb"))
-        list.add(MessageContent(6, "abobaaboba", emptyList(), SenderType.OTHER))
+        list.add(Date(counter++, "2 Feb"))
+        list.add(MessageContent(counter++, "abobaaboba", emptyList(), SenderType.OTHER))
         return list
     }
 
@@ -121,14 +120,20 @@ class MainActivity : AppCompatActivity() {
                     SenderType.OWN
                 )
             )
-            recyclerAdapter.list = messagesList
+            Timber.d("list of Data: $messagesList")
+            recyclerAdapter.list = messagesList.reversed()
         }
     }
 
     // Создаём новую ссылку
     private fun instanateNewList() {
-        val tmp : MutableList<MessageContentInterface> = mutableListOf()
-        messagesList.forEach { tmp.add(it) }
+        val tmp: MutableList<MessageContentInterface> =
+            messagesList.map {
+                if (it is MessageContent)
+                    it.copy()
+                else
+                    (it as Date).copy()
+            }.toMutableList()
         messagesList = tmp
     }
 

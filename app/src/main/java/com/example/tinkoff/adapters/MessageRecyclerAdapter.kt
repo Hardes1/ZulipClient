@@ -14,16 +14,17 @@ import com.example.tinkoff.databinding.DateItemBinding
 import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
 import com.google.android.material.textview.MaterialTextView
+import timber.log.Timber
 
 class MessageRecyclerAdapter :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
 
 
-    private val differ = AsyncListDiffer(this, CustomDiffUtil())
-
+    private val _differ = AsyncListDiffer(this, CustomDiffUtil())
+    private var _parent: RecyclerView? = null
     var list: List<MessageContentInterface>
-        set(value) = differ.submitList(value)
-        get() = differ.currentList
+        set(value) = _differ.submitList(value) { _parent?.scrollToPosition(0) }
+        get() = _differ.currentList
 
 
     sealed class MessageContentViewHolder(itemView: View) :
@@ -39,6 +40,7 @@ class MessageRecyclerAdapter :
             val text =
                 binding.messageViewGroup.findViewById<MaterialTextView>(R.id.message_textview)
             text.text = newContent.content
+            Timber.d("MessageOtherViewHolder: ${newContent.id} contentType: ${newContent.type}")
         }
     }
 
@@ -47,6 +49,7 @@ class MessageRecyclerAdapter :
         override fun bind(content: MessageContentInterface) {
             val newContent = content as MessageContent
             binding.messageTextview.text = newContent.content
+            Timber.d("MessageOwnViewHolder: ${newContent.id} contentType: ${newContent.type}")
         }
     }
 
@@ -56,7 +59,14 @@ class MessageRecyclerAdapter :
         override fun bind(content: MessageContentInterface) {
             val newContent = content as Date
             binding.dateText.text = newContent.date
+            Timber.d("DateViewHolder: ${newContent.id}")
         }
+    }
+
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        _parent = recyclerView
+        super.onAttachedToRecyclerView(recyclerView)
     }
 
 
@@ -94,14 +104,14 @@ class MessageRecyclerAdapter :
     }
 
     override fun onBindViewHolder(contentViewHolder: MessageContentViewHolder, position: Int) {
-        contentViewHolder.bind(differ.currentList[differ.currentList.size - position - 1])
+        contentViewHolder.bind(list[position])
     }
 
-    override fun getItemCount(): Int = differ.currentList.size
+    override fun getItemCount(): Int = list.size
 
 
     override fun getItemViewType(position: Int): Int {
-        val item = differ.currentList[differ.currentList.size - position - 1]
+        val item = list[position]
         return if (item is Date) {
             DATE
         } else {

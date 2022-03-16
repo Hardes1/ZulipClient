@@ -6,12 +6,13 @@ import com.example.tinkoff.data.MessageContent
 import com.example.tinkoff.data.MessageContentInterface
 
 class CustomDiffUtil : DiffUtil.ItemCallback<MessageContentInterface>() {
+
     override fun areItemsTheSame(
         oldItem: MessageContentInterface,
         newItem: MessageContentInterface
     ): Boolean {
         if (oldItem is MessageContent && newItem is MessageContent) {
-            return oldItem.id == newItem.id
+            return oldItem.id == newItem.id && oldItem.type == newItem.type
         } else if (oldItem is Date && newItem is Date) {
             return oldItem.id == newItem.id
         }
@@ -36,4 +37,5 @@ class CustomDiffUtil : DiffUtil.ItemCallback<MessageContentInterface>() {
         }
         return false
     }
+
 }
