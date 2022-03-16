@@ -1,4 +1,4 @@
-package com.example.tinkoff.views
+package com.example.tinkoff.ui.views
 
 
 import android.content.Context
@@ -14,7 +14,6 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import com.example.tinkoff.R
-import timber.log.Timber
 
 
 class EmojiView @JvmOverloads constructor(
@@ -23,8 +22,7 @@ class EmojiView @JvmOverloads constructor(
 ) :
     View(context, attrs) {
 
-    private var text: String = "228"
-
+    var text: String = "228"
     private val textPaint = TextPaint().apply {
         isAntiAlias = true
     }
@@ -32,6 +30,7 @@ class EmojiView @JvmOverloads constructor(
     private val tempBounds = Rect()
     private val tempViewPoint = PointF()
     private var iteration = 0
+
     init {
         val defaultTextSize = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP,
@@ -83,12 +82,11 @@ class EmojiView @JvmOverloads constructor(
     }
 
 
-
     companion object {
         private const val TEXT_SIZE = 14f
         private val SUPPORTED_DRAWABLE_STATE = intArrayOf(android.R.attr.state_selected)
 
-        fun builder(context: Context, resources: Resources, str : String): EmojiView {
+        fun builder(context: Context, resources: Resources, str: String): EmojiView {
             val newView = EmojiView(context, null)
             val horizontalPadding =
                 resources.getDimension(R.dimen.horizontal_padding_emoji_view).toInt()

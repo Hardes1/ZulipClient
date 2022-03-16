@@ -1,4 +1,4 @@
-package com.example.tinkoff.views
+package com.example.tinkoff.ui.views
 
 import android.content.Context
 import android.util.AttributeSet

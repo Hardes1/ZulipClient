@@ -3,7 +3,7 @@ package com.example.tinkoff.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff.R
@@ -14,19 +14,18 @@ import com.example.tinkoff.data.SenderType
 import com.example.tinkoff.databinding.DateItemBinding
 import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
-import com.example.tinkoff.ui.bottomSheetFragment.BottomSheetFragment
 import com.google.android.material.textview.MaterialTextView
 import timber.log.Timber
 
-class MessageRecyclerAdapter(private val fragmentManager : FragmentManager) :
+class MessageRecyclerAdapter(private val messagePosition: MutableLiveData<Int>) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
+
 
     private val _differ = AsyncListDiffer(this, CustomDiffUtil())
     private var _parent: RecyclerView? = null
     var list: List<MessageContentInterface>
-        set(value) = _differ.submitList(value) { _parent?.scrollToPosition(0) }
+        set(value) = _differ.submitList(value.reversed()) { _parent?.scrollToPosition(0) }
         get() = _differ.currentList
-
 
     sealed class MessageContentViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
@@ -34,27 +33,33 @@ class MessageRecyclerAdapter(private val fragmentManager : FragmentManager) :
     }
 
 
-    class MessageOtherViewHolder(private val fragmentManager: FragmentManager, private val binding: MessageOtherItemBinding) :
+    class MessageOtherViewHolder(
+        private val messagePosition: MutableLiveData<Int>,
+        private val binding: MessageOtherItemBinding
+    ) :
         MessageContentViewHolder(binding.root) {
         override fun bind(content: MessageContentInterface) {
             val newContent = content as MessageContent
             val text =
                 binding.messageViewGroup.findViewById<MaterialTextView>(R.id.message_textview)
             binding.messageViewGroup.setOnClickListener {
-                BottomSheetFragment().show(fragmentManager, TAG)
+                messagePosition.value = adapterPosition
             }
             text.text = newContent.content
             Timber.d("MessageOtherViewHolder: ${newContent.id} contentType: ${newContent.type}")
         }
     }
 
-    class MessageOwnViewHolder(private val fragmentManager: FragmentManager, private val binding: MessageOwnItemBinding) :
+    class MessageOwnViewHolder(
+        private val messagePosition: MutableLiveData<Int>,
+        private val binding: MessageOwnItemBinding
+    ) :
         MessageContentViewHolder(binding.root) {
         override fun bind(content: MessageContentInterface) {
             val newContent = content as MessageContent
             binding.messageTextview.text = newContent.content
             binding.messageTextview.setOnClickListener {
-                BottomSheetFragment().show(fragmentManager, TAG)
+                messagePosition.value = adapterPosition
             }
             Timber.d("MessageOwnViewHolder: ${newContent.id} contentType: ${newContent.type}")
         }
@@ -80,7 +85,8 @@ class MessageRecyclerAdapter(private val fragmentManager : FragmentManager) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageContentViewHolder {
         return when (viewType) {
             DATE -> {
-                DateViewHolder(DateItemBinding.inflate(
+                DateViewHolder(
+                    DateItemBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
@@ -88,7 +94,8 @@ class MessageRecyclerAdapter(private val fragmentManager : FragmentManager) :
                 )
             }
             MESSAGE_OTHER -> {
-                MessageOtherViewHolder(fragmentManager,
+                MessageOtherViewHolder(
+                    messagePosition,
                     MessageOtherItemBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
@@ -97,7 +104,8 @@ class MessageRecyclerAdapter(private val fragmentManager : FragmentManager) :
                 )
             }
             MESSAGE_OWN -> {
-                MessageOwnViewHolder(fragmentManager,
+                MessageOwnViewHolder(
+                    messagePosition,
                     MessageOwnItemBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
@@ -133,7 +141,6 @@ class MessageRecyclerAdapter(private val fragmentManager : FragmentManager) :
         const val DATE: Int = 1
         const val MESSAGE_OTHER: Int = 2
         const val MESSAGE_OWN: Int = 3
-        const val TAG = "TAG"
     }
 
 }

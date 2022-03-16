@@ -4,21 +4,32 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MutableLiveData
 import com.example.tinkoff.adapters.ReactionsRecyclerAdapter
 import com.example.tinkoff.data.EmotionsList
 import com.example.tinkoff.databinding.FragmentBottomSheetBinding
+import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import timber.log.Timber
 
 class BottomSheetFragment : BottomSheetDialogFragment() {
 
+    companion object {
+        fun newInstance(): BottomSheetFragment {
+            return BottomSheetFragment()
+        }
+    }
 
-    private var _binding : FragmentBottomSheetBinding? = null
-    private val binding : FragmentBottomSheetBinding
+    private val viewModel: ReactionsViewModel by activityViewModels()
+
+    private var _binding: FragmentBottomSheetBinding? = null
+    private val binding: FragmentBottomSheetBinding
         get() = _binding!!
     private lateinit var reactionsRecyclerAdapter: ReactionsRecyclerAdapter
 
-
-    override fun onCreateView(
+        override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
@@ -27,13 +38,17 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        reactionsRecyclerAdapter = ReactionsRecyclerAdapter(EmotionsList.list)
+        val positionLiveData: MutableLiveData<Int> = MutableLiveData(-1)
+        reactionsRecyclerAdapter = ReactionsRecyclerAdapter(positionLiveData, EmotionsList.list)
+        positionLiveData.observe(viewLifecycleOwner) {
+            if (it != -1) {
+                Timber.d("emotion: ${EmotionsList.list[it]}")
+                viewModel.setReactionIndex(it)
+                dismiss()
+            }
+        }
         binding.recyclerView.adapter = reactionsRecyclerAdapter
     }
-
-
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

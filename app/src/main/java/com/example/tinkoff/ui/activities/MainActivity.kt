@@ -3,25 +3,35 @@ package com.example.tinkoff.ui.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tinkoff.R
 import com.example.tinkoff.adapters.MessageRecyclerAdapter
-import com.example.tinkoff.data.Date
-import com.example.tinkoff.data.MessageContent
-import com.example.tinkoff.data.MessageContentInterface
-import com.example.tinkoff.data.SenderType
+import com.example.tinkoff.data.*
 import com.example.tinkoff.databinding.ActivityMainBinding
 import com.example.tinkoff.decorations.MessageItemDecoration
+import com.example.tinkoff.ui.bottomSheetFragment.BottomSheetFragment
+import com.example.tinkoff.ui.views.FlexBoxLayout
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
+
+    companion object {
+        private const val FRAGMENT_TAG = "TAG"
+    }
+
+
+    private val viewModel: ReactionsViewModel by viewModels()
     private var _binding: ActivityMainBinding? = null
     private val binding: ActivityMainBinding
         get() = _binding!!
     private lateinit var recyclerAdapter: MessageRecyclerAdapter
+    private val messageIndex: MutableLiveData<Int> = MutableLiveData(-1)
+
 
     private val decorator: MessageItemDecoration by lazy {
         MessageItemDecoration(
@@ -39,6 +49,26 @@ class MainActivity : AppCompatActivity() {
         setChangeTextListener()
         setButtonClickListener()
         initializeRecyclerView()
+        val bottomSheetDialog = BottomSheetFragment.newInstance()
+        messageIndex.observe(this) {
+            if (it >= 0 && it < messagesList.size) {
+                if (!bottomSheetDialog.isAdded)
+                    bottomSheetDialog.show(supportFragmentManager, FRAGMENT_TAG)
+            }
+        }
+        viewModel.reactionIndex.observe(this) {
+            val messageIndexValue = messageIndex.value ?: -1
+            Timber.d("MainActivityReaction: reactId - ${it}, messageId: $messageIndexValue")
+            if (it >= 0 && it < EmotionsList.list.size && messageIndexValue >= 0 && messageIndexValue < messagesList.size) {
+                Timber.d("MainActivityReaction: react - ${EmotionsList.list[it]}, messageId: $messageIndexValue")
+                val view =
+                    binding.recyclerView.findViewHolderForAdapterPosition(messageIndexValue)!!.
+                    itemView.
+                    findViewById<FlexBoxLayout>(R.id.flex_box_layout)
+                view.addReaction(baseContext, EmotionsList.list[it])
+
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -105,7 +135,6 @@ class MainActivity : AppCompatActivity() {
         binding.sendButton.setOnClickListener {
             val text = (binding.messageContentTextView.text ?: "")
             binding.messageContentTextView.text = SpannableStringBuilder("")
-            copyMessagesList()
             messagesList.add(
                 MessageContent(
                     counter++,
@@ -115,20 +144,8 @@ class MainActivity : AppCompatActivity() {
                 )
             )
             Timber.d("list of Data: $messagesList")
-            recyclerAdapter.list = messagesList.reversed()
+            recyclerAdapter.list = messagesList
         }
-    }
-
-    // Создаём новую массив
-    private fun copyMessagesList() {
-        val tmp: MutableList<MessageContentInterface> =
-            messagesList.map {
-                if (it is MessageContent)
-                    it.copy()
-                else
-                    (it as Date).copy()
-            }.toMutableList()
-        messagesList = tmp
     }
 
 
@@ -153,11 +170,11 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun initializeRecyclerView(){
+    private fun initializeRecyclerView() {
         messagesList = generateData()
         layoutManager = LinearLayoutManager(baseContext, LinearLayoutManager.VERTICAL, true)
-        recyclerAdapter = MessageRecyclerAdapter(supportFragmentManager)
-        recyclerAdapter.list = messagesList.reversed()
+        recyclerAdapter = MessageRecyclerAdapter(messageIndex)
+        recyclerAdapter.list = messagesList
         binding.recyclerView.adapter = recyclerAdapter
         binding.recyclerView.addItemDecoration(decorator)
         binding.recyclerView.layoutManager = layoutManager

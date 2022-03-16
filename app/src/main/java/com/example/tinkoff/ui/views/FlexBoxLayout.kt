@@ -1,4 +1,4 @@
-package com.example.tinkoff.views
+package com.example.tinkoff.ui.views
 
 import android.content.Context
 import android.content.res.TypedArray
@@ -21,8 +21,6 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         private const val MARGIN_HORIZONTAL = 10f
         private const val MARGIN_VERTICAL = 6f
     }
-
-    private var iteration = 0
 
     init {
         val defaultHorizontalMargin = TypedValue.applyDimension(
@@ -48,6 +46,20 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
             defaultVerticalMargin
         ).toInt()
         typedArray.recycle()
+    }
+
+    fun addReaction(context : Context, reaction : String){
+        for(i in 0 until childCount-1){
+            val child = getChildAt(i) as EmojiView
+            val childArray = child.text.split(" ")
+            if(childArray[0] == reaction){
+                child.text = "$reaction ${childArray[1].toInt() + 1}"
+                child.requestLayout()
+                return
+            }
+        }
+        val newEmoji = EmojiView.builder(context, context.resources, "$reaction 1")
+        addView(newEmoji, 0, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
     }
 
     override fun onAttachedToWindow() {
@@ -82,10 +94,23 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var currentWidth = 0
-        var currentHeight = 0
+
+
         var maxWidth = 0
         var maxHeight = 0
+        if(childCount==1){
+            maxWidth += paddingLeft + paddingRight
+            maxHeight += paddingTop + paddingBottom
+            val resultWidth = resolveSize(maxWidth, widthMeasureSpec)
+            val resultHeight = resolveSize(maxHeight, heightMeasureSpec)
+            setMeasuredDimension(
+                resultWidth,
+                resultHeight
+            )
+            return
+        }
+        var currentWidth = 0
+        var currentHeight = 0
         var i = 0
         while (i < childCount) {
             val child = getChildAt(i)
@@ -121,13 +146,14 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
             resultWidth,
             resultHeight
         )
-        iteration++
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         var currentWidth = 0
         var currentHeight = 0
         var i = 0
+        if(childCount == 1)
+            return
         while (i < childCount) {
             val child = getChildAt(i)
             if (currentWidth + child.measuredWidth <= measuredWidth) {
