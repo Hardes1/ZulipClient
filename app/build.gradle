@@ -42,4 +42,5 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$appCompat"
     implementation "com.google.android.material:material:$material"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayout"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }

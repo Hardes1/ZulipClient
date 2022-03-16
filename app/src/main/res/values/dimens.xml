@@ -28,4 +28,6 @@
     <dimen name="message_edit_text_padding_horizontal">10dp</dimen>
     <dimen name="message_content_small_recycler_distance">15dp</dimen>
     <dimen name="message_content_big_recycler_distance">29dp</dimen>
+    <dimen name="plank_image_view_margin_top">8dp</dimen>
+    <dimen name="reactions_recycler_padding_horizontal">10dp</dimen>
 </resources>

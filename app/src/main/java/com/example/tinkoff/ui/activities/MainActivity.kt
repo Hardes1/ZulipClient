@@ -1,4 +1,4 @@
-package com.example.tinkoff
+package com.example.tinkoff.ui.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.text.SpannableStringBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.tinkoff.R
 import com.example.tinkoff.adapters.MessageRecyclerAdapter
 import com.example.tinkoff.data.Date
 import com.example.tinkoff.data.MessageContent
@@ -37,14 +38,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setChangeTextListener()
         setButtonClickListener()
-        messagesList = generateData()
-        layoutManager = LinearLayoutManager(baseContext, LinearLayoutManager.VERTICAL, true)
-        recyclerAdapter = MessageRecyclerAdapter()
-        recyclerAdapter.list = messagesList.reversed()
-        binding.recyclerView.adapter = recyclerAdapter
-        binding.recyclerView.addItemDecoration(decorator)
-        binding.recyclerView.layoutManager = layoutManager
-
+        initializeRecyclerView()
     }
 
     override fun onDestroy() {
@@ -59,20 +53,20 @@ class MainActivity : AppCompatActivity() {
         list.add(
             MessageContent(
                 counter++,
-                "dasdasdhdjashdsjdjhsjfhasj\nsjadasjdhdjadsjda",
+                "Hello, my friend!",
                 emptyList(),
                 SenderType.OTHER
             )
         )
         list.add(
             MessageContent(
-                counter++, "dasdasdhdjashdsjdjhsjfhasj\nsjadasjdhdjadsjda", emptyList(),
+                counter++, "How are you?", emptyList(),
                 SenderType.OTHER
             )
         )
         list.add(
             MessageContent(
-                counter++, "dasdasdhdjashdsjdjhsjfhasj\nsjadasjdhdjadsjda",
+                counter++, "Why are you ignorin me???",
                 emptyList(),
                 SenderType.OTHER
             )
@@ -95,7 +89,7 @@ class MainActivity : AppCompatActivity() {
         )
         list.add(
             MessageContent(
-                counter++, "dasdasdhdjashdsjdjhsjfhasjsjadasjdhdjadsjda",
+                counter++, "Hello, dude",
                 emptyList(),
                 SenderType.OWN
             )
@@ -111,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         binding.sendButton.setOnClickListener {
             val text = (binding.messageContentTextView.text ?: "")
             binding.messageContentTextView.text = SpannableStringBuilder("")
-            instanateNewList()
+            copyMessagesList()
             messagesList.add(
                 MessageContent(
                     counter++,
@@ -125,8 +119,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Создаём новую ссылку
-    private fun instanateNewList() {
+    // Создаём новую массив
+    private fun copyMessagesList() {
         val tmp: MutableList<MessageContentInterface> =
             messagesList.map {
                 if (it is MessageContent)
@@ -158,5 +152,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    private fun initializeRecyclerView(){
+        messagesList = generateData()
+        layoutManager = LinearLayoutManager(baseContext, LinearLayoutManager.VERTICAL, true)
+        recyclerAdapter = MessageRecyclerAdapter(supportFragmentManager)
+        recyclerAdapter.list = messagesList.reversed()
+        binding.recyclerView.adapter = recyclerAdapter
+        binding.recyclerView.addItemDecoration(decorator)
+        binding.recyclerView.layoutManager = layoutManager
+    }
 
 }
