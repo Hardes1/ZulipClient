@@ -1,8 +1,8 @@
 package com.example.tinkoff.data
 
 
-object EmotionsList {
-    val list: List<String> = listOf(
+object ReactionsData {
+    val reactionsStringList: List<String> = listOf(
         "\uD83D\uDE00",
         "\uD83E\uDD23",
         "\uD83D\uDE42",

@@ -4,11 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import com.example.tinkoff.adapters.ReactionsRecyclerAdapter
-import com.example.tinkoff.data.EmotionsList
+import com.example.tinkoff.data.ReactionsData
 import com.example.tinkoff.databinding.FragmentBottomSheetBinding
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -39,10 +38,10 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val positionLiveData: MutableLiveData<Int> = MutableLiveData(-1)
-        reactionsRecyclerAdapter = ReactionsRecyclerAdapter(positionLiveData, EmotionsList.list)
+        reactionsRecyclerAdapter = ReactionsRecyclerAdapter(positionLiveData, ReactionsData.reactionsStringList)
         positionLiveData.observe(viewLifecycleOwner) {
             if (it != -1) {
-                Timber.d("emotion: ${EmotionsList.list[it]}")
+                Timber.d("emotion: ${ReactionsData.reactionsStringList[it]}")
                 viewModel.setReactionIndex(it)
                 dismiss()
             }

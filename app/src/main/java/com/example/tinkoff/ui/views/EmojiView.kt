@@ -23,6 +23,7 @@ class EmojiView @JvmOverloads constructor(
     View(context, attrs) {
 
     var text: String = "228"
+        private set
     private val textPaint = TextPaint().apply {
         isAntiAlias = true
     }
@@ -104,13 +105,14 @@ class EmojiView @JvmOverloads constructor(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-            newView.setOnClickListener {
-                it.isSelected = !it.isSelected
-            }
             newView.text = str
             return newView
         }
+    }
 
+    fun setTextAndDraw(s : String){
+        text = s
+        requestLayout()
     }
 
 }

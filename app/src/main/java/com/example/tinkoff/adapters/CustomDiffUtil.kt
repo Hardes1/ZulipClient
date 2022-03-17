@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.DiffUtil
 import com.example.tinkoff.data.Date
 import com.example.tinkoff.data.MessageContent
 import com.example.tinkoff.data.MessageContentInterface
+import timber.log.Timber
 
 class CustomDiffUtil : DiffUtil.ItemCallback<MessageContentInterface>() {
 
@@ -28,9 +29,12 @@ class CustomDiffUtil : DiffUtil.ItemCallback<MessageContentInterface>() {
                 oldItem.id == newItem.id &&
                         oldItem.type == newItem.type &&
                         oldItem.content == newItem.content &&
-                        oldItem.emotions.size == newItem.emotions.size
-            for (i in 0 until oldItem.emotions.size)
-                flag = flag and (oldItem.emotions[i] == newItem.emotions[i])
+                        oldItem.reactions.size == newItem.reactions.size
+            if (flag) {
+                for (i in 0 until oldItem.reactions.size) {
+                    flag = flag and (oldItem.reactions[i] == newItem.reactions[i])
+                }
+            }
             return flag
         } else if (oldItem is Date && newItem is Date) {
             return oldItem.id == newItem.id && oldItem.date == newItem.date

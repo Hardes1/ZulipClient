@@ -5,10 +5,9 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ViewGroup
-import android.widget.ImageView
 import com.example.tinkoff.R
+import timber.log.Timber
 import kotlin.math.max
-import kotlin.random.Random
 
 class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ViewGroup(context, attrs) {
@@ -48,49 +47,35 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         typedArray.recycle()
     }
 
-    fun addReaction(context : Context, reaction : String){
-        for(i in 0 until childCount-1){
+
+    fun addOrUpdateReaction(context: Context, reaction: String, quantity: Int, reactionState : Boolean) {
+        Timber.d("reaction : $reaction quantity $quantity")
+        for (i in 0 until childCount - 1) {
             val child = getChildAt(i) as EmojiView
-            val childArray = child.text.split(" ")
-            if(childArray[0] == reaction){
-                child.text = "$reaction ${childArray[1].toInt() + 1}"
-                child.requestLayout()
-                return
-            }
-        }
-        val newEmoji = EmojiView.builder(context, context.resources, "$reaction 1")
-        addView(newEmoji, 0, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
-    }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        var i = 0
-        val randomSmile = arrayOf("\uD83D\uDE02", "\uD83D\uDE05", "\uD83D\uDE0A", "\uD83D\uDE0D")
-        val bound = 1337
-        val random = Random(bound)
-        while (i < childCount) {
-            val child = getChildAt(i)
-            if (i + 1 < childCount) {
-                (child as EmojiView).setOnClickListener {
-                    it.isSelected = !it.isSelected
+            val emojiViewText = child.text.split(" ")[0]
+            if (emojiViewText == reaction) {
+                child.isSelected = reactionState
+                if (quantity > 0) {
+                    child.setTextAndDraw("$reaction $quantity")
                 }
-            } else {
-                (child as ImageView).setOnClickListener {
-                    addView(
-                        EmojiView.builder(
-                            context,
-                            resources,
-                            "${random.nextInt(bound)} ${randomSmile.random()}"
-                        ),
-                        childCount - 1
-                    )
-                    forceLayout()
+                else {
+                    removeViewAt(i)
+                    requestLayout()
+                    return
                 }
             }
-            i++
         }
-
+        val newEmoji = EmojiView.builder(context, context.resources, "$reaction $quantity")
+        newEmoji.isSelected = reactionState
+        addView(
+            newEmoji,
+            childCount - 1,
+            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        )
     }
+
+
+
 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -98,7 +83,7 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
 
         var maxWidth = 0
         var maxHeight = 0
-        if(childCount==1){
+        if (childCount == 1) {
             maxWidth += paddingLeft + paddingRight
             maxHeight += paddingTop + paddingBottom
             val resultWidth = resolveSize(maxWidth, widthMeasureSpec)
@@ -152,7 +137,7 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         var currentWidth = 0
         var currentHeight = 0
         var i = 0
-        if(childCount == 1)
+        if (childCount == 1)
             return
         while (i < childCount) {
             val child = getChildAt(i)

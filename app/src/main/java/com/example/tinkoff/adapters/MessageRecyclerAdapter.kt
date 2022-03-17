@@ -1,5 +1,6 @@
 package com.example.tinkoff.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,17 +15,29 @@ import com.example.tinkoff.data.SenderType
 import com.example.tinkoff.databinding.DateItemBinding
 import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
+import com.example.tinkoff.ui.activities.MainActivity
+import com.example.tinkoff.ui.views.FlexBoxLayout
 import com.google.android.material.textview.MaterialTextView
 import timber.log.Timber
 
-class MessageRecyclerAdapter(private val messagePosition: MutableLiveData<Int>) :
+class MessageRecyclerAdapter(
+    private val messagePosition: MutableLiveData<Int>,
+    private val imageButtonListener: (view: View) -> Unit,
+    private val listChanged: () -> Unit,
+    private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
+    private val context: Context
+) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
 
 
     private val _differ = AsyncListDiffer(this, CustomDiffUtil())
     private var _parent: RecyclerView? = null
     var list: List<MessageContentInterface>
-        set(value) = _differ.submitList(value.reversed()) { _parent?.scrollToPosition(0) }
+        set(value)  {
+            Timber.d("listUtilBeforeChanges $list")
+            Timber.d("listUtilAfterChanges ${value.reversed()}")
+            _differ.submitList(value.reversed()) { listChanged }
+        }
         get() = _differ.currentList
 
     sealed class MessageContentViewHolder(itemView: View) :
@@ -35,6 +48,9 @@ class MessageRecyclerAdapter(private val messagePosition: MutableLiveData<Int>) 
 
     class MessageOtherViewHolder(
         private val messagePosition: MutableLiveData<Int>,
+        private val imageButtonListener: (view: View) -> Unit,
+        private val context: Context,
+        private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
         private val binding: MessageOtherItemBinding
     ) :
         MessageContentViewHolder(binding.root) {
@@ -45,6 +61,36 @@ class MessageRecyclerAdapter(private val messagePosition: MutableLiveData<Int>) 
             binding.messageViewGroup.setOnClickListener {
                 messagePosition.value = adapterPosition
             }
+            val flexBoxLayout =
+                binding.messageViewGroup.findViewById<FlexBoxLayout>(R.id.flex_box_layout)
+
+            while (flexBoxLayout.childCount > 1) {
+                flexBoxLayout.removeViewAt(0)
+            }
+            flexBoxLayout.requestLayout()
+            for (element in newContent.reactions) {
+                val state = element.users_id.indexOfFirst { it == MainActivity.MY_ID } == -1
+                Timber.d("reaction: $state")
+                flexBoxLayout.addOrUpdateReaction(
+                    context,
+                    element.emoji,
+                    element.users_id.size,
+                    !state
+                )
+                flexBoxLayout.requestLayout()
+                val index = flexBoxLayout.childCount - 2
+
+                flexBoxLayout.getChildAt(index).setOnClickListener {
+                    it.isSelected = !it.isSelected
+                    updateElementCallBack(adapterPosition, index, it.isSelected)
+                }
+            }
+            flexBoxLayout.requestLayout()
+
+            flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
+                .setOnClickListener(imageButtonListener)
+
+
             text.text = newContent.content
             Timber.d("MessageOtherViewHolder: ${newContent.id} contentType: ${newContent.type}")
         }
@@ -52,6 +98,9 @@ class MessageRecyclerAdapter(private val messagePosition: MutableLiveData<Int>) 
 
     class MessageOwnViewHolder(
         private val messagePosition: MutableLiveData<Int>,
+        private val imageButtonListener: (view: View) -> Unit,
+        private val context: Context,
+        private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
         private val binding: MessageOwnItemBinding
     ) :
         MessageContentViewHolder(binding.root) {
@@ -61,6 +110,27 @@ class MessageRecyclerAdapter(private val messagePosition: MutableLiveData<Int>) 
             binding.messageTextview.setOnClickListener {
                 messagePosition.value = adapterPosition
             }
+            val flexBoxLayout = binding.flexBoxLayout
+            while (flexBoxLayout.childCount > 1) {
+                flexBoxLayout.removeViewAt(0)
+            }
+            flexBoxLayout.requestLayout()
+            for (element in newContent.reactions) {
+                flexBoxLayout.addOrUpdateReaction(
+                    context,
+                    element.emoji,
+                    element.users_id.size,
+                    element.users_id.indexOfFirst { it == MainActivity.MY_ID } != -1
+                )
+                val index = flexBoxLayout.childCount - 2
+                flexBoxLayout.getChildAt(index).setOnClickListener {
+                    it.isSelected = !it.isSelected
+                    updateElementCallBack(adapterPosition, index, it.isSelected)
+                }
+            }
+
+            flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
+                .setOnClickListener(imageButtonListener)
             Timber.d("MessageOwnViewHolder: ${newContent.id} contentType: ${newContent.type}")
         }
     }
@@ -96,6 +166,9 @@ class MessageRecyclerAdapter(private val messagePosition: MutableLiveData<Int>) 
             MESSAGE_OTHER -> {
                 MessageOtherViewHolder(
                     messagePosition,
+                    imageButtonListener,
+                    context,
+                    updateElementCallBack,
                     MessageOtherItemBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
@@ -106,6 +179,9 @@ class MessageRecyclerAdapter(private val messagePosition: MutableLiveData<Int>) 
             MESSAGE_OWN -> {
                 MessageOwnViewHolder(
                     messagePosition,
+                    imageButtonListener,
+                    context,
+                    updateElementCallBack,
                     MessageOwnItemBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,

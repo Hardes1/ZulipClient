@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/custom_preview.xml" value="0.31302083333333336" />
         <entry key="app/src/main/res/drawable/date_text_shape.xml" value="0.22" />
         <entry key="app/src/main/res/drawable/edit_text_shape.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/emoji_not_selected.xml" value="0.1" />
