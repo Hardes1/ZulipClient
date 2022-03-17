@@ -18,7 +18,6 @@ import com.example.tinkoff.databinding.MessageOwnItemBinding
 import com.example.tinkoff.ui.activities.MainActivity
 import com.example.tinkoff.ui.views.FlexBoxLayout
 import com.google.android.material.textview.MaterialTextView
-import timber.log.Timber
 
 class MessageRecyclerAdapter(
     private val messagePosition: MutableLiveData<Int>,
@@ -34,8 +33,6 @@ class MessageRecyclerAdapter(
     private var _parent: RecyclerView? = null
     var list: List<MessageContentInterface>
         set(value)  {
-            Timber.d("listUtilBeforeChanges $list")
-            Timber.d("listUtilAfterChanges ${value.reversed()}")
             _differ.submitList(value.reversed()) { listChanged }
         }
         get() = _differ.currentList
@@ -69,12 +66,11 @@ class MessageRecyclerAdapter(
             }
             flexBoxLayout.requestLayout()
             for (element in newContent.reactions) {
-                val state = element.users_id.indexOfFirst { it == MainActivity.MY_ID } == -1
-                Timber.d("reaction: $state")
+                val state = element.usersId.indexOfFirst { it == MainActivity.MY_ID } == -1
                 flexBoxLayout.addOrUpdateReaction(
                     context,
                     element.emoji,
-                    element.users_id.size,
+                    element.usersId.size,
                     !state
                 )
                 flexBoxLayout.requestLayout()
@@ -92,7 +88,6 @@ class MessageRecyclerAdapter(
 
 
             text.text = newContent.content
-            Timber.d("MessageOtherViewHolder: ${newContent.id} contentType: ${newContent.type}")
         }
     }
 
@@ -119,8 +114,8 @@ class MessageRecyclerAdapter(
                 flexBoxLayout.addOrUpdateReaction(
                     context,
                     element.emoji,
-                    element.users_id.size,
-                    element.users_id.indexOfFirst { it == MainActivity.MY_ID } != -1
+                    element.usersId.size,
+                    element.usersId.indexOfFirst { it == MainActivity.MY_ID } != -1
                 )
                 val index = flexBoxLayout.childCount - 2
                 flexBoxLayout.getChildAt(index).setOnClickListener {
@@ -131,7 +126,6 @@ class MessageRecyclerAdapter(
 
             flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
                 .setOnClickListener(imageButtonListener)
-            Timber.d("MessageOwnViewHolder: ${newContent.id} contentType: ${newContent.type}")
         }
     }
 
@@ -141,7 +135,6 @@ class MessageRecyclerAdapter(
         override fun bind(content: MessageContentInterface) {
             val newContent = content as Date
             binding.dateText.text = newContent.date
-            Timber.d("DateViewHolder: ${newContent.id}")
         }
     }
 

@@ -20,9 +20,11 @@ class MessageItemDecoration(private val smallSpacing: Int, private val bigSpacin
             if (position != 0) {
                 val currentType = adapter.getItemViewType(position)
                 val previousType = adapter.getItemViewType(position - 1)
-                if ((currentType == MessageRecyclerAdapter.MESSAGE_OTHER || currentType == MessageRecyclerAdapter.MESSAGE_OWN)
-                    && (previousType == MessageRecyclerAdapter.MESSAGE_OTHER || previousType == MessageRecyclerAdapter.MESSAGE_OWN)
-                )
+                val checkCurrentType = currentType == MessageRecyclerAdapter.MESSAGE_OTHER ||
+                        currentType == MessageRecyclerAdapter.MESSAGE_OWN
+                val checkPreviousType = previousType == MessageRecyclerAdapter.MESSAGE_OTHER ||
+                        previousType == MessageRecyclerAdapter.MESSAGE_OWN
+                if (checkCurrentType && checkPreviousType)
                     outRect.bottom = bigSpacing
                 else
                     outRect.bottom = smallSpacing
@@ -38,16 +40,5 @@ class MessageItemDecoration(private val smallSpacing: Int, private val bigSpacin
             }
         }
 
-
-        /* parent.adapter?.let { adapter ->
-             outRect.bottom = when (parent.getChildAdapterPosition(view)) {
-                 RecyclerView.NO_POSITION -> 0
-                 else ->
-             }
-             outRect.top = when (parent.getChildAdapterPosition(view)) {
-                 adapter.itemCount - 1 -> spacing
-                 else -> 0
-             }
-         }*/
     }
 }

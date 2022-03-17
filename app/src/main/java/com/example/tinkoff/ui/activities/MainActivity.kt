@@ -11,13 +11,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tinkoff.R
 import com.example.tinkoff.adapters.MessageRecyclerAdapter
-import com.example.tinkoff.data.*
+import com.example.tinkoff.data.ReactionsData
+import com.example.tinkoff.data.Reaction
+import com.example.tinkoff.data.MessageContent
+import com.example.tinkoff.data.SenderType
+import com.example.tinkoff.data.MessageContentInterface
+import com.example.tinkoff.data.Date
 import com.example.tinkoff.databinding.ActivityMainBinding
 import com.example.tinkoff.decorations.MessageItemDecoration
 import com.example.tinkoff.ui.bottomSheetFragment.BottomSheetFragment
-import com.example.tinkoff.ui.views.EmojiView
-import com.example.tinkoff.ui.views.FlexBoxLayout
-import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setChangeTextListener()
-        setButtonClickListener()
+        setButtonSendClickListener()
         initializeRecyclerView()
         observeViewModels()
 
@@ -85,14 +87,14 @@ class MainActivity : AppCompatActivity() {
          )
          list.add(
              MessageContent(
-                 counter++, "Why are you ignorin me???",
+                 counter++, "Why are you ignoring me???",
                  mutableListOf(),
                  SenderType.OTHER
              )
          )
          list.add(
              MessageContent(
-                 counter++, "dasdasdhdjashdsjdjhsjfhasj\nsjadasjdhdjadsjda",
+                 counter++, "I am tired....\nGoing bad now",
                  mutableListOf(Reaction(ReactionsData.reactionsStringList[0], mutableListOf(-1))),
                  SenderType.OTHER
              ),
@@ -119,10 +121,10 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun setButtonClickListener() {
+    private fun setButtonSendClickListener() {
 
         binding.sendButton.setOnClickListener {
-            val text = (binding.messageContentTextView.text ?: "")
+            val text = (binding.messageContentTextView.text ?: "").trim()
             binding.messageContentTextView.text = SpannableStringBuilder("")
             messagesList.add(
                 MessageContent(
@@ -132,7 +134,6 @@ class MainActivity : AppCompatActivity() {
                     SenderType.OWN
                 )
             )
-            Timber.d("list of Data: $messagesList")
             updateAdapter()
         }
     }
@@ -140,7 +141,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setChangeTextListener() {
         binding.messageContentTextView.addTextChangedListener {
-            when (it.isNullOrEmpty()) {
+            when (it?.trim().isNullOrEmpty()) {
                 true -> {
                     binding.sendButton.background = ContextCompat.getDrawable(
                         baseContext,
@@ -188,19 +189,18 @@ class MainActivity : AppCompatActivity() {
         }
         viewModel.reactionIndex.observe(this) { reactionIndexValue ->
             val messageIndexValue = messageIndex.value ?: -1
-            Timber.d("MainActivityReaction: reactId - ${reactionIndexValue}, messageId: $messageIndexValue")
-            if (reactionIndexValue >= 0 && reactionIndexValue < ReactionsData.reactionsStringList.size && messageIndexValue >= 0 && messageIndexValue < messagesList.size) {
-                Timber.d("MainActivityReaction: react - ${ReactionsData.reactionsStringList[reactionIndexValue]}, messageId: $messageIndexValue")
-                val view =
-                    binding.recyclerView.findViewHolderForAdapterPosition(messageIndexValue)!!.itemView.findViewById<FlexBoxLayout>(
-                        R.id.flex_box_layout
-                    )
-
+            val reactionCondition = reactionIndexValue >= 0 &&
+                    reactionIndexValue < ReactionsData.reactionsStringList.size
+            val messageCondition = messageIndexValue >= 0 && messageIndexValue < messagesList.size
+            if (reactionCondition && messageCondition) {
                 val currentReactions =
-                    (messagesList[messagesList.size - 1 - messageIndexValue] as MessageContent).reactions
+                    (messagesList[messagesList.size - 1 - messageIndexValue] as MessageContent)
+                        .reactions
                 val pressedReactionIndex =
-                    currentReactions.indexOfFirst { reaction -> reaction.emoji == ReactionsData.reactionsStringList[reactionIndexValue] }
-
+                    currentReactions.indexOfFirst {
+                            reaction ->
+                        reaction.emoji == ReactionsData.reactionsStringList[reactionIndexValue]
+                    }
                 if (pressedReactionIndex == -1) {
                     currentReactions.add(
                         Reaction(
@@ -209,12 +209,11 @@ class MainActivity : AppCompatActivity() {
                         )
                     )
 
-                } else if (currentReactions[pressedReactionIndex].users_id.firstOrNull { id -> id == MY_ID } == null) {
-                    currentReactions[pressedReactionIndex].users_id.add(MY_ID)
+                } else if (currentReactions[pressedReactionIndex].usersId.firstOrNull
+                    { id -> id == MY_ID } == null) {
+                    currentReactions[pressedReactionIndex].usersId.add(MY_ID)
                 }
-                Timber.d("Reaction click list called: $messagesList")
                 updateAdapter()
-
             }
         }
     }
@@ -229,7 +228,7 @@ class MainActivity : AppCompatActivity() {
                 val reactionsContent = mutableListOf<Reaction>()
                 for (reaction in element.reactions) {
                     val usersId = mutableListOf<Int>()
-                    usersId.addAll(reaction.users_id)
+                    usersId.addAll(reaction.usersId)
                     reactionsContent.add(Reaction(reaction.emoji, usersId))
                 }
                 result.add(
@@ -252,12 +251,12 @@ class MainActivity : AppCompatActivity() {
             val currentReaction =
                 (messagesList[adapterPosition] as MessageContent).reactions[reactionPosition]
             if (isAdd) {
-                if (currentReaction.users_id.find { it == MY_ID } == null)
-                    currentReaction.users_id.add(MY_ID)
+                if (currentReaction.usersId.find { it == MY_ID } == null)
+                    currentReaction.usersId.add(MY_ID)
             } else {
-                currentReaction.users_id.removeIf { it == MY_ID }
+                currentReaction.usersId.removeIf { it == MY_ID }
             }
-            if(currentReaction.users_id.size == 0)
+            if(currentReaction.usersId.size == 0)
             (messagesList[adapterPosition] as MessageContent).reactions.remove(currentReaction)
             updateAdapter()
         }
@@ -272,6 +271,5 @@ class MainActivity : AppCompatActivity() {
         copiedMessagesList = prepareList()
         recyclerAdapter.list = copiedMessagesList
     }
-
 
 }

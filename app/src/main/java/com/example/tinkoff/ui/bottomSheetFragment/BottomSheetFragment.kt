@@ -11,7 +11,6 @@ import com.example.tinkoff.data.ReactionsData
 import com.example.tinkoff.databinding.FragmentBottomSheetBinding
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import timber.log.Timber
 
 class BottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -41,7 +40,6 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         reactionsRecyclerAdapter = ReactionsRecyclerAdapter(positionLiveData, ReactionsData.reactionsStringList)
         positionLiveData.observe(viewLifecycleOwner) {
             if (it != -1) {
-                Timber.d("emotion: ${ReactionsData.reactionsStringList[it]}")
                 viewModel.setReactionIndex(it)
                 dismiss()
             }

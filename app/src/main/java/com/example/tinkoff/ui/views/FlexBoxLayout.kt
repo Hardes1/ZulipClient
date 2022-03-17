@@ -49,7 +49,6 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
 
 
     fun addOrUpdateReaction(context: Context, reaction: String, quantity: Int, reactionState : Boolean) {
-        Timber.d("reaction : $reaction quantity $quantity")
         for (i in 0 until childCount - 1) {
             val child = getChildAt(i) as EmojiView
             val emojiViewText = child.text.split(" ")[0]

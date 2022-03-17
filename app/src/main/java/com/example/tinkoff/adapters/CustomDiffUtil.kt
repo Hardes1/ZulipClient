@@ -4,7 +4,6 @@ import androidx.recyclerview.widget.DiffUtil
 import com.example.tinkoff.data.Date
 import com.example.tinkoff.data.MessageContent
 import com.example.tinkoff.data.MessageContentInterface
-import timber.log.Timber
 
 class CustomDiffUtil : DiffUtil.ItemCallback<MessageContentInterface>() {
 
@@ -12,19 +11,19 @@ class CustomDiffUtil : DiffUtil.ItemCallback<MessageContentInterface>() {
         oldItem: MessageContentInterface,
         newItem: MessageContentInterface
     ): Boolean {
-        if (oldItem is MessageContent && newItem is MessageContent) {
-            return oldItem.id == newItem.id && oldItem.type == newItem.type
+        return if (oldItem is MessageContent && newItem is MessageContent) {
+            oldItem.id == newItem.id && oldItem.type == newItem.type
         } else if (oldItem is Date && newItem is Date) {
-            return oldItem.id == newItem.id
-        }
-        return false
+            oldItem.id == newItem.id
+        } else
+            false
     }
 
     override fun areContentsTheSame(
         oldItem: MessageContentInterface,
         newItem: MessageContentInterface
     ): Boolean {
-        if (oldItem is MessageContent && newItem is MessageContent) {
+        return if (oldItem is MessageContent && newItem is MessageContent) {
             var flag =
                 oldItem.id == newItem.id &&
                         oldItem.type == newItem.type &&
@@ -35,11 +34,11 @@ class CustomDiffUtil : DiffUtil.ItemCallback<MessageContentInterface>() {
                     flag = flag and (oldItem.reactions[i] == newItem.reactions[i])
                 }
             }
-            return flag
+            flag
         } else if (oldItem is Date && newItem is Date) {
-            return oldItem.id == newItem.id && oldItem.date == newItem.date
-        }
-        return false
+            oldItem.id == newItem.id && oldItem.date == newItem.date
+        } else
+            false
     }
 
 }
