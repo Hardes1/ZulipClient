@@ -3,11 +3,9 @@ package com.example.tinkoff.ui.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.SpannableStringBuilder
-import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tinkoff.R
 import com.example.tinkoff.adapters.MessageRecyclerAdapter
@@ -35,9 +33,8 @@ class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding
         get() = _binding!!
     private lateinit var recyclerAdapter: MessageRecyclerAdapter
-    private val messageIndex: MutableLiveData<Int> = MutableLiveData(-1)
     private val bottomSheetDialog = BottomSheetFragment.newInstance()
-
+    private var messageIndex: Int = -1
 
     private val decorator: MessageItemDecoration by lazy {
         MessageItemDecoration(
@@ -71,43 +68,43 @@ class MainActivity : AppCompatActivity() {
     private fun generateData(): MutableList<MessageContentInterface> {
         val list: MutableList<MessageContentInterface> = mutableListOf()
         list.add(Date(counter++, "1 Feb"))
-         list.add(
-             MessageContent(
-                 counter++,
-                 "Hello, my friend!",
-                 mutableListOf(),
-                 SenderType.OTHER
-             )
-         )
-         list.add(
-             MessageContent(
-                 counter++, "How are you?", mutableListOf(),
-                 SenderType.OTHER
-             )
-         )
-         list.add(
-             MessageContent(
-                 counter++, "Why are you ignoring me???",
-                 mutableListOf(),
-                 SenderType.OTHER
-             )
-         )
-         list.add(
-             MessageContent(
-                 counter++, "I am tired....\nGoing bad now",
-                 mutableListOf(Reaction(ReactionsData.reactionsStringList[0], mutableListOf(-1))),
-                 SenderType.OTHER
-             ),
+        list.add(
+            MessageContent(
+                counter++,
+                "Hello, my friend!",
+                mutableListOf(),
+                SenderType.OTHER
+            )
+        )
+        list.add(
+            MessageContent(
+                counter++, "How are you?", mutableListOf(),
+                SenderType.OTHER
+            )
+        )
+        list.add(
+            MessageContent(
+                counter++, "Why are you ignoring me???",
+                mutableListOf(),
+                SenderType.OTHER
+            )
+        )
+        list.add(
+            MessageContent(
+                counter++, "I am tired....\nGoing bad now",
+                mutableListOf(Reaction(ReactionsData.reactionsStringList[0], mutableListOf(-1))),
+                SenderType.OTHER
+            ),
 
-             )
-         list.add(
-             MessageContent(
-                 counter++,
-                 "Eoteogsdfkjsdfkcbvcnb hahahaha",
-                 mutableListOf(),
-                 SenderType.OTHER
-             )
-         )
+            )
+        list.add(
+            MessageContent(
+                counter++,
+                "Eoteogsdfkjsdfkcbvcnb hahahaha",
+                mutableListOf(),
+                SenderType.OTHER
+            )
+        )
         list.add(
             MessageContent(
                 counter++, "Hello, dude",
@@ -164,11 +161,9 @@ class MainActivity : AppCompatActivity() {
         messagesList = generateData()
         layoutManager = LinearLayoutManager(baseContext, LinearLayoutManager.VERTICAL, true)
         recyclerAdapter = MessageRecyclerAdapter(
-            messageIndex,
-            imageButtonClickListener,
+            onMessageIndexChanged,
             {
                 messagesList = copiedMessagesList
-                binding.recyclerView.smoothScrollToPosition(0)
             },
             updateElementCallBack,
             baseContext
@@ -181,14 +176,9 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun observeViewModels() {
-        messageIndex.observe(this) {
-            if (it >= 0 && it < messagesList.size) {
-                if (!bottomSheetDialog.isAdded)
-                    bottomSheetDialog.show(supportFragmentManager, FRAGMENT_TAG)
-            }
-        }
+
         viewModel.reactionIndex.observe(this) { reactionIndexValue ->
-            val messageIndexValue = messageIndex.value ?: -1
+            val messageIndexValue = messageIndex
             val reactionCondition = reactionIndexValue >= 0 &&
                     reactionIndexValue < ReactionsData.reactionsStringList.size
             val messageCondition = messageIndexValue >= 0 && messageIndexValue < messagesList.size
@@ -197,8 +187,7 @@ class MainActivity : AppCompatActivity() {
                     (messagesList[messagesList.size - 1 - messageIndexValue] as MessageContent)
                         .reactions
                 val pressedReactionIndex =
-                    currentReactions.indexOfFirst {
-                            reaction ->
+                    currentReactions.indexOfFirst { reaction ->
                         reaction.emoji == ReactionsData.reactionsStringList[reactionIndexValue]
                     }
                 if (pressedReactionIndex == -1) {
@@ -210,7 +199,8 @@ class MainActivity : AppCompatActivity() {
                     )
 
                 } else if (currentReactions[pressedReactionIndex].usersId.firstOrNull
-                    { id -> id == MY_ID } == null) {
+                    { id -> id == MY_ID } == null
+                ) {
                     currentReactions[pressedReactionIndex].usersId.add(MY_ID)
                 }
                 updateAdapter()
@@ -245,6 +235,14 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private val onMessageIndexChanged: (Int) -> Unit = { position ->
+        messageIndex = position
+        if(!bottomSheetDialog.isAdded){
+            bottomSheetDialog.show(supportFragmentManager, FRAGMENT_TAG)
+        }
+    }
+
+
     private val updateElementCallBack: (Int, Int, Boolean) -> Unit =
         { invertedAdapterPosition, reactionPosition, isAdd ->
             val adapterPosition = messagesList.size - 1 - invertedAdapterPosition
@@ -256,20 +254,15 @@ class MainActivity : AppCompatActivity() {
             } else {
                 currentReaction.usersId.removeIf { it == MY_ID }
             }
-            if(currentReaction.usersId.size == 0)
-            (messagesList[adapterPosition] as MessageContent).reactions.remove(currentReaction)
+            if (currentReaction.usersId.size == 0)
+                (messagesList[adapterPosition] as MessageContent).reactions.remove(currentReaction)
             updateAdapter()
         }
 
-    private val imageButtonClickListener: (View) -> Unit =
-        {
-            if (!bottomSheetDialog.isAdded)
-                bottomSheetDialog.show(supportFragmentManager, FRAGMENT_TAG)
-        }
 
     private fun updateAdapter() {
         copiedMessagesList = prepareList()
-        recyclerAdapter.list = copiedMessagesList
+        recyclerAdapter.updateList(copiedMessagesList)
     }
 
 }

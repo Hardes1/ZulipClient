@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import com.example.tinkoff.adapters.ReactionsRecyclerAdapter
 import com.example.tinkoff.data.ReactionsData
 import com.example.tinkoff.databinding.FragmentBottomSheetBinding
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import timber.log.Timber
 
 class BottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -27,7 +27,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         get() = _binding!!
     private lateinit var reactionsRecyclerAdapter: ReactionsRecyclerAdapter
 
-        override fun onCreateView(
+    override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
@@ -35,15 +35,13 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val positionLiveData: MutableLiveData<Int> = MutableLiveData(-1)
-        reactionsRecyclerAdapter = ReactionsRecyclerAdapter(positionLiveData, ReactionsData.reactionsStringList)
-        positionLiveData.observe(viewLifecycleOwner) {
-            if (it != -1) {
-                viewModel.setReactionIndex(it)
-                dismiss()
-            }
+        val onPositionChanged: (Int) -> Unit = {
+            viewModel.setReactionIndex(it)
+            dismiss()
         }
+        reactionsRecyclerAdapter = ReactionsRecyclerAdapter(onPositionChanged, ReactionsData.reactionsStringList)
         binding.recyclerView.adapter = reactionsRecyclerAdapter
     }
 
