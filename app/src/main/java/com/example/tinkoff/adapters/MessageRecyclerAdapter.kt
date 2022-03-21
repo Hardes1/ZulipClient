@@ -62,8 +62,9 @@ class MessageRecyclerAdapter(
                 flexBoxLayout.removeViewAt(0)
             }
             flexBoxLayout.requestLayout()
+            // TODO : fix user (remove 1)
             for (element in content.reactions) {
-                val state = element.usersId.indexOfFirst { it == MainActivity.MY_ID } == -1
+                val state = element.usersId.indexOfFirst { it == 1 } == -1
                 flexBoxLayout.addOrUpdateReaction(
                     context,
                     element.emoji,
@@ -108,12 +109,13 @@ class MessageRecyclerAdapter(
                 flexBoxLayout.removeViewAt(0)
             }
             flexBoxLayout.requestLayout()
+            // TODO : fix user (remove 1)
             for (element in content.reactions) {
                 flexBoxLayout.addOrUpdateReaction(
                     context,
                     element.emoji,
                     element.usersId.size,
-                    element.usersId.indexOfFirst { it == MainActivity.MY_ID } != -1
+                    element.usersId.indexOfFirst { it == 1 } != -1
                 )
                 val index = flexBoxLayout.childCount - 2
                 flexBoxLayout.getChildAt(index).setOnClickListener {

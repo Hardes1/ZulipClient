@@ -10,5 +10,11 @@ data class Date(val id: Int, val date : String) : MessageContentInterface {
         }
 
     }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + date.hashCode()
+        return result
+    }
 }
 

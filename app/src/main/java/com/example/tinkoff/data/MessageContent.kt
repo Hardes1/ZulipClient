@@ -24,6 +24,14 @@ data class MessageContent(
             flag
         }
     }
+
+    override fun hashCode(): Int {
+        var result = id
+        result = 31 * result + content.hashCode()
+        result = 31 * result + reactions.hashCode()
+        result = 31 * result + type.hashCode()
+        return result
+    }
 }
 
 
