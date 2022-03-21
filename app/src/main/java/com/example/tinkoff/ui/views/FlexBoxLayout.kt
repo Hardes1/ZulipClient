@@ -1,14 +1,13 @@
-package com.example.tinkoff.views
+package com.example.tinkoff.ui.views
 
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ViewGroup
-import android.widget.ImageView
 import com.example.tinkoff.R
+import timber.log.Timber
 import kotlin.math.max
-import kotlin.random.Random
 
 class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ViewGroup(context, attrs) {
@@ -48,74 +47,97 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         typedArray.recycle()
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        var i = 0
-        val randomSmile = arrayOf("\uD83D\uDE02", "\uD83D\uDE05", "\uD83D\uDE0A", "\uD83D\uDE0D")
-        val bound = 1337
-        val random = Random(bound)
-        while (i < childCount) {
-            val child = getChildAt(i)
-            if (i + 1 < childCount) {
-                (child as EmojiView).setOnClickListener {
-                    it.isSelected = !it.isSelected
+
+    fun addOrUpdateReaction(context: Context, reaction: String, quantity: Int, reactionState : Boolean) {
+        for (i in 0 until childCount - 1) {
+            val child = getChildAt(i) as EmojiView
+            val emojiViewText = child.text.split(" ")[0]
+            if (emojiViewText == reaction) {
+                child.isSelected = reactionState
+                if (quantity > 0) {
+                    child.setTextAndDraw("$reaction $quantity")
                 }
-            } else {
-                (child as ImageView).setOnClickListener {
-                    addView(
-                        EmojiView.builder(
-                            context,
-                            resources,
-                            "${random.nextInt(bound)} ${randomSmile.random()}"
-                        ),
-                        childCount - 1
-                    )
+                else {
+                    removeViewAt(i)
                     requestLayout()
+                    return
                 }
             }
-            i++
         }
-
+        val newEmoji = EmojiView.builder(context, context.resources, "$reaction $quantity")
+        newEmoji.isSelected = reactionState
+        addView(
+            newEmoji,
+            childCount - 1,
+            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+        )
     }
 
 
+
+
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        var currentWidth = 0
-        var currentHeight = 0
+
+
         var maxWidth = 0
         var maxHeight = 0
+        if (childCount == 1) {
+            maxWidth += paddingLeft + paddingRight
+            maxHeight += paddingTop + paddingBottom
+            val resultWidth = resolveSize(maxWidth, widthMeasureSpec)
+            val resultHeight = resolveSize(maxHeight, heightMeasureSpec)
+            setMeasuredDimension(
+                resultWidth,
+                resultHeight
+            )
+            return
+        }
+        var currentWidth = 0
+        var currentHeight = 0
         var i = 0
         while (i < childCount) {
             val child = getChildAt(i)
             measureChild(child, widthMeasureSpec, heightMeasureSpec)
-            if (currentWidth + child.measuredWidth + marginHorizontal <=
-                MeasureSpec.getSize(widthMeasureSpec)
-            ) {
-                currentWidth += child.measuredWidth + marginHorizontal
-                maxWidth = max(currentWidth, maxWidth)
-                maxHeight = max(currentHeight, maxHeight)
-            } else {
-                currentWidth = child.measuredWidth + marginVertical
-                currentHeight += child.measuredHeight
-                maxWidth = max(currentWidth, maxWidth)
-                maxHeight = max(currentHeight, maxHeight)
+            when {
+                currentWidth + child.measuredWidth + marginHorizontal <=
+                        MeasureSpec.getSize(widthMeasureSpec) -> {
+                    currentWidth += child.measuredWidth + marginHorizontal
+                }
+                currentWidth + child.measuredWidth <= MeasureSpec.getSize(widthMeasureSpec) -> {
+                    currentWidth += child.measuredWidth
+                }
+                else -> {
+                    currentWidth = child.measuredWidth + marginHorizontal
+                    currentHeight += child.measuredHeight + marginVertical
+                }
             }
+            if (i + 1 == childCount) {
+                currentHeight += child.measuredHeight
+            }
+            maxWidth = max(currentWidth, maxWidth)
+            maxHeight = max(currentHeight, maxHeight)
             i++
+
+
         }
+
         maxWidth += paddingLeft + paddingRight
         maxHeight += paddingTop + paddingBottom
+        val resultWidth = resolveSize(maxWidth, widthMeasureSpec)
+        val resultHeight = resolveSize(maxHeight, heightMeasureSpec)
         setMeasuredDimension(
-            resolveSize(maxWidth, widthMeasureSpec),
-            resolveSize(maxHeight, heightMeasureSpec)
+            resultWidth,
+            resultHeight
         )
-
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         var currentWidth = 0
         var currentHeight = 0
         var i = 0
+        if (childCount == 1)
+            return
         while (i < childCount) {
             val child = getChildAt(i)
             if (currentWidth + child.measuredWidth <= measuredWidth) {

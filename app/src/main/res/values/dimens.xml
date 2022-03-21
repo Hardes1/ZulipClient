@@ -16,4 +16,19 @@
     <dimen name="header_top_margin">4dp</dimen>
     <dimen name="message_bottom_margin">10dp</dimen>
     <dimen name="content_margin_bottom">7dp</dimen>
+    <dimen name="edit_text_radius_size">30dp</dimen>
+    <dimen name="date_text_padding_horizontal">12dp</dimen>
+    <dimen name="date_text_padding_vertical">4dp</dimen>
+    <dimen name="send_button_margin_vertical">10dp</dimen>
+    <dimen name="send_button_margin_end">12dp</dimen>
+    <dimen name="message_edit_text_margin_top">5dp</dimen>
+    <dimen name="message_edit_text_margin_bottom">5dp</dimen>
+    <dimen name="message_edit_text_margin_start">10dp</dimen>
+    <dimen name="message_edit_text_margin_end">12dp</dimen>
+    <dimen name="message_edit_text_padding_horizontal">10dp</dimen>
+    <dimen name="message_content_small_recycler_distance">15dp</dimen>
+    <dimen name="message_content_big_recycler_distance">29dp</dimen>
+    <dimen name="plank_image_view_margin_top">8dp</dimen>
+    <dimen name="reactions_recycler_padding_horizontal">10dp</dimen>
+    <dimen name="corners_round_bottom_sheet">10dp</dimen>
 </resources>

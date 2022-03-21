@@ -1,4 +1,4 @@
-package com.example.tinkoff.views
+package com.example.tinkoff.ui.views
 
 
 import android.content.Context
@@ -22,15 +22,15 @@ class EmojiView @JvmOverloads constructor(
 ) :
     View(context, attrs) {
 
-    private var text: String = "228"
-
+    var text: String = "228"
+        private set
     private val textPaint = TextPaint().apply {
         isAntiAlias = true
     }
 
     private val tempBounds = Rect()
     private val tempViewPoint = PointF()
-
+    private var iteration = 0
 
     init {
         val defaultTextSize = TypedValue.applyDimension(
@@ -60,6 +60,7 @@ class EmojiView @JvmOverloads constructor(
         val resultWidth = resolveSize(sumWidth, widthMeasureSpec)
         val resultHeight = resolveSize(sumHeight, heightMeasureSpec)
         setMeasuredDimension(resultWidth, resultHeight)
+        iteration++
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -82,12 +83,11 @@ class EmojiView @JvmOverloads constructor(
     }
 
 
-
     companion object {
-        private const val TEXT_SIZE = 15f
+        private const val TEXT_SIZE = 14f
         private val SUPPORTED_DRAWABLE_STATE = intArrayOf(android.R.attr.state_selected)
 
-        fun builder(context: Context, resources: Resources, str : String): EmojiView {
+        fun builder(context: Context, resources: Resources, str: String): EmojiView {
             val newView = EmojiView(context, null)
             val horizontalPadding =
                 resources.getDimension(R.dimen.horizontal_padding_emoji_view).toInt()
@@ -105,13 +105,14 @@ class EmojiView @JvmOverloads constructor(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-            newView.setOnClickListener {
-                it.isSelected = !it.isSelected
-            }
             newView.text = str
             return newView
         }
+    }
 
+    fun setTextAndDraw(s : String){
+        text = s
+        requestLayout()
     }
 
 }

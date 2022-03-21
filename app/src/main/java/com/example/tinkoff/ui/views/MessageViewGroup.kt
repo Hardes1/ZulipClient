@@ -1,4 +1,4 @@
-package com.example.tinkoff.views
+package com.example.tinkoff.ui.views
 
 import android.content.Context
 import android.util.AttributeSet
@@ -12,9 +12,8 @@ class MessageViewGroup @JvmOverloads constructor(context: Context, attrs: Attrib
     ViewGroup(context, attrs) {
 
     init {
-        inflate(context, R.layout.message_layout, this)
+        inflate(context, R.layout.message_content, this)
     }
-
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val imageView = findViewById<ImageView>(R.id.avatar_icon)
@@ -45,9 +44,11 @@ class MessageViewGroup @JvmOverloads constructor(context: Context, attrs: Attrib
             imageView.measuredWidthWithMargins + flexBoxLayout.measuredWidthWithMargins
         val contentHeight =
             flexBoxLayout.measuredHeightWithMargins + messageContent.measuredHeightWithMargins
+        val resultWidth = resolveSize(contentWidth, widthMeasureSpec)
+        val resultHeight = resolveSize(contentHeight, heightMeasureSpec)
         setMeasuredDimension(
-            resolveSize(contentWidth, widthMeasureSpec),
-            resolveSize(contentHeight, heightMeasureSpec)
+            resultWidth,
+            resultHeight
         )
     }
 
