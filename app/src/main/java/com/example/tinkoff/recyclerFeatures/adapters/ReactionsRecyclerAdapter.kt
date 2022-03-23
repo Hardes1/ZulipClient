@@ -1,4 +1,4 @@
-package com.example.tinkoff.adapters
+package com.example.tinkoff.recyclerFeatures.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

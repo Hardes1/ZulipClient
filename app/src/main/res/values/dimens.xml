@@ -31,4 +31,9 @@
     <dimen name="plank_image_view_margin_top">8dp</dimen>
     <dimen name="reactions_recycler_padding_horizontal">10dp</dimen>
     <dimen name="corners_round_bottom_sheet">10dp</dimen>
+    <dimen name="log_out_horizontal_margin_button">110dp</dimen>
+    <dimen name="log_out_vertical_margin_button">64dp</dimen>
+    <dimen name="log_out_vertical_padding_button">10dp</dimen>
+    <dimen name="people_big_spacing_recycler_view">25dp</dimen>
+    <dimen name="people_small_spacing_recycler_view">17dp</dimen>
 </resources>

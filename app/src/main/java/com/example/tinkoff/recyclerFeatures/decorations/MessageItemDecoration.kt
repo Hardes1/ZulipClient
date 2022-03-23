@@ -1,9 +1,9 @@
-package com.example.tinkoff.decorations
+package com.example.tinkoff.recyclerFeatures.decorations
 
 import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tinkoff.adapters.MessageRecyclerAdapter
+import com.example.tinkoff.recyclerFeatures.adapters.MessageRecyclerAdapter
 
 class MessageItemDecoration(private val smallSpacing: Int, private val bigSpacing: Int) :
     RecyclerView.ItemDecoration() {

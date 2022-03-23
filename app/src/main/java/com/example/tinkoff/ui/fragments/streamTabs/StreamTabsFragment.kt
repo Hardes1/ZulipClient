@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.tinkoff.adapters.StreamsAdapter
+import com.example.tinkoff.recyclerFeatures.adapters.StreamsViewPagerAdapter
 import com.example.tinkoff.databinding.FragmentStreamsTabsBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -25,7 +25,7 @@ class StreamsTabsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val streamsAdapter = StreamsAdapter(lifecycle, childFragmentManager)
+        val streamsAdapter = StreamsViewPagerAdapter(lifecycle, childFragmentManager)
         binding.viewPager2.adapter = streamsAdapter
         TabLayoutMediator(binding.tabLayout, binding.viewPager2) {
             tab, position -> tab.text = when(position){

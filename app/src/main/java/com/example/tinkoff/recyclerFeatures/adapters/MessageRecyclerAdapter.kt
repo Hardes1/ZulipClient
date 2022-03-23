@@ -1,4 +1,4 @@
-package com.example.tinkoff.adapters
+package com.example.tinkoff.recyclerFeatures.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,14 +7,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff.R
-import com.example.tinkoff.data.Date
-import com.example.tinkoff.data.MessageContent
-import com.example.tinkoff.data.MessageContentInterface
-import com.example.tinkoff.data.SenderType
+import com.example.tinkoff.recyclerFeatures.diffUtils.MessagesDiffUtil
+import com.example.tinkoff.data.classes.Date
+import com.example.tinkoff.data.classes.MessageContent
+import com.example.tinkoff.data.classes.MessageContentInterface
+import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.databinding.DateItemBinding
 import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
-import com.example.tinkoff.ui.activities.MainActivity
 import com.example.tinkoff.ui.views.FlexBoxLayout
 import com.google.android.material.textview.MaterialTextView
 
@@ -27,7 +27,7 @@ class MessageRecyclerAdapter(
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
 
 
-    private val differ = AsyncListDiffer(this, CustomDiffUtil())
+    private val differ = AsyncListDiffer(this, MessagesDiffUtil())
     private var list: List<MessageContentInterface>
         set(value) {
             differ.submitList(value.reversed()) { listChanged }

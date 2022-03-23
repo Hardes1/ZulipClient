@@ -1,11 +1,11 @@
-package com.example.tinkoff.adapters
+package com.example.tinkoff.recyclerFeatures.diffUtils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.example.tinkoff.data.Date
-import com.example.tinkoff.data.MessageContent
-import com.example.tinkoff.data.MessageContentInterface
+import com.example.tinkoff.data.classes.Date
+import com.example.tinkoff.data.classes.MessageContent
+import com.example.tinkoff.data.classes.MessageContentInterface
 
-class CustomDiffUtil : DiffUtil.ItemCallback<MessageContentInterface>() {
+class MessagesDiffUtil : DiffUtil.ItemCallback<MessageContentInterface>() {
 
     override fun areItemsTheSame(
         oldItem: MessageContentInterface,

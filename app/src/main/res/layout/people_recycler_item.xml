@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id = "@+id/avatar_icon"
+        android:layout_width="80dp"
+        android:layout_marginStart="15dp"
+        android:layout_height="80dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/icon_preview"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id = "@+id/online_status"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintEnd_toEndOf="@id/avatar_icon"
+        app:layout_constraintBottom_toBottomOf="@id/avatar_icon"
+        android:background="@drawable/online_status_selector"
+        app:shapeAppearanceOverlay="@style/OnlineStatusView" />
+
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/NameTextView"
+        android:id="@+id/name_text_view"
+        android:textSize="22sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/avatar_icon"
+        tools:text="Darrel steward"
+        />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id ="@+id/email_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"
+        android:textColor="@color/email_text_color"
+        app:layout_constraintStart_toStartOf="@id/name_text_view"
+        app:layout_constraintTop_toBottomOf="@id/name_text_view"
+        tools:text="darrel@company.com"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

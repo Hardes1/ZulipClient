@@ -8,29 +8,83 @@
 
 
     <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/avatar_imageview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="120dp"
         android:scaleType="fitCenter"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/union"
-        app:shapeAppearanceOverlay="@style/ShapeableImageView"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/ShapeableImageView"
+        app:srcCompat="@drawable/union" />
 
+
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/NameTextView"
+        android:id="@+id/name_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/avatar_imageview"
+        tools:text="Darrel Steward" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/status_constraint_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/name_textview">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/state_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="In a meeting"
+            android:textColor="@color/state_text_color"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toBottomOf="@id/status_constraint_layout"
+            app:layout_constraintEnd_toStartOf="@id/online_status_textview"
+            app:layout_constraintStart_toStartOf="@id/status_constraint_layout"
+            app:layout_constraintTop_toTopOf="@id/status_constraint_layout"
+            tools:text="In a meeting" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/online_status_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:text="online"
+            android:textColor="@color/green_online_color"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="@+id/state_textview"
+            app:layout_constraintEnd_toEndOf="@id/status_constraint_layout"
+            app:layout_constraintStart_toEndOf="@id/state_textview"
+            tools:text="online" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logout_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="110dp"
-        android:layout_marginEnd="110dp"
-        android:layout_marginBottom="65dp"
+        android:layout_marginStart="@dimen/log_out_horizontal_margin_button"
+        android:layout_marginEnd="@dimen/log_out_horizontal_margin_button"
+        android:layout_marginBottom="@dimen/log_out_vertical_margin_button"
+        android:fontFamily="@font/inter"
+        android:paddingTop="@dimen/log_out_vertical_padding_button"
+        android:paddingBottom="@dimen/log_out_vertical_padding_button"
+        android:textSize="18sp"
         android:text="@string/logout_button_text"
+        android:textAllCaps="false"
         android:textColor="@color/white"
         app:cornerRadius="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
 

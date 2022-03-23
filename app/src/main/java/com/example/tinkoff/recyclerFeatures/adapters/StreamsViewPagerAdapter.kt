@@ -1,4 +1,4 @@
-package com.example.tinkoff.adapters
+package com.example.tinkoff.recyclerFeatures.adapters
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -6,7 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.tinkoff.ui.fragments.stream.StreamFragment
 
-class StreamsAdapter(lifecycle: Lifecycle, supportFragmentManager: FragmentManager) :
+class StreamsViewPagerAdapter(lifecycle: Lifecycle, supportFragmentManager: FragmentManager) :
     FragmentStateAdapter(supportFragmentManager, lifecycle) {
     override fun getItemCount(): Int = SIZE
 

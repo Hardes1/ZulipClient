@@ -1,4 +1,4 @@
-package com.example.tinkoff.data
+package com.example.tinkoff.data.classes
 
 
 object ReactionsData {
