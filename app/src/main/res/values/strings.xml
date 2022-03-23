@@ -11,4 +11,5 @@
     <string name="streams_fragment_name">Streams</string>
     <string name="people_fragment_name">People</string>
     <string name="profile_fragment_name">Profile</string>
+    <string name="logout_button_text">Log out</string>
 </resources>
