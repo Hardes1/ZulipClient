@@ -22,7 +22,6 @@ class StreamFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        (activity as AppCompatActivity).supportActionBar?.show()
     }
 
     companion object {

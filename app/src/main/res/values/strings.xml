@@ -12,4 +12,6 @@
     <string name="people_fragment_name">People</string>
     <string name="profile_fragment_name">Profile</string>
     <string name="logout_button_text">Log out</string>
+    <string name="user_online_text">online</string>
+    <string name="user_offline_text">offline</string>
 </resources>

@@ -3,6 +3,7 @@
     <item
         android:id="@+id/navigation_stream_tabs"
         android:icon="@drawable/ic_streams"
+
         android:title="@string/streams_fragment_name" />
 
     <item

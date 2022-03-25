@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tinkoff.data.classes.MessageContentInterface
 import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.PeopleRecyclerItemBinding
 import com.example.tinkoff.recyclerFeatures.diffUtils.UserDiffUtil
 
-class PeopleRecyclerAdapter : RecyclerView.Adapter<PeopleRecyclerAdapter.PeopleViewHolder>() {
+class PeopleRecyclerAdapter(private val userClickCallBack: (Int) -> Unit) :
+    RecyclerView.Adapter<PeopleRecyclerAdapter.PeopleViewHolder>() {
 
     private val differ = AsyncListDiffer(this, UserDiffUtil())
     private var list: List<User>
@@ -19,9 +19,15 @@ class PeopleRecyclerAdapter : RecyclerView.Adapter<PeopleRecyclerAdapter.PeopleV
         }
         get() = differ.currentList
 
-    class PeopleViewHolder(private val binding: PeopleRecyclerItemBinding) :
+    class PeopleViewHolder(
+        private val userClickCallBack: (Int) -> Unit,
+        private val binding: PeopleRecyclerItemBinding
+    ) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(user: User) {
+            binding.root.setOnClickListener {
+                userClickCallBack(adapterPosition)
+            }
             binding.nameTextView.text = user.name
             binding.emailTextView.text = user.email
             binding.onlineStatus.isEnabled = when (user.status) {
@@ -34,7 +40,7 @@ class PeopleRecyclerAdapter : RecyclerView.Adapter<PeopleRecyclerAdapter.PeopleV
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PeopleViewHolder {
         val binding =
             PeopleRecyclerItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PeopleViewHolder(binding)
+        return PeopleViewHolder(userClickCallBack, binding)
     }
 
     override fun onBindViewHolder(holder: PeopleViewHolder, position: Int) {
@@ -47,7 +53,6 @@ class PeopleRecyclerAdapter : RecyclerView.Adapter<PeopleRecyclerAdapter.PeopleV
     fun updateList(otherList: List<User>) {
         list = otherList
     }
-
 
 
 }

@@ -6,12 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.FragmentPeopleBinding
 import com.example.tinkoff.recyclerFeatures.adapters.PeopleRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.UserItemDecoration
+import com.example.tinkoff.ui.fragments.profile.ProfileFragment
+import timber.log.Timber
 
 
 class PeopleFragment : Fragment() {
@@ -20,7 +23,21 @@ class PeopleFragment : Fragment() {
     private var _binding: FragmentPeopleBinding? = null
     private val binding: FragmentPeopleBinding
         get() = _binding!!
-    private val adapter = PeopleRecyclerAdapter()
+    private val adapter: PeopleRecyclerAdapter by lazy {
+        PeopleRecyclerAdapter(userClickCallBack)
+    }
+    private var dataList: List<User> = generateData()
+    private val userClickCallBack: (Int) -> Unit = { index ->
+        val user = dataList[index]
+        Timber.d("print user $user")
+        val action =
+            PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(
+                user
+            )
+
+        findNavController().navigate(action)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -30,7 +47,6 @@ class PeopleFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        (activity as AppCompatActivity).supportActionBar?.show()
         binding.peopleRecyclerView.addItemDecoration(
             UserItemDecoration(
                 resources.getDimensionPixelSize(R.dimen.people_small_spacing_recycler_view),
@@ -38,13 +54,13 @@ class PeopleFragment : Fragment() {
             )
         )
         binding.peopleRecyclerView.adapter = adapter
-        adapter.updateList(generateData())
+        adapter.updateList(dataList)
     }
 
     fun generateData(): List<User> {
         var counter = 0
         return listOf(
-            User(counter++, "ABOBA", "abobaMail@mail.ru", UserStatus.OFFLINE),
+            User(counter++, "ABOBA", "abobaMail@mail.ru", UserStatus.ONLINE),
             User(counter++, "ABOBA", "abobaMail@mail.ru", UserStatus.OFFLINE),
             User(counter++, "ABOBAfds", "abobaMail@mail.ru", UserStatus.OFFLINE),
             User(counter++, "ABOBAa", "abobaMail@mail.ru", UserStatus.ONLINE),

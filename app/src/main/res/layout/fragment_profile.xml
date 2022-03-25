@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="25dp"
             android:text="online"
-            android:textColor="@color/green_online_color"
+            android:textColor="@drawable/profile_online_status_selector"
             android:textSize="15sp"
             app:layout_constraintBottom_toBottomOf="@+id/state_textview"
             app:layout_constraintEnd_toEndOf="@id/status_constraint_layout"
