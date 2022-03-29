@@ -1,12 +1,14 @@
 package com.example.tinkoff.ui.fragments.profile
 
 import android.os.Bundle
+import android.view.*
+import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.navigation.fragment.navArgs
 import com.example.tinkoff.R
-import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.FragmentProfileBinding
 import timber.log.Timber
@@ -24,15 +26,16 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        setHasOptionsMenu(true)
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Timber.d("${arguments?.getParcelable<User>(KEY)}")
         if (arguments != null) {
-            val user = arguments?.getParcelable<User>(KEY)
+            val args: ProfileFragmentArgs by navArgs()
+            val user = args.user
             binding.nameTextview.text = user?.name
             binding.logoutButton.visibility = View.INVISIBLE
             when (user?.status) {
@@ -50,9 +53,6 @@ class ProfileFragment : Fragment() {
                         isEnabled = false
                     }
                 }
-                else -> {
-                    throw NotImplementedError()
-                }
             }
         }
     }
@@ -62,9 +62,15 @@ class ProfileFragment : Fragment() {
         _binding = null
     }
 
-    companion object {
 
-        const val KEY = "user"
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        val searchItem = menu.findItem(R.id.action_search)
+        Timber.d("search: called onCreateOptionsMenu")
+        searchItem.isVisible = false
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    companion object {
 
         @JvmStatic
         fun newInstance() =

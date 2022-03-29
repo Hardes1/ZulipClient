@@ -26,7 +26,7 @@ class PeopleRecyclerAdapter(private val userClickCallBack: (Int) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(user: User) {
             binding.root.setOnClickListener {
-                userClickCallBack(adapterPosition)
+                userClickCallBack(user.id)
             }
             binding.nameTextView.text = user.name
             binding.emailTextView.text = user.email

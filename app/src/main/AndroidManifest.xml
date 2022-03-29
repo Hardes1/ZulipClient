@@ -12,7 +12,7 @@
         android:theme="@style/Theme.Homework1">
         <activity
             android:name="com.example.tinkoff.ui.activities.MainActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:windowSoftInputMode="adjustPan"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

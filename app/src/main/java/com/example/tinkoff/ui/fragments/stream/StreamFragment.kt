@@ -1,16 +1,13 @@
 package com.example.tinkoff.ui.fragments.stream
 
 import android.os.Bundle
+import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import com.example.tinkoff.R
 
 
 class StreamFragment : Fragment() {
-
 
 
     override fun onCreateView(
@@ -22,6 +19,12 @@ class StreamFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        val item: MenuItem = menu.findItem(R.id.action_search)
+        item.isVisible = true
     }
 
     companion object {

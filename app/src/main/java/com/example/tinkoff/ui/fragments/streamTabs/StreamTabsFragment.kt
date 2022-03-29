@@ -25,6 +25,7 @@ class StreamsTabsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
         val streamsAdapter = StreamsViewPagerAdapter(lifecycle, childFragmentManager)
         binding.viewPager2.adapter = streamsAdapter
         TabLayoutMediator(binding.tabLayout, binding.viewPager2) {

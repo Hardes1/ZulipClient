@@ -30,6 +30,7 @@
         tools:layout="@layout/fragment_profile" >
         <argument
             android:name="user"
-            app:argType="com.example.tinkoff.data.classes.User" />
+            app:argType="com.example.tinkoff.data.classes.User"
+            app:nullable="true" />
     </fragment>
 </navigation>

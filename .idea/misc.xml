@@ -9,6 +9,7 @@
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.33" />
         <entry key="app/src/main/res/layout/people_recycler_item.xml" value="0.1" />
         <entry key="app/src/main/res/menu/bottom_navigation_menu.xml" value="0.1" />
+        <entry key="app/src/main/res/menu/search_action_menu.xml" value="0.26794871794871794" />
       </map>
     </option>
   </component>
