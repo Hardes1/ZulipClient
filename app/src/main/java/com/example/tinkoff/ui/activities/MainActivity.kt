@@ -2,8 +2,8 @@ package com.example.tinkoff.ui.activities
 
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -12,11 +12,12 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.databinding.ActivityMainBinding
+import timber.log.Timber
 
 
 class MainActivity : AppCompatActivity() {
 
-
+    private var searchItem : MenuItem? = null
     private var _binding: ActivityMainBinding? = null
     private val binding: ActivityMainBinding
         get() = _binding!!
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         binding.navView.setupWithNavController(navController)
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            searchItem?.collapseActionView()
             when (destination.id) {
                 R.id.navigation_other_profile -> {
                     binding.navView.visibility = View.INVISIBLE
@@ -50,12 +52,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
+        Timber.d("navigated up")
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
 
+    override fun onBackPressed() {
+        Timber.d("back pressed")
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.search_action_menu, menu)
+        searchItem = menu?.findItem(R.id.action_search)
         return true
     }
 

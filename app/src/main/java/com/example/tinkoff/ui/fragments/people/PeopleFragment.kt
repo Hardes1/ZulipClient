@@ -2,11 +2,7 @@ package com.example.tinkoff.ui.fragments.people
 
 import android.os.Bundle
 import android.view.*
-import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
@@ -15,7 +11,6 @@ import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.FragmentPeopleBinding
 import com.example.tinkoff.recyclerFeatures.adapters.PeopleRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.UserItemDecoration
-import com.example.tinkoff.ui.fragments.profile.ProfileFragment
 import timber.log.Timber
 
 
@@ -29,11 +24,11 @@ class PeopleFragment : Fragment() {
         PeopleRecyclerAdapter(userClickCallBack)
     }
 
-
     private var dataList: List<User> = generateData()
     private val userClickCallBack: (Int) -> Unit = { index ->
         val user = dataList.find { it.id == index }
         val action = PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(user)
+        Timber.d("onPreNavigation called")
         findNavController().navigate(
             action
         )
@@ -79,10 +74,11 @@ class PeopleFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         val searchItem = menu.findItem(R.id.action_search)
+        searchItem.isVisible = true
         val searchView = searchItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {

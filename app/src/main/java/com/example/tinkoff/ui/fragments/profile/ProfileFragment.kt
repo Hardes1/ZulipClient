@@ -2,16 +2,11 @@ package com.example.tinkoff.ui.fragments.profile
 
 import android.os.Bundle
 import android.view.*
-import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
-import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.example.tinkoff.R
 import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.FragmentProfileBinding
-import timber.log.Timber
 
 
 class ProfileFragment : Fragment() {
@@ -53,6 +48,9 @@ class ProfileFragment : Fragment() {
                         isEnabled = false
                     }
                 }
+                else -> {
+                    throw NotImplementedError()
+                }
             }
         }
     }
@@ -62,13 +60,6 @@ class ProfileFragment : Fragment() {
         _binding = null
     }
 
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        val searchItem = menu.findItem(R.id.action_search)
-        Timber.d("search: called onCreateOptionsMenu")
-        searchItem.isVisible = false
-        super.onCreateOptionsMenu(menu, inflater)
-    }
 
     companion object {
 

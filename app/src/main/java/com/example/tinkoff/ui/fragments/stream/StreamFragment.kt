@@ -2,7 +2,6 @@ package com.example.tinkoff.ui.fragments.stream
 
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import com.example.tinkoff.R
 
