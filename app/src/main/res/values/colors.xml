@@ -25,5 +25,8 @@
     <color name="state_text_color">#BCBCBC</color>
     <color name="green_online_color">#4AB54D</color>
     <color name="red_online_color">#ff0d19</color>
+    <color name="tab_indicator_color">#219653</color>
     <color name="email_text_color">#A1A1A1</color>
+    <color name="separator_line">#323232</color>
+    <color name="topic_color">#2A9D8F</color>
 </resources>

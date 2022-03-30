@@ -14,4 +14,7 @@
     <string name="logout_button_text">Log out</string>
     <string name="user_online_text">online</string>
     <string name="user_offline_text">offline</string>
+    <string name="stream_header">#%s</string>
+    <string name="search_title">Search</string>
+    <string name="message_topic_header">Topic: #%s</string>
 </resources>

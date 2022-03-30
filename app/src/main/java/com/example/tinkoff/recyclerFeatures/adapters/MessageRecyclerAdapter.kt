@@ -15,22 +15,24 @@ import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.databinding.DateItemBinding
 import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
+import com.example.tinkoff.ui.fragments.messages.MessageFragment.Companion.MY_ID
 import com.example.tinkoff.ui.views.FlexBoxLayout
 import com.google.android.material.textview.MaterialTextView
 
 class MessageRecyclerAdapter(
-    private val onPositionChanged : (Int) -> Unit,
+    private val onPositionChanged: (Int) -> Unit,
     private val listChanged: () -> Unit,
     private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
-    private val context: Context
 ) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
 
 
     private val differ = AsyncListDiffer(this, MessagesDiffUtil())
     private var list: List<MessageContentInterface>
-        set(value) {
-            differ.submitList(value.reversed()) { listChanged }
+        private set(value) {
+            differ.submitList(value.reversed()) {
+                listChanged
+            }
         }
         get() = differ.currentList
 
@@ -42,7 +44,7 @@ class MessageRecyclerAdapter(
 
     class MessageOtherViewHolder(
 
-        private val onPositionChanged : (Int) -> Unit,
+        private val onPositionChanged: (Int) -> Unit,
         private val context: Context,
         private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
         private val binding: MessageOtherItemBinding
@@ -53,7 +55,7 @@ class MessageRecyclerAdapter(
             val text =
                 binding.messageViewGroup.findViewById<MaterialTextView>(R.id.message_textview)
             binding.messageViewGroup.setOnClickListener {
-               onPositionChanged(adapterPosition)
+                onPositionChanged(adapterPosition)
             }
             val flexBoxLayout =
                 binding.messageViewGroup.findViewById<FlexBoxLayout>(R.id.flex_box_layout)
@@ -62,9 +64,8 @@ class MessageRecyclerAdapter(
                 flexBoxLayout.removeViewAt(0)
             }
             flexBoxLayout.requestLayout()
-            // TODO : fix user (remove 1)
             for (element in content.reactions) {
-                val state = element.usersId.indexOfFirst { it == 1 } == -1
+                val state = element.usersId.indexOfFirst { it == MY_ID } == -1
                 flexBoxLayout.addOrUpdateReaction(
                     context,
                     element.emoji,
@@ -82,7 +83,7 @@ class MessageRecyclerAdapter(
             flexBoxLayout.requestLayout()
 
             flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
-                .setOnClickListener{
+                .setOnClickListener {
                     onPositionChanged(adapterPosition)
                 }
 
@@ -109,13 +110,12 @@ class MessageRecyclerAdapter(
                 flexBoxLayout.removeViewAt(0)
             }
             flexBoxLayout.requestLayout()
-            // TODO : fix user (remove 1)
             for (element in content.reactions) {
                 flexBoxLayout.addOrUpdateReaction(
                     context,
                     element.emoji,
                     element.usersId.size,
-                    element.usersId.indexOfFirst { it == 1 } != -1
+                    element.usersId.indexOfFirst { it == MY_ID } != -1
                 )
                 val index = flexBoxLayout.childCount - 2
                 flexBoxLayout.getChildAt(index).setOnClickListener {
@@ -125,7 +125,7 @@ class MessageRecyclerAdapter(
             }
 
             flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
-                .setOnClickListener{
+                .setOnClickListener {
                     onPositionChanged(adapterPosition)
                 }
         }
@@ -155,7 +155,7 @@ class MessageRecyclerAdapter(
             MESSAGE_OTHER -> {
                 MessageOtherViewHolder(
                     onPositionChanged,
-                    context,
+                    parent.context,
                     updateElementCallBack,
                     MessageOtherItemBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -167,7 +167,7 @@ class MessageRecyclerAdapter(
             MESSAGE_OWN -> {
                 MessageOwnViewHolder(
                     onPositionChanged,
-                    context,
+                    parent.context,
                     updateElementCallBack,
                     MessageOwnItemBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -200,10 +200,10 @@ class MessageRecyclerAdapter(
         }
     }
 
-
     fun updateList(otherList: List<MessageContentInterface>) {
         list = otherList
     }
+
 
     companion object {
         const val DATE: Int = 1

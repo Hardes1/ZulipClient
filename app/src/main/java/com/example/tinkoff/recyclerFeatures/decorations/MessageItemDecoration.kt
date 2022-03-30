@@ -13,8 +13,6 @@ class MessageItemDecoration(private val smallSpacing: Int, private val bigSpacin
         parent: RecyclerView,
         state: RecyclerView.State
     ) {
-
-
         parent.adapter?.let { adapter ->
             val position = parent.getChildAdapterPosition(view)
             if (position != 0) {
