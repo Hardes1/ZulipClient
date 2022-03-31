@@ -43,4 +43,6 @@
     <dimen name="tab_layout_padding_bottom">20dp</dimen>
     <dimen name="streams_small_spacing_decoration">1dp</dimen>
     <dimen name="streams_big_spacing_decoration">4dp</dimen>
+    <dimen name="separator_margin_start">15dp</dimen>
+    <dimen name="separator_margin_end">70dp</dimen>
 </resources>
