@@ -14,7 +14,10 @@ import com.example.tinkoff.databinding.StreamItemBinding
 import com.example.tinkoff.databinding.TopicItemBinding
 import com.example.tinkoff.recyclerFeatures.diffUtils.StreamsDiffUtil
 
-class StreamsRecyclerAdapter(private val selectCallBack: (Int, Boolean) -> Unit) :
+class StreamsRecyclerAdapter(
+    private val selectCallBack: (Int, Boolean) -> Unit,
+    private val navigateToMessageFragmentCallBack: (String, String) -> Unit
+) :
     RecyclerView.Adapter<StreamsRecyclerAdapter.StreamsInterfaceViewHolder>() {
 
 
@@ -50,12 +53,20 @@ class StreamsRecyclerAdapter(private val selectCallBack: (Int, Boolean) -> Unit)
         }
     }
 
-    class TopicViewHolder(private val binding: TopicItemBinding) :
+    class TopicViewHolder(
+        private val findStreamByTopic: (Int) -> StreamsInterface?,
+        private val navigateToMessageFragmentCallBack: (String, String) -> Unit,
+        private val binding: TopicItemBinding
+    ) :
         StreamsInterfaceViewHolder(binding.root) {
         override fun bind(content: StreamsInterface) {
             require(content is TopicHeader)
             binding.topicNameTextView.text = content.name
-
+            val stream = findStreamByTopic(content.streamId)
+            require(stream is StreamHeader)
+            binding.root.setOnClickListener {
+                navigateToMessageFragmentCallBack(stream.name, content.name)
+            }
         }
     }
 
@@ -72,6 +83,12 @@ class StreamsRecyclerAdapter(private val selectCallBack: (Int, Boolean) -> Unit)
                 )
             )
             else -> TopicViewHolder(
+                { index ->
+                    list.find {
+                        it is StreamHeader && it.id == index
+                    }
+                },
+                navigateToMessageFragmentCallBack,
                 TopicItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,

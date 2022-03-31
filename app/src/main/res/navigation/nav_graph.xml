@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    android:label="'"
     app:startDestination="@id/navigation_profile">
 
     <fragment
@@ -23,7 +22,11 @@
     <fragment
         android:id="@+id/navigation_stream_tabs"
         android:name="com.example.tinkoff.ui.fragments.streamTabs.StreamsTabsFragment"
-        android:label="@string/streams_fragment_name" />
+        android:label="@string/streams_fragment_name" >
+        <action
+            android:id="@+id/action_navigation_stream_tabs_to_messageFragment"
+            app:destination="@id/navigation_message" />
+    </fragment>
     <fragment
         android:id="@+id/navigation_other_profile"
         android:name="com.example.tinkoff.ui.fragments.profile.ProfileFragment"
@@ -33,5 +36,19 @@
             android:name="user"
             app:argType="com.example.tinkoff.data.classes.User"
             app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_message"
+        android:name="com.example.tinkoff.ui.fragments.messages.MessageFragment"
+        android:label="fragment_message"
+        tools:layout="@layout/fragment_message" >
+        <argument
+            android:name="appBarHeader"
+            app:argType="string"
+            android:defaultValue=" " />
+        <argument
+            android:name="topicHeader"
+            app:argType="string"
+            android:defaultValue=" " />
     </fragment>
 </navigation>

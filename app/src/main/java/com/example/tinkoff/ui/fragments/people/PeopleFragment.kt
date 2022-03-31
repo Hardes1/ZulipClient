@@ -104,11 +104,4 @@ class PeopleFragment : Fragment() {
         _binding = null
     }
 
-
-    companion object {
-
-        @JvmStatic
-        fun newInstance() =
-            PeopleFragment()
-    }
 }

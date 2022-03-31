@@ -12,8 +12,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 class StreamsTabsFragment : Fragment() {
 
 
-    private var _binding : FragmentStreamsTabsBinding? = null
-    private val binding : FragmentStreamsTabsBinding
+    private var _binding: FragmentStreamsTabsBinding? = null
+    private val binding: FragmentStreamsTabsBinding
         get() = _binding!!
 
     override fun onCreateView(
@@ -28,8 +28,13 @@ class StreamsTabsFragment : Fragment() {
         setHasOptionsMenu(true)
         val streamsAdapter = StreamsViewPagerAdapter(lifecycle, childFragmentManager)
         binding.viewPager2.adapter = streamsAdapter
-        TabLayoutMediator(binding.tabLayout, binding.viewPager2) {
-            tab, position -> tab.text = when(position){
+        initializeTabLayout()
+    }
+
+
+    private fun initializeTabLayout() {
+        TabLayoutMediator(binding.tabLayout, binding.viewPager2) { tab, position ->
+            tab.text = when (position) {
                 0 -> "Subscribed"
                 1 -> "All streams"
                 else -> throw NotImplementedError("Error Tab layout")
@@ -43,10 +48,4 @@ class StreamsTabsFragment : Fragment() {
         _binding = null
     }
 
-
-    companion object {
-
-        @JvmStatic
-        fun newInstance() = StreamsTabsFragment()
-    }
 }

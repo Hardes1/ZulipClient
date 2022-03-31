@@ -1,11 +1,13 @@
 package com.example.tinkoff.ui.activities
 
+import android.app.Activity
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
@@ -44,23 +46,44 @@ class MainActivity : AppCompatActivity() {
         binding.navView.setupWithNavController(navController)
         navController.addOnDestinationChangedListener { _, destination, _ ->
             searchItem?.collapseActionView()
+            val messageInputMode: Int =
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or
+                        WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN
+            val bottomNavViewInputMode: Int = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
             when (destination.id) {
                 R.id.navigation_other_profile -> {
-                    binding.navView.visibility = View.INVISIBLE
-                    setAppBarColor(R.color.content_layout_bg_color)
+                    setAppBarColor(R.color.color_bg_black)
+                    setSoftInputMode(bottomNavViewInputMode)
+                    binding.navView.visibility = View.GONE
                 }
                 R.id.navigation_profile -> {
                     setAppBarColor(R.color.color_bg_black)
+                    setSoftInputMode(bottomNavViewInputMode)
                     binding.navView.visibility = View.VISIBLE
                 }
-                else -> {
+                R.id.navigation_people -> {
                     setAppBarColor(R.color.content_layout_bg_color)
+                    setSoftInputMode(bottomNavViewInputMode)
                     binding.navView.visibility = View.VISIBLE
+                }
+                R.id.navigation_stream_tabs -> {
+                    setAppBarColor(R.color.content_layout_bg_color)
+                    setSoftInputMode(bottomNavViewInputMode)
+                    binding.navView.visibility = View.VISIBLE
+                }
+                R.id.navigation_message -> {
+                    setAppBarColor(R.color.topic_color)
+                    setSoftInputMode(messageInputMode)
+                    binding.navView.visibility = View.GONE
                 }
             }
         }
     }
 
+
+    private fun setSoftInputMode(mode: Int) {
+        window.setSoftInputMode(mode)
+    }
 
     private fun setAppBarColor(colorId: Int) {
         val color = ContextCompat.getColor(
@@ -93,5 +116,9 @@ class MainActivity : AppCompatActivity() {
         _binding = null
     }
 
-
 }
+
+fun AppCompatActivity.setActionBarTitle(title: String) {
+    supportActionBar?.title = title
+}
+

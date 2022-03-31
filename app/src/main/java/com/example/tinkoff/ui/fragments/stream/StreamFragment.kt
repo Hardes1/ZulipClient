@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.Stream
 import com.example.tinkoff.data.classes.StreamHeader
@@ -12,6 +13,7 @@ import com.example.tinkoff.data.classes.TopicHeader
 import com.example.tinkoff.databinding.FragmentStreamsBinding
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
+import com.example.tinkoff.ui.fragments.streamTabs.StreamsTabsFragmentDirections
 
 
 class StreamFragment : Fragment() {
@@ -29,8 +31,18 @@ class StreamFragment : Fragment() {
         adapter.updateList(prepareListForAdapter(list))
     }
 
+    private val navigateToMessageFragmentCallBack: (String, String) -> Unit =
+        { appBarHeader, topicHeader ->
+            val action =
+                StreamsTabsFragmentDirections.actionNavigationStreamTabsToMessageFragment(
+                    appBarHeader,
+                    topicHeader
+                )
+            findNavController().navigate(action)
+        }
+
     private val adapter: StreamsRecyclerAdapter by lazy {
-        StreamsRecyclerAdapter(changeStateCallBack)
+        StreamsRecyclerAdapter(changeStateCallBack, navigateToMessageFragmentCallBack)
     }
 
 
@@ -45,26 +57,9 @@ class StreamFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
-        binding.streamsRecyclerView.adapter = adapter
-        val topicDrawable =
-            ContextCompat.getDrawable(requireContext(), R.drawable.topic_item_decoration)
-        val streamDrawable =
-            ContextCompat.getDrawable(requireContext(), R.drawable.stream_item_decoration)
-        require(streamDrawable != null && topicDrawable != null)
-        binding.streamsRecyclerView.addItemDecoration(
-            StreamItemDecoration(
-                resources.getDimensionPixelSize(
-                    R.dimen.streams_small_spacing_decoration
-                ),
-                resources.getDimensionPixelSize(
-                    R.dimen.streams_big_spacing_decoration
-                ),
-                topicDrawable,
-                streamDrawable
-                )
-        )
-        adapter.updateList(prepareListForAdapter(list))
+        initializeRecyclerView()
     }
+
 
 
     private fun prepareListForAdapter(streams: List<Stream>): List<StreamsInterface> {
@@ -110,10 +105,31 @@ class StreamFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-
-    companion object {
-        @JvmStatic
-        fun newInstance() =
-            StreamFragment()
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
+
+    private fun initializeRecyclerView() {
+        binding.streamsRecyclerView.adapter = adapter
+        val topicDrawable =
+            ContextCompat.getDrawable(requireContext(), R.drawable.topic_item_decoration)
+        val streamDrawable =
+            ContextCompat.getDrawable(requireContext(), R.drawable.stream_item_decoration)
+        require(streamDrawable != null && topicDrawable != null)
+        binding.streamsRecyclerView.addItemDecoration(
+            StreamItemDecoration(
+                resources.getDimensionPixelSize(
+                    R.dimen.streams_small_spacing_decoration
+                ),
+                resources.getDimensionPixelSize(
+                    R.dimen.streams_big_spacing_decoration
+                ),
+                topicDrawable,
+                streamDrawable
+            )
+        )
+        adapter.updateList(prepareListForAdapter(list))
+    }
+
 }
