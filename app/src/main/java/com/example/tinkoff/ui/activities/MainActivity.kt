@@ -17,7 +17,7 @@ import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
-    private var searchItem : MenuItem? = null
+    private var searchItem: MenuItem? = null
     private var _binding: ActivityMainBinding? = null
     private val binding: ActivityMainBinding
         get() = _binding!!
@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         navController = navHostFragment.navController
+        supportActionBar?.elevation = 0f
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.navigation_stream_tabs, R.id.navigation_people, R.id.navigation_profile
@@ -56,10 +57,6 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
-
-    override fun onBackPressed() {
-        Timber.d("back pressed")
-    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.search_action_menu, menu)
