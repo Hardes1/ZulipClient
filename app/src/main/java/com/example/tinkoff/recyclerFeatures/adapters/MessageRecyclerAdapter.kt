@@ -19,7 +19,7 @@ import com.example.tinkoff.ui.views.FlexBoxLayout
 import com.google.android.material.textview.MaterialTextView
 
 class MessageRecyclerAdapter(
-    private val onPositionChanged : (Int) -> Unit,
+    private val onPositionChanged: (Int) -> Unit,
     private val listChanged: () -> Unit,
     private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
     private val context: Context
@@ -29,7 +29,7 @@ class MessageRecyclerAdapter(
 
     private val differ = AsyncListDiffer(this, MessagesDiffUtil())
     private var list: List<MessageContentInterface>
-        set(value) {
+        private set(value) {
             differ.submitList(value.reversed()) { listChanged }
         }
         get() = differ.currentList
@@ -42,7 +42,7 @@ class MessageRecyclerAdapter(
 
     class MessageOtherViewHolder(
 
-        private val onPositionChanged : (Int) -> Unit,
+        private val onPositionChanged: (Int) -> Unit,
         private val context: Context,
         private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
         private val binding: MessageOtherItemBinding
@@ -53,7 +53,7 @@ class MessageRecyclerAdapter(
             val text =
                 binding.messageViewGroup.findViewById<MaterialTextView>(R.id.message_textview)
             binding.messageViewGroup.setOnClickListener {
-               onPositionChanged(adapterPosition)
+                onPositionChanged(adapterPosition)
             }
             val flexBoxLayout =
                 binding.messageViewGroup.findViewById<FlexBoxLayout>(R.id.flex_box_layout)
@@ -82,7 +82,7 @@ class MessageRecyclerAdapter(
             flexBoxLayout.requestLayout()
 
             flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
-                .setOnClickListener{
+                .setOnClickListener {
                     onPositionChanged(adapterPosition)
                 }
 
@@ -125,7 +125,7 @@ class MessageRecyclerAdapter(
             }
 
             flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
-                .setOnClickListener{
+                .setOnClickListener {
                     onPositionChanged(adapterPosition)
                 }
         }
@@ -200,10 +200,10 @@ class MessageRecyclerAdapter(
         }
     }
 
-
     fun updateList(otherList: List<MessageContentInterface>) {
         list = otherList
     }
+
 
     companion object {
         const val DATE: Int = 1

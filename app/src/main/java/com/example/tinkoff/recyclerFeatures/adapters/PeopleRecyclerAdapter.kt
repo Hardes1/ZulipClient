@@ -7,14 +7,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.PeopleRecyclerItemBinding
-import com.example.tinkoff.recyclerFeatures.diffUtils.UserDiffUtil
+import com.example.tinkoff.recyclerFeatures.diffUtils.UsersDiffUtil
 
 class PeopleRecyclerAdapter(private val userClickCallBack: (Int) -> Unit) :
     RecyclerView.Adapter<PeopleRecyclerAdapter.PeopleViewHolder>() {
 
-    private val differ = AsyncListDiffer(this, UserDiffUtil())
+    private val differ = AsyncListDiffer(this, UsersDiffUtil())
     private var list: List<User>
-        set(value) {
+        private set(value) {
             differ.submitList(value)
         }
         get() = differ.currentList

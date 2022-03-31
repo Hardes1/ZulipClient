@@ -8,7 +8,11 @@
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.15" />
         <entry key="app/src/main/res/layout/fragment_people.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_streams.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_streams_tabs.xml" value="0.1" />
         <entry key="app/src/main/res/layout/people_recycler_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/stream_item.xml" value="0.38651994497936726" />
+        <entry key="app/src/main/res/layout/topic_item.xml" value="0.24017094017094018" />
         <entry key="app/src/main/res/menu/bottom_navigation_menu.xml" value="0.1" />
         <entry key="app/src/main/res/menu/search_action_menu.xml" value="0.26794871794871794" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />

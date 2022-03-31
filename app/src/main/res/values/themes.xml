@@ -17,6 +17,15 @@
     </style>
 
 
+    <style name="StreamHeader">
+        <item name="android:layout_marginStart">@dimen/stream_header_margin_horizontal</item>
+        <item name="android:layout_marginTop">@dimen/stream_header_margin_vertical</item>
+        <item name="android:layout_marginBottom">@dimen/stream_header_margin_vertical</item>
+        <item name="android:fontFamily">@font/inter_medium</item>
+        <item name="android:textColor">@color/message_color</item>
+        <item name="android:textSize">@dimen/stream_header_text_size</item>
+    </style>
+
     <style name="ShapeableImageView" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="cornerSize">10%</item>
     </style>
