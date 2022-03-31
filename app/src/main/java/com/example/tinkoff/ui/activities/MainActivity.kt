@@ -1,10 +1,12 @@
 package com.example.tinkoff.ui.activities
 
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -44,13 +46,32 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.navigation_other_profile -> {
                     binding.navView.visibility = View.INVISIBLE
+                    setAppBarColor(R.color.color_bg_black)
+                }
+                R.id.navigation_profile -> {
+                    setAppBarColor(R.color.color_bg_black)
+                    binding.navView.visibility = View.VISIBLE
                 }
                 else -> {
+                    setAppBarColor(R.color.content_layout_bg_color)
                     binding.navView.visibility = View.VISIBLE
                 }
             }
         }
     }
+
+
+    private fun setAppBarColor(color: Int) {
+        supportActionBar?.setBackgroundDrawable(
+            ColorDrawable(
+                ContextCompat.getColor(
+                    baseContext,
+                    color
+                )
+            )
+        )
+    }
+
 
     override fun onSupportNavigateUp(): Boolean {
         Timber.d("navigated up")

@@ -69,6 +69,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.button.MaterialButton
+        style="@style/Widget.App.ButtonStyle"
         android:id="@+id/logout_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
