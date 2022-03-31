@@ -2,6 +2,7 @@ package com.example.tinkoff.ui.fragments.stream
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.Stream
@@ -10,6 +11,7 @@ import com.example.tinkoff.data.classes.StreamsInterface
 import com.example.tinkoff.data.classes.TopicHeader
 import com.example.tinkoff.databinding.FragmentStreamsBinding
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
+import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
 
 
 class StreamFragment : Fragment() {
@@ -44,6 +46,23 @@ class StreamFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         binding.streamsRecyclerView.adapter = adapter
+        val topicDrawable =
+            ContextCompat.getDrawable(requireContext(), R.drawable.topic_item_decoration)
+        val streamDrawable =
+            ContextCompat.getDrawable(requireContext(), R.drawable.stream_item_decoration)
+        require(streamDrawable != null && topicDrawable != null)
+        binding.streamsRecyclerView.addItemDecoration(
+            StreamItemDecoration(
+                resources.getDimensionPixelSize(
+                    R.dimen.streams_small_spacing_decoration
+                ),
+                resources.getDimensionPixelSize(
+                    R.dimen.streams_big_spacing_decoration
+                ),
+                topicDrawable,
+                streamDrawable
+                )
+        )
         adapter.updateList(prepareListForAdapter(list))
     }
 

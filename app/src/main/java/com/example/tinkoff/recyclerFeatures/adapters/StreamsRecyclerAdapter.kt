@@ -41,8 +41,10 @@ class StreamsRecyclerAdapter(private val selectCallBack: (Int, Boolean) -> Unit)
             binding.streamNameTextView.text =
                 context.resources.getString(R.string.stream_header, content.name)
             binding.selectedImageView.isSelected = content.isSelected
+            binding.root.isSelected = content.isSelected
             binding.root.setOnClickListener {
                 binding.selectedImageView.isSelected = !binding.selectedImageView.isSelected
+                binding.root.isSelected = binding.selectedImageView.isSelected
                 selectCallBack(content.id, binding.selectedImageView.isSelected)
             }
         }
@@ -99,8 +101,8 @@ class StreamsRecyclerAdapter(private val selectCallBack: (Int, Boolean) -> Unit)
     }
 
     companion object {
-        private const val STREAM = 1
-        private const val TOPIC = 2
+        const val STREAM = 1
+        const val TOPIC = 2
     }
 
 

@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
+    android:label="'"
     app:startDestination="@id/navigation_profile">
 
     <fragment
         android:id="@+id/navigation_people"
         android:name="com.example.tinkoff.ui.fragments.people.PeopleFragment"
         android:label="@string/people_fragment_name"
-        tools:layout="@layout/fragment_people" >
+        tools:layout="@layout/fragment_people">
         <action
             android:id="@+id/action_navigation_people_to_navigation_other_profile"
             app:destination="@id/navigation_other_profile" />
@@ -17,7 +18,7 @@
     <fragment
         android:id="@+id/navigation_profile"
         android:name="com.example.tinkoff.ui.fragments.profile.ProfileFragment"
-        android:label="@string/profile_fragment_name"
+        android:label=" "
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/navigation_stream_tabs"
@@ -26,8 +27,8 @@
     <fragment
         android:id="@+id/navigation_other_profile"
         android:name="com.example.tinkoff.ui.fragments.profile.ProfileFragment"
-        android:label="Other people"
-        tools:layout="@layout/fragment_profile" >
+        android:label="@string/profile_fragment_name"
+        tools:layout="@layout/fragment_profile">
         <argument
             android:name="user"
             app:argType="com.example.tinkoff.data.classes.User"

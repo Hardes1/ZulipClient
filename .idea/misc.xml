@@ -3,7 +3,21 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/bottom_sheet.xml" value="0.1405" />
+        <entry key="app/src/main/res/drawable/edit_text_shape.xml" value="0.1675" />
+        <entry key="app/src/main/res/drawable/emoji_not_selected.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/emoji_state_selector.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_add.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_add_content.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_down.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_plank.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1675" />
+        <entry key="app/src/main/res/drawable/icon_selected_color.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/online_status_selector.xml" value="0.104" />
+        <entry key="app/src/main/res/drawable/profile_online_status_selector.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/stream_header_selector.xml" value="0.18" />
+        <entry key="app/src/main/res/drawable/stream_item_decoration.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/streams_selector.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.15" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.15" />
         <entry key="app/src/main/res/layout/fragment_people.xml" value="0.1" />

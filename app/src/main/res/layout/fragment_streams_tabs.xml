@@ -10,10 +10,11 @@
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:paddingBottom="@dimen/tab_layout_padding_bottom"
+        android:background="@color/content_layout_bg_color"
         app:tabTextColor="@color/white"
         app:tabIndicatorColor="@color/tab_indicator_color"
         app:tabIndicatorFullWidth="false"
-        app:tabBackground="@color/content_layout_bg_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

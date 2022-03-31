@@ -40,4 +40,7 @@
     <dimen name="stream_header_margin_vertical">20dp</dimen>
     <dimen name="stream_button_margin_horizontal">20dp</dimen>
     <dimen name="stream_header_text_size">18sp</dimen>
+    <dimen name="tab_layout_padding_bottom">20dp</dimen>
+    <dimen name="streams_small_spacing_decoration">1dp</dimen>
+    <dimen name="streams_big_spacing_decoration">4dp</dimen>
 </resources>
