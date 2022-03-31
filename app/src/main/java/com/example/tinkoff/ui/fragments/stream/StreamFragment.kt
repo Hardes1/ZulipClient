@@ -10,10 +10,12 @@ import com.example.tinkoff.data.classes.Stream
 import com.example.tinkoff.data.classes.StreamHeader
 import com.example.tinkoff.data.classes.StreamsInterface
 import com.example.tinkoff.data.classes.TopicHeader
+import com.example.tinkoff.data.states.StreamsType
 import com.example.tinkoff.databinding.FragmentStreamsBinding
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
 import com.example.tinkoff.ui.fragments.streamTabs.StreamsTabsFragmentDirections
+import timber.log.Timber
 
 
 class StreamFragment : Fragment() {
@@ -23,8 +25,9 @@ class StreamFragment : Fragment() {
     private val binding: FragmentStreamsBinding
         get() = _binding!!
 
-    private val list = generateData()
+    private lateinit var list: List<Stream>
     private var counter = 0
+    private lateinit var type: StreamsType
 
     private val changeStateCallBack: (Int, Boolean) -> Unit = { id, isSelected ->
         list.find { it.streamHeader.id == id }?.streamHeader?.isSelected = isSelected
@@ -51,15 +54,19 @@ class StreamFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentStreamsBinding.inflate(inflater, container, false)
+        type = StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
         return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
+        counter = 0
+        Timber.d("Stream type is $type")
+        if (type == StreamsType.ALL_STREAMS)
+            counter = 50
         initializeRecyclerView()
     }
-
 
 
     private fun prepareListForAdapter(streams: List<Stream>): List<StreamsInterface> {
@@ -87,6 +94,7 @@ class StreamFragment : Fragment() {
     }
 
     private fun generateStreamHeader(): StreamHeader {
+        Timber.d("current header counter is $counter")
         return StreamHeader(counter++, "$counter")
     }
 
@@ -102,6 +110,7 @@ class StreamFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         val item: MenuItem = menu.findItem(R.id.action_search)
         item.isVisible = true
+
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -111,6 +120,7 @@ class StreamFragment : Fragment() {
     }
 
     private fun initializeRecyclerView() {
+        list = generateData()
         binding.streamsRecyclerView.adapter = adapter
         val topicDrawable =
             ContextCompat.getDrawable(requireContext(), R.drawable.topic_item_decoration)
@@ -131,5 +141,21 @@ class StreamFragment : Fragment() {
         )
         adapter.updateList(prepareListForAdapter(list))
     }
+
+
+    companion object {
+
+        private const val STREAMS_TYPE = "type"
+
+
+        fun newInstance(type: StreamsType): StreamFragment {
+            return StreamFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(STREAMS_TYPE, type.ordinal)
+                }
+            }
+        }
+    }
+
 
 }

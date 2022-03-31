@@ -1,18 +1,19 @@
 package com.example.tinkoff.ui.fragments.streamTabs
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import com.example.tinkoff.R
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsViewPagerAdapter
 import com.example.tinkoff.databinding.FragmentStreamsTabsBinding
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 class StreamsTabsFragment : Fragment() {
 
 
     private var _binding: FragmentStreamsTabsBinding? = null
+    private var searchItem: MenuItem? = null
     private val binding: FragmentStreamsTabsBinding
         get() = _binding!!
 
@@ -29,6 +30,17 @@ class StreamsTabsFragment : Fragment() {
         val streamsAdapter = StreamsViewPagerAdapter(lifecycle, childFragmentManager)
         binding.viewPager2.adapter = streamsAdapter
         initializeTabLayout()
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                searchItem?.collapseActionView()
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+        })
     }
 
 
@@ -41,6 +53,13 @@ class StreamsTabsFragment : Fragment() {
             }
         }.attach()
     }
+
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        searchItem = menu.findItem(R.id.action_search)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
 
 
     override fun onDestroy() {
