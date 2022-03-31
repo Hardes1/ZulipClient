@@ -1,5 +1,6 @@
 package com.example.tinkoff.ui.activities
 
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
@@ -46,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.navigation_other_profile -> {
                     binding.navView.visibility = View.INVISIBLE
-                    setAppBarColor(R.color.color_bg_black)
+                    setAppBarColor(R.color.content_layout_bg_color)
                 }
                 R.id.navigation_profile -> {
                     setAppBarColor(R.color.color_bg_black)
@@ -61,13 +62,15 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun setAppBarColor(color: Int) {
+    private fun setAppBarColor(colorId: Int) {
+        val color = ContextCompat.getColor(
+            baseContext,
+            colorId
+        )
+        window.statusBarColor = color
         supportActionBar?.setBackgroundDrawable(
             ColorDrawable(
-                ContextCompat.getColor(
-                    baseContext,
-                    color
-                )
+                color
             )
         )
     }
