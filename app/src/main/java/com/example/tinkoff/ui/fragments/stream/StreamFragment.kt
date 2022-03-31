@@ -1,7 +1,12 @@
 package com.example.tinkoff.ui.fragments.stream
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.View
+import android.view.ViewGroup
+import android.view.MenuInflater
+import android.view.MenuItem
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -64,7 +69,7 @@ class StreamFragment : Fragment() {
         counter = 0
         Timber.d("Stream type is $type")
         if (type == StreamsType.ALL_STREAMS)
-            counter = 50
+            counter = ALL_STREAMS_MIN_ID
         initializeRecyclerView()
     }
 
@@ -85,8 +90,7 @@ class StreamFragment : Fragment() {
 
     private fun generateData(): List<Stream> {
         val list: MutableList<Stream> = mutableListOf()
-        val sz = 3
-        repeat(sz) {
+        repeat(REPEAT_COUNT) {
             val header = generateStreamHeader()
             list.add(Stream(header, generateTopics(header.id)))
         }
@@ -147,6 +151,8 @@ class StreamFragment : Fragment() {
 
         private const val STREAMS_TYPE = "type"
 
+        private const val ALL_STREAMS_MIN_ID = 50
+        private const val REPEAT_COUNT = 3
 
         fun newInstance(type: StreamsType): StreamFragment {
             return StreamFragment().apply {
@@ -156,6 +162,5 @@ class StreamFragment : Fragment() {
             }
         }
     }
-
 
 }

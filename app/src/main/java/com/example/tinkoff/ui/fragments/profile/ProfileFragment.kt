@@ -1,9 +1,10 @@
 package com.example.tinkoff.ui.fragments.profile
 
-import android.graphics.drawable.ColorDrawable
+
 import android.os.Bundle
-import android.view.*
-import androidx.core.content.ContextCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.example.tinkoff.R

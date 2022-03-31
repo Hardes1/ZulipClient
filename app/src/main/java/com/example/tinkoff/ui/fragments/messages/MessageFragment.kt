@@ -13,7 +13,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tinkoff.R
-import com.example.tinkoff.data.classes.*
+import com.example.tinkoff.data.classes.Date
+import com.example.tinkoff.data.classes.MessageContent
+import com.example.tinkoff.data.classes.MessageContentInterface
+import com.example.tinkoff.data.classes.Reaction
+import com.example.tinkoff.data.classes.ReactionsData
 import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.databinding.FragmentMessageBinding
 import com.example.tinkoff.recyclerFeatures.adapters.MessageRecyclerAdapter
@@ -59,7 +63,9 @@ class MessageFragment : Fragment() {
         binding.topicNameTextView.text =
             resources.getString(R.string.message_topic_header, args.topicHeader)
         binding.sendButton.isEnabled = false
-        changeAppBarTitle()
+        require(activity is AppCompatActivity)
+        (activity as AppCompatActivity).supportActionBar?.title =
+            resources.getString(R.string.stream_header, args.appBarHeader)
         setChangeTextListener()
         setButtonSendClickListener()
         initializeRecyclerView()
@@ -264,13 +270,6 @@ class MessageFragment : Fragment() {
         list.add(Date(counter++, "2 Feb"))
         list.add(MessageContent(counter++, "abobaaboba", mutableListOf(), SenderType.OTHER))
         return list
-    }
-
-
-    private fun changeAppBarTitle() {
-        require(activity is AppCompatActivity)
-        (activity as AppCompatActivity).supportActionBar?.title =
-            resources.getString(R.string.stream_header, args.appBarHeader)
     }
 
 

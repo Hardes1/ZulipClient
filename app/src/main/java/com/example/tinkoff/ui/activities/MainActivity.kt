@@ -121,4 +121,3 @@ class MainActivity : AppCompatActivity() {
 fun AppCompatActivity.setActionBarTitle(title: String) {
     supportActionBar?.title = title
 }
-
