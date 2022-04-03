@@ -19,7 +19,7 @@ import com.example.tinkoff.data.states.StreamsType
 import com.example.tinkoff.databinding.FragmentStreamsBinding
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
-import com.example.tinkoff.ui.fragments.streamTabs.StreamsTabsFragmentDirections
+import com.example.tinkoff.ui.fragments.streamTabs.StreamTabsFragmentDirections
 import timber.log.Timber
 
 
@@ -42,7 +42,7 @@ class StreamFragment : Fragment() {
     private val navigateToMessageFragmentCallBack: (String, String) -> Unit =
         { appBarHeader, topicHeader ->
             val action =
-                StreamsTabsFragmentDirections.actionNavigationStreamTabsToMessageFragment(
+                StreamTabsFragmentDirections.actionNavigationStreamTabsToMessageFragment(
                     appBarHeader,
                     topicHeader
                 )
