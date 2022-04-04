@@ -2,6 +2,7 @@ package com.example.tinkoff.network
 
 import com.example.tinkoff.data.classes.*
 import com.example.tinkoff.data.states.SenderType
+import com.example.tinkoff.data.states.StreamsType
 import com.example.tinkoff.data.states.UserStatus
 import timber.log.Timber
 
@@ -24,8 +25,8 @@ object Repository {
         )
     }
 
-    fun generateStreamsData(): List<Stream> {
-        counter = 0
+    fun generateStreamsData(type: StreamsType): List<Stream> {
+        counter = if (type == StreamsType.SUBSCRIBED) 0 else 50
         val list: MutableList<Stream> = mutableListOf()
         repeat(REPEAT_COUNT) {
             val header = generateStreamHeader()
