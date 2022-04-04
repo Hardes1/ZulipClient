@@ -23,7 +23,7 @@ class ProfileFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.d("Fragment recreated.")
+        Timber.d(getString(R.string.debug_fragment_recreated))
     }
 
     override fun onCreateView(
@@ -37,7 +37,7 @@ class ProfileFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Timber.d("View recreated.")
+        Timber.d(getString(R.string.debug_view_recreated))
         if (arguments != null) {
             val args: ProfileFragmentArgs by navArgs()
             val user = args.user

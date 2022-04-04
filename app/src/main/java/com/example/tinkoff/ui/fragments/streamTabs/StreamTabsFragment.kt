@@ -22,10 +22,9 @@ class StreamTabsFragment : Fragment() {
     private val binding: FragmentStreamsTabsBinding
         get() = _binding!!
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.d("Fragment recreated.")
+        Timber.d(getString(R.string.debug_fragment_recreated))
     }
 
     override fun onCreateView(
@@ -38,7 +37,7 @@ class StreamTabsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
-        Timber.d("View recreated.")
+        Timber.d(getString(R.string.debug_view_recreated))
         val streamsAdapter = StreamsViewPagerAdapter(lifecycle, childFragmentManager)
         binding.viewPager2.adapter = streamsAdapter
         initializeTabLayout()
@@ -62,9 +61,9 @@ class StreamTabsFragment : Fragment() {
     private fun initializeTabLayout() {
         TabLayoutMediator(binding.tabLayout, binding.viewPager2) { tab, position ->
             tab.text = when (position) {
-                0 -> "Subscribed"
-                1 -> "All streams"
-                else -> throw NotImplementedError("Error Tab layout")
+                0 -> getString(R.string.subscribed_header)
+                1 -> getString(R.string.all_streams_header)
+                else -> throw NotImplementedError(getString(R.string.error_tab_layout))
             }
         }.attach()
     }
