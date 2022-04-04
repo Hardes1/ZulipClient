@@ -21,8 +21,8 @@
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/navigation_stream_tabs"
-        android:name="com.example.tinkoff.ui.fragments.streamTabs.StreamsTabsFragment"
-        android:label="@string/streams_fragment_name" >
+        android:name="com.example.tinkoff.ui.fragments.streamTabs.StreamTabsFragment"
+        android:label="@string/streams_fragment_name">
         <action
             android:id="@+id/action_navigation_stream_tabs_to_messageFragment"
             app:destination="@id/navigation_message" />

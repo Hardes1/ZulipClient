@@ -27,21 +27,6 @@ class MessageRecyclerAdapter(
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
 
 
-    private val differ = AsyncListDiffer(this, MessagesDiffUtil())
-    private var list: List<MessageContentInterface>
-        private set(value) {
-            differ.submitList(value.reversed()) {
-                listChanged
-            }
-        }
-        get() = differ.currentList
-
-    abstract class MessageContentViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
-        abstract fun bind(content: MessageContentInterface)
-    }
-
-
     class MessageOtherViewHolder(
 
         private val onPositionChanged: (Int) -> Unit,
@@ -140,6 +125,20 @@ class MessageRecyclerAdapter(
         }
     }
 
+
+    private val differ = AsyncListDiffer(this, MessagesDiffUtil())
+    private var list: List<MessageContentInterface>
+        private set(value) {
+            differ.submitList(value.reversed()) {
+                listChanged
+            }
+        }
+        get() = differ.currentList
+
+    abstract class MessageContentViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
+        abstract fun bind(content: MessageContentInterface)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageContentViewHolder {
         return when (viewType) {

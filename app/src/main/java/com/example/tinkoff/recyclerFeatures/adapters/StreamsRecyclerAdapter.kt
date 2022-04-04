@@ -21,13 +21,6 @@ class StreamsRecyclerAdapter(
     RecyclerView.Adapter<StreamsRecyclerAdapter.StreamsInterfaceViewHolder>() {
 
 
-    private val differ = AsyncListDiffer(this, StreamsDiffUtil())
-    private var list: List<StreamsInterface>
-        private set(value) {
-            differ.submitList(value)
-        }
-        get() = differ.currentList
-
 
     abstract class StreamsInterfaceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         abstract fun bind(content: StreamsInterface)
@@ -70,6 +63,14 @@ class StreamsRecyclerAdapter(
         }
     }
 
+    private val differ = AsyncListDiffer(this, StreamsDiffUtil())
+    private var list: List<StreamsInterface>
+        private set(value) {
+            differ.submitList(value)
+        }
+        get() = differ.currentList
+
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StreamsInterfaceViewHolder {
         return when (viewType) {
@@ -82,7 +83,7 @@ class StreamsRecyclerAdapter(
                     false
                 )
             )
-            else -> TopicViewHolder(
+            TOPIC -> TopicViewHolder(
                 { index ->
                     list.find {
                         it is StreamHeader && it.id == index
@@ -95,6 +96,7 @@ class StreamsRecyclerAdapter(
                     false
                 )
             )
+            else -> throw NotImplementedError()
         }
     }
 
