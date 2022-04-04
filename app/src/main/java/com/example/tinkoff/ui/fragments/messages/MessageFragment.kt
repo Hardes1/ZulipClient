@@ -20,6 +20,7 @@ import com.example.tinkoff.data.classes.Reaction
 import com.example.tinkoff.data.classes.ReactionsData
 import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.databinding.FragmentMessageBinding
+import com.example.tinkoff.network.Repository
 import com.example.tinkoff.recyclerFeatures.adapters.MessageRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.MessageItemDecoration
 import com.example.tinkoff.ui.activities.ReactionsViewModel
@@ -113,7 +114,7 @@ class MessageFragment : Fragment() {
 
 
     private fun initializeRecyclerView() {
-        messagesList = generateData()
+        messagesList = Repository.generateMessagesData()
         layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         adapter = MessageRecyclerAdapter(
             onMessageIndexChanged,
@@ -220,57 +221,6 @@ class MessageFragment : Fragment() {
     }
 
 
-    private fun generateData(): MutableList<MessageContentInterface> {
-        val list: MutableList<MessageContentInterface> = mutableListOf()
-        list.add(Date(counter++, "1 Feb"))
-        list.add(
-            MessageContent(
-                counter++,
-                "Hello, my friend!",
-                mutableListOf(),
-                SenderType.OTHER
-            )
-        )
-        list.add(
-            MessageContent(
-                counter++, "How are you?", mutableListOf(),
-                SenderType.OTHER
-            )
-        )
-        list.add(
-            MessageContent(
-                counter++, "Why are you ignoring me???",
-                mutableListOf(),
-                SenderType.OTHER
-            )
-        )
-        list.add(
-            MessageContent(
-                counter++, "I am tired....\nGoing bad now",
-                mutableListOf(Reaction(ReactionsData.reactionsStringList[0], mutableListOf(-1))),
-                SenderType.OTHER
-            ),
-
-            )
-        list.add(
-            MessageContent(
-                counter++,
-                "Eoteogsdfkjsdfkcbvcnb hahahaha",
-                mutableListOf(),
-                SenderType.OTHER
-            )
-        )
-        list.add(
-            MessageContent(
-                counter++, "Hello, dude",
-                mutableListOf(),
-                SenderType.OWN
-            )
-        )
-        list.add(Date(counter++, "2 Feb"))
-        list.add(MessageContent(counter++, "abobaaboba", mutableListOf(), SenderType.OTHER))
-        return list
-    }
 
 
     override fun onDestroy() {

@@ -22,6 +22,12 @@ class StreamTabsFragment : Fragment() {
     private val binding: FragmentStreamsTabsBinding
         get() = _binding!!
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Timber.d("Fragment recreated.")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -32,6 +38,7 @@ class StreamTabsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
+        Timber.d("View recreated.")
         val streamsAdapter = StreamsViewPagerAdapter(lifecycle, childFragmentManager)
         binding.viewPager2.adapter = streamsAdapter
         initializeTabLayout()

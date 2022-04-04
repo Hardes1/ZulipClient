@@ -39,6 +39,7 @@ ext {
     fragmentKtx = '1.4.1'
     navigation = '2.4.1'
     support = '1.0.0'
+    rx_android = "2.0.1"
 }
 
 task clean(type: Delete) {

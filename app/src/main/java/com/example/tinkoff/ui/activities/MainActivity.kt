@@ -1,7 +1,5 @@
 package com.example.tinkoff.ui.activities
 
-import android.app.Activity
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
@@ -11,6 +9,8 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -116,8 +116,5 @@ class MainActivity : AppCompatActivity() {
         _binding = null
     }
 
-}
 
-fun AppCompatActivity.setActionBarTitle(title: String) {
-    supportActionBar?.title = title
 }
