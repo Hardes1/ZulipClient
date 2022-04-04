@@ -20,4 +20,9 @@
     <string name="tab_is_selected">Tab is selected</string>
     <string name="tab_is_unselected">Tab is unselected</string>
     <string name="tab_is_reselected">Tab is selected</string>
+    <string name="subscribed_header">Subscribed</string>
+    <string name="all_streams_header">All streams</string>
+    <string name="error_tab_layout">Error Tab layout</string>
+    <string name="debug_fragment_recreated">Fragment recreated.</string>
+    <string name="debug_view_recreated">View recreated.</string>
 </resources>

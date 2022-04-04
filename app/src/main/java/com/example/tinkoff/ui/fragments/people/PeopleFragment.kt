@@ -38,7 +38,6 @@ class PeopleFragment : Fragment() {
     private val userClickCallBack: (Int) -> Unit = { index ->
         val user = dataList.find { it.id == index }
         val action = PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(user)
-        Timber.d("onPreNavigation called")
         findNavController().navigate(
             action
         )
@@ -47,7 +46,7 @@ class PeopleFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.d("Fragment recreated.")
+        Timber.d(getString(R.string.debug_fragment_recreated))
     }
 
 
@@ -61,7 +60,7 @@ class PeopleFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Timber.d("View recreated.")
+        Timber.d(getString(R.string.debug_view_recreated))
         initializeRecyclerView()
     }
 

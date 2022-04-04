@@ -9,6 +9,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.Stream
@@ -35,12 +36,12 @@ class StreamFragment : Fragment() {
     private val binding: FragmentStreamsBinding
         get() = _binding!!
 
-    private lateinit var list: List<Stream>
-    private lateinit var type: StreamsType
+    private val viewModel: StreamViewModel by activityViewModels()
+
 
     private val changeStateCallBack: (Int, Boolean) -> Unit = { id, isSelected ->
-        list.find { it.streamHeader.id == id }?.streamHeader?.isSelected = isSelected
-        adapter.updateList(prepareListForAdapter(list))
+        viewModel.list?.find { it.streamHeader.id == id }?.streamHeader?.isSelected = isSelected
+        adapter.updateList(prepareListForAdapter(viewModel.list ?: listOf()))
     }
 
     private val navigateToMessageFragmentCallBack: (String, String) -> Unit =
@@ -60,7 +61,7 @@ class StreamFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.d("Fragment recreated.")
+        Timber.d(getString(R.string.debug_fragment_recreated))
     }
 
     override fun onCreateView(
@@ -69,13 +70,14 @@ class StreamFragment : Fragment() {
     ): View {
         setHasOptionsMenu(true)
         _binding = FragmentStreamsBinding.inflate(inflater, container, false)
-        type = StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
+        if (viewModel.type == null)
+            viewModel.type = StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
         return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Timber.d("View recreated.")
+        Timber.d(getString(R.string.debug_view_recreated))
         initializeRecyclerView()
     }
 
@@ -107,7 +109,6 @@ class StreamFragment : Fragment() {
     }
 
     private fun initializeRecyclerView() {
-        list = Repository.generateStreamsData()
         binding.streamsRecyclerView.adapter = adapter
         val topicDrawable =
             ContextCompat.getDrawable(requireContext(), R.drawable.topic_item_decoration)
@@ -126,7 +127,10 @@ class StreamFragment : Fragment() {
                 streamDrawable
             )
         )
-        adapter.updateList(prepareListForAdapter(list))
+        if (viewModel.list == null)
+            initializeDataList()
+        else
+            adapter.updateList(prepareListForAdapter(viewModel.list ?: listOf()))
     }
 
 
@@ -137,16 +141,14 @@ class StreamFragment : Fragment() {
             )
             .subscribe(object : SingleObserver<List<Stream>> {
                 override fun onSubscribe(d: Disposable?) {
-                    TODO("Not yet implemented")
                 }
 
                 override fun onSuccess(value: List<Stream>) {
-                    list = value
-                    adapter.updateList(prepareListForAdapter(list))
+                    viewModel.list = value
+                    adapter.updateList(prepareListForAdapter(viewModel.list ?: listOf()))
                 }
 
                 override fun onError(e: Throwable?) {
-                    TODO("Not yet implemented")
                 }
 
             })
@@ -155,7 +157,7 @@ class StreamFragment : Fragment() {
 
     companion object {
 
-        private const val STREAMS_TYPE = "type"
+        private const val STREAMS_TYPE = "STREAM_TYPE"
 
         fun newInstance(type: StreamsType): StreamFragment {
             return StreamFragment().apply {
