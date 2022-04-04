@@ -9,7 +9,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.Stream
@@ -20,7 +20,6 @@ import com.example.tinkoff.network.Repository
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
 import com.example.tinkoff.ui.fragments.streamTabs.StreamTabsFragmentDirections
-import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -36,7 +35,7 @@ class StreamFragment : Fragment() {
     private val binding: FragmentStreamsBinding
         get() = _binding!!
 
-    private val viewModel: StreamViewModel by activityViewModels()
+    private val viewModel: StreamViewModel by viewModels()
 
 
     private val changeStateCallBack: (Int, Boolean) -> Unit = { id, isSelected ->
@@ -78,6 +77,7 @@ class StreamFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
+        Timber.d("TYPE is ${viewModel.type}")
         initializeRecyclerView()
     }
 
@@ -135,22 +135,30 @@ class StreamFragment : Fragment() {
 
 
     private fun initializeDataList() {
-        Single.create<List<Stream>> { emitter -> emitter.onSuccess(Repository.generateStreamsData()) }
+        Single.create<List<Stream>> { emitter ->
+            emitter.onSuccess(
+                Repository.generateStreamsData(
+                    viewModel.type ?: StreamsType.SUBSCRIBED
+                )
+            )
+        }
             .subscribeOn(
                 Schedulers.computation()
-            )
-            .subscribe(object : SingleObserver<List<Stream>> {
+            ).flatMap {
+                viewModel.list = it
+                Single.just(prepareListForAdapter(it))
+            }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<List<StreamsInterface>> {
                 override fun onSubscribe(d: Disposable?) {
                 }
 
-                override fun onSuccess(value: List<Stream>) {
-                    viewModel.list = value
-                    adapter.updateList(prepareListForAdapter(viewModel.list ?: listOf()))
+                override fun onSuccess(value: List<StreamsInterface>) {
+                    adapter.updateList(value)
                 }
 
                 override fun onError(e: Throwable?) {
                 }
-
             })
     }
 
