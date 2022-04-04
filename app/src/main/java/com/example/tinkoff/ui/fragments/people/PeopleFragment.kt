@@ -12,10 +12,15 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.User
-import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.FragmentPeopleBinding
+import com.example.tinkoff.network.Repository
 import com.example.tinkoff.recyclerFeatures.adapters.PeopleRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.UserItemDecoration
+import io.reactivex.Single
+import io.reactivex.SingleObserver
+import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 
@@ -29,7 +34,7 @@ class PeopleFragment : Fragment() {
         PeopleRecyclerAdapter(userClickCallBack)
     }
 
-    private var dataList: List<User> = generateData()
+    private var dataList: List<User> = listOf()
     private val userClickCallBack: (Int) -> Unit = { index ->
         val user = dataList.find { it.id == index }
         val action = PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(user)
@@ -40,40 +45,24 @@ class PeopleFragment : Fragment() {
     }
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Timber.d("Fragment recreated.")
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        setHasOptionsMenu(true)
         _binding = FragmentPeopleBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setHasOptionsMenu(true)
-        binding.peopleRecyclerView.addItemDecoration(
-            UserItemDecoration(
-                resources.getDimensionPixelSize(R.dimen.people_small_spacing_recycler_view),
-                resources.getDimensionPixelSize(R.dimen.people_big_spacing_recycler_view)
-            )
-        )
-        binding.peopleRecyclerView.adapter = adapter
-        adapter.updateList(dataList)
-    }
-
-    private fun generateData(): List<User> {
-        var counter = 0
-        return listOf(
-            User(counter++, "Устинов Георгий", "abobaMail@mail.ru", UserStatus.ONLINE),
-            User(counter++, "Устинова Алёна", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Привет, как дела", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Проверяю текст", "abobaMail@mail.ru", UserStatus.ONLINE),
-            User(counter++, "Мельников Игорь", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Как же хочется прыгать", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Откуда я знаю", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "ABOBA spirs", "abobaMail@mail.ru", UserStatus.ONLINE),
-            User(counter++, "ABOBA pirs", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "ABOBA poso", "abobaMail@mail.ru", UserStatus.OFFLINE)
-        )
+        Timber.d("View recreated.")
+        initializeRecyclerView()
     }
 
 
@@ -94,6 +83,37 @@ class PeopleFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    private fun initializeRecyclerView() {
+        binding.peopleRecyclerView.addItemDecoration(
+            UserItemDecoration(
+                resources.getDimensionPixelSize(R.dimen.people_small_spacing_recycler_view),
+                resources.getDimensionPixelSize(R.dimen.people_big_spacing_recycler_view)
+            )
+        )
+        binding.peopleRecyclerView.adapter = adapter
+        initializeDataList()
+    }
+
+    private fun initializeDataList() {
+        Single.create<List<User>> { emitter ->
+            emitter.onSuccess(Repository.generateUsersData())
+        }.subscribeOn(Schedulers.computation()).observeOn(mainThread())
+            .subscribe(object : SingleObserver<List<User>> {
+                override fun onSubscribe(d: Disposable) {
+
+                }
+
+                override fun onSuccess(list: List<User>) {
+                    dataList = list
+                    adapter.updateList(dataList)
+                }
+
+                override fun onError(e: Throwable) {
+                }
+            })
+    }
+
+
     private fun filterListByString(filter: String) {
         val filteredList: List<User> = if (filter.isNotEmpty()) {
             dataList.filter { it.name.contains(filter, ignoreCase = true) }
@@ -106,6 +126,7 @@ class PeopleFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+
         _binding = null
     }
 

@@ -10,6 +10,7 @@ import androidx.navigation.fragment.navArgs
 import com.example.tinkoff.R
 import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.FragmentProfileBinding
+import timber.log.Timber
 
 
 class ProfileFragment : Fragment() {
@@ -19,6 +20,11 @@ class ProfileFragment : Fragment() {
     private val binding: FragmentProfileBinding
         get() = _binding!!
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Timber.d("Fragment recreated.")
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,6 +37,7 @@ class ProfileFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Timber.d("View recreated.")
         if (arguments != null) {
             val args: ProfileFragmentArgs by navArgs()
             val user = args.user
@@ -58,8 +65,8 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onDestroy() {
+        super.onDestroy()
         _binding = null
     }
 

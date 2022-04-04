@@ -12,14 +12,19 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.Stream
-import com.example.tinkoff.data.classes.StreamHeader
 import com.example.tinkoff.data.classes.StreamsInterface
-import com.example.tinkoff.data.classes.TopicHeader
 import com.example.tinkoff.data.states.StreamsType
 import com.example.tinkoff.databinding.FragmentStreamsBinding
+import com.example.tinkoff.network.Repository
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
 import com.example.tinkoff.ui.fragments.streamTabs.StreamTabsFragmentDirections
+import io.reactivex.Scheduler
+import io.reactivex.Single
+import io.reactivex.SingleObserver
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 
 
@@ -31,7 +36,6 @@ class StreamFragment : Fragment() {
         get() = _binding!!
 
     private lateinit var list: List<Stream>
-    private var counter = 0
     private lateinit var type: StreamsType
 
     private val changeStateCallBack: (Int, Boolean) -> Unit = { id, isSelected ->
@@ -54,10 +58,16 @@ class StreamFragment : Fragment() {
     }
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Timber.d("Fragment recreated.")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        setHasOptionsMenu(true)
         _binding = FragmentStreamsBinding.inflate(inflater, container, false)
         type = StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
         return binding.root
@@ -65,11 +75,7 @@ class StreamFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setHasOptionsMenu(true)
-        counter = 0
-        Timber.d("Stream type is $type")
-        if (type == StreamsType.ALL_STREAMS)
-            counter = ALL_STREAMS_MIN_ID
+        Timber.d("View recreated.")
         initializeRecyclerView()
     }
 
@@ -88,29 +94,6 @@ class StreamFragment : Fragment() {
     }
 
 
-    private fun generateData(): List<Stream> {
-        val list: MutableList<Stream> = mutableListOf()
-        repeat(REPEAT_COUNT) {
-            val header = generateStreamHeader()
-            list.add(Stream(header, generateTopics(header.id)))
-        }
-        return list
-    }
-
-    private fun generateStreamHeader(): StreamHeader {
-        Timber.d("current header counter is $counter")
-        return StreamHeader(counter++, "$counter")
-    }
-
-    private fun generateTopics(parentId: Int): List<TopicHeader> {
-        val list: MutableList<TopicHeader> = mutableListOf()
-        val n = counter
-        repeat(n) {
-            list.add(TopicHeader(counter++, parentId, "$counter"))
-        }
-        return list
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         val item: MenuItem = menu.findItem(R.id.action_search)
         item.isVisible = true
@@ -124,7 +107,7 @@ class StreamFragment : Fragment() {
     }
 
     private fun initializeRecyclerView() {
-        list = generateData()
+        list = Repository.generateStreamsData()
         binding.streamsRecyclerView.adapter = adapter
         val topicDrawable =
             ContextCompat.getDrawable(requireContext(), R.drawable.topic_item_decoration)
@@ -147,12 +130,32 @@ class StreamFragment : Fragment() {
     }
 
 
+    private fun initializeDataList() {
+        Single.create<List<Stream>> { emitter -> emitter.onSuccess(Repository.generateStreamsData()) }
+            .subscribeOn(
+                Schedulers.computation()
+            )
+            .subscribe(object : SingleObserver<List<Stream>> {
+                override fun onSubscribe(d: Disposable?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onSuccess(value: List<Stream>) {
+                    list = value
+                    adapter.updateList(prepareListForAdapter(list))
+                }
+
+                override fun onError(e: Throwable?) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+    }
+
+
     companion object {
 
         private const val STREAMS_TYPE = "type"
-
-        private const val ALL_STREAMS_MIN_ID = 50
-        private const val REPEAT_COUNT = 3
 
         fun newInstance(type: StreamsType): StreamFragment {
             return StreamFragment().apply {
