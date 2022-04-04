@@ -12,13 +12,6 @@ import com.example.tinkoff.recyclerFeatures.diffUtils.UsersDiffUtil
 class PeopleRecyclerAdapter(private val userClickCallBack: (Int) -> Unit) :
     RecyclerView.Adapter<PeopleRecyclerAdapter.PeopleViewHolder>() {
 
-    private val differ = AsyncListDiffer(this, UsersDiffUtil())
-    private var list: List<User>
-        private set(value) {
-            differ.submitList(value)
-        }
-        get() = differ.currentList
-
     class PeopleViewHolder(
         private val userClickCallBack: (Int) -> Unit,
         private val binding: PeopleRecyclerItemBinding
@@ -36,6 +29,13 @@ class PeopleRecyclerAdapter(private val userClickCallBack: (Int) -> Unit) :
             }
         }
     }
+
+    private val differ = AsyncListDiffer(this, UsersDiffUtil())
+    private var list: List<User>
+        private set(value) {
+            differ.submitList(value)
+        }
+        get() = differ.currentList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PeopleViewHolder {
         val binding =

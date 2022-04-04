@@ -44,16 +44,16 @@ class StreamTabsFragment : Fragment() {
         initializeTabLayout()
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
-                Timber.d("Tab is selected")
+                Timber.d(getString(R.string.tab_is_selected))
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {
-                Timber.d("Tab is unselected")
+                Timber.d(getString(R.string.tab_is_unselected))
                 searchItem?.collapseActionView()
             }
 
             override fun onTabReselected(tab: TabLayout.Tab?) {
-                Timber.d("Tab is selected")
+                Timber.d(getString(R.string.tab_is_reselected))
             }
         })
     }

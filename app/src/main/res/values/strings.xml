@@ -17,4 +17,7 @@
     <string name="stream_header">#%s</string>
     <string name="search_title">Search</string>
     <string name="message_topic_header">Topic: #%s</string>
+    <string name="tab_is_selected">Tab is selected</string>
+    <string name="tab_is_unselected">Tab is unselected</string>
+    <string name="tab_is_reselected">Tab is selected</string>
 </resources>
