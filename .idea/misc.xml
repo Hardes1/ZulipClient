@@ -3,27 +3,35 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="../../../../layout/custom_preview.xml" value="0.31302083333333336" />
-        <entry key="app/src/main/res/drawable/bottom_sheet.xml" value="0.22" />
-        <entry key="app/src/main/res/drawable/bottom_sheet_drawable.xml" value="0.1" />
-        <entry key="app/src/main/res/drawable/date_text_shape.xml" value="0.22" />
-        <entry key="app/src/main/res/drawable/edit_text_shape.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/bottom_sheet.xml" value="0.1405" />
+        <entry key="app/src/main/res/drawable/edit_text_shape.xml" value="0.1675" />
         <entry key="app/src/main/res/drawable/emoji_not_selected.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/emoji_state_selector.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_add.xml" value="0.1" />
-        <entry key="app/src/main/res/drawable/ic_add_content.xml" value="0.222" />
-        <entry key="app/src/main/res/drawable/message_own_bg.xml" value="0.22" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_add_content.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_down.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_plank.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1675" />
+        <entry key="app/src/main/res/drawable/icon_selected_color.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/online_status_selector.xml" value="0.104" />
+        <entry key="app/src/main/res/drawable/profile_online_status_selector.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/stream_header_selector.xml" value="0.18" />
+        <entry key="app/src/main/res/drawable/stream_item_decoration.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/streams_selector.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.15" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.15" />
-        <entry key="app/src/main/res/layout/date_item.xml" value="1.705592105263158" />
-        <entry key="app/src/main/res/layout/flexbox_layout.xml" value="0.75" />
-        <entry key="app/src/main/res/layout/fragment_bottom_sheet.xml" value="0.6015228426395939" />
-        <entry key="app/src/main/res/layout/message_content.xml" value="0.718816067653277" />
-        <entry key="app/src/main/res/layout/message_item.xml" value="0.290625" />
-        <entry key="app/src/main/res/layout/message_layout.xml" value="0.75" />
-        <entry key="app/src/main/res/layout/message_other_item.xml" value="0.5592105263157895" />
-        <entry key="app/src/main/res/layout/message_own_item.xml" value="0.67" />
-        <entry key="app/src/main/res/layout/reaction_item.xml" value="0.75" />
+        <entry key="app/src/main/res/layout/fragment_message.xml" value="0.5089285714285714" />
+        <entry key="app/src/main/res/layout/fragment_message2.xml" value="0.26794871794871794" />
+        <entry key="app/src/main/res/layout/fragment_people.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_streams.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_streams_tabs.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/people_recycler_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/stream_item.xml" value="0.38651994497936726" />
+        <entry key="app/src/main/res/layout/topic_item.xml" value="0.24017094017094018" />
+        <entry key="app/src/main/res/menu/bottom_navigation_menu.xml" value="0.1" />
+        <entry key="app/src/main/res/menu/search_action_menu.xml" value="0.26794871794871794" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
       </map>
     </option>
   </component>

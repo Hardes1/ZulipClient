@@ -1,20 +1,57 @@
-<resources xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.Homework1" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorPrimaryVariant">@color/content_layout_bg_color</item>
         <item name="colorOnPrimary">@color/white</item>
+        <item name="android:windowBackground">@color/color_bg_black</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondary">@color/white</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/content_layout_bg_color
+        </item>
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="emoji_view">
+
+    <style name="StreamHeader">
+        <item name="android:layout_marginStart">@dimen/stream_header_margin_horizontal</item>
+        <item name="android:layout_marginTop">@dimen/stream_header_margin_vertical</item>
+        <item name="android:layout_marginBottom">@dimen/stream_header_margin_vertical</item>
+        <item name="android:fontFamily">@font/inter_medium</item>
+        <item name="android:textColor">@color/message_color</item>
+        <item name="android:textSize">@dimen/stream_header_text_size</item>
+    </style>
+
+    <style name="ShapeableImageView" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="cornerSize">10%</item>
+    </style>
+
+
+    <style name="OnlineStatusView" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="cornerSize">50%</item>
+    </style>
+
+
+    <style name="NameTextView">
+        <item name="android:text">Darrel Steward</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">32sp</item>
+    </style>
+
+
+    <style name="Widget.App.ButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="materialThemeOverlay">@style/LogoutButtonOverlay</item>
+    </style>
+
+    <style name="LogoutButtonOverlay">
+        <item name="colorPrimary">@color/content_layout_bg_color</item>
+    </style>
+
+    <style name="Emoji_View">
         <item name="android:background">@drawable/emoji_state_selector</item>
         <item name="android:paddingStart">@dimen/horizontal_padding_emoji_view</item>
         <item name="android:paddingEnd">@dimen/horizontal_padding_emoji_view</item>
