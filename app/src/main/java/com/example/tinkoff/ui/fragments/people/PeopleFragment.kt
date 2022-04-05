@@ -9,6 +9,7 @@ import android.view.MenuInflater
 
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.User
@@ -16,12 +17,14 @@ import com.example.tinkoff.databinding.FragmentPeopleBinding
 import com.example.tinkoff.network.Repository
 import com.example.tinkoff.recyclerFeatures.adapters.PeopleRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.UserItemDecoration
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 
 class PeopleFragment : Fragment() {
@@ -33,10 +36,9 @@ class PeopleFragment : Fragment() {
     private val adapter: PeopleRecyclerAdapter by lazy {
         PeopleRecyclerAdapter(userClickCallBack)
     }
-
-    private var dataList: List<User> = listOf()
+    private val viewModel: PeopleViewModel by viewModels()
     private val userClickCallBack: (Int) -> Unit = { index ->
-        val user = dataList.find { it.id == index }
+        val user = viewModel.list?.find { it.id == index }
         val action = PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(user)
         findNavController().navigate(
             action
@@ -90,43 +92,60 @@ class PeopleFragment : Fragment() {
             )
         )
         binding.peopleRecyclerView.adapter = adapter
-        initializeDataList()
+        if (viewModel.list == null) {
+            initializeDataList()
+        } else {
+            adapter.updateList(viewModel.list ?: listOf())
+            binding.root.showNext()
+        }
     }
 
     private fun initializeDataList() {
         Single.create<List<User>> { emitter ->
             emitter.onSuccess(Repository.generateUsersData())
-        }.subscribeOn(Schedulers.computation()).observeOn(mainThread())
+        }.delay(DELAY_TIME, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.computation()).observeOn(mainThread())
             .subscribe(object : SingleObserver<List<User>> {
                 override fun onSubscribe(d: Disposable) {
-
+                    binding.shimmerLayout.startShimmer()
                 }
 
                 override fun onSuccess(list: List<User>) {
-                    dataList = list
-                    adapter.updateList(dataList)
+                    binding.shimmerLayout.stopShimmer()
+                    binding.root.showNext()
+                    viewModel.list = list
+                    adapter.updateList(viewModel.list ?: emptyList())
                 }
 
                 override fun onError(e: Throwable) {
+                    Snackbar.make(
+                        binding.peopleRecyclerView,
+                        getString(R.string.error_people_loading),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 }
             })
     }
 
 
     private fun filterListByString(filter: String) {
-        val filteredList: List<User> = if (filter.isNotEmpty()) {
-            dataList.filter { it.name.contains(filter, ignoreCase = true) }
+        val filteredList: List<User>? = if (filter.isNotEmpty()) {
+            viewModel.list?.filter { it.name.contains(filter, ignoreCase = true) }
         } else {
-            dataList.map { it.copy() }
+            viewModel.list?.map { it.copy() }
         }
-        adapter.updateList(filteredList)
+        adapter.updateList(filteredList ?: emptyList())
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
-
         _binding = null
     }
+
+    companion object {
+        private const val DELAY_TIME: Long = 1000
+    }
+
 
 }

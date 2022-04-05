@@ -1,0 +1,23 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="@dimen/people_big_spacing_recycler_view"
+    android:orientation="vertical">
+
+    <include layout="@layout/people_shimmer_item" />
+
+    <include layout="@layout/people_shimmer_item" />
+
+    <include layout="@layout/people_shimmer_item" />
+
+    <include layout="@layout/people_shimmer_item" />
+
+    <include layout="@layout/people_shimmer_item" />
+
+    <include layout="@layout/people_shimmer_item" />
+
+    <include layout="@layout/people_shimmer_item" />
+
+    <include layout="@layout/people_shimmer_item" />
+
+</LinearLayout>

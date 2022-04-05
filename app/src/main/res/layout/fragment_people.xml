@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:inAnimation="@anim/view_switcher_in_animation"
+    android:outAnimation="@anim/view_switcher_out_animation"
     tools:context=".ui.fragments.people.PeopleFragment">
+
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:shimmer_auto_start="false">
+
+        <include layout="@layout/people_shimmer_layout" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -13,4 +26,4 @@
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-</FrameLayout>
+</ViewSwitcher>
