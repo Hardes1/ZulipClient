@@ -28,7 +28,9 @@
         <entry key="app/src/main/res/layout/fragment_streams.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_streams_tabs.xml" value="0.1" />
         <entry key="app/src/main/res/layout/people_recycler_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/shimmer_stream_item.xml" value="0.25" />
         <entry key="app/src/main/res/layout/stream_item.xml" value="0.38651994497936726" />
+        <entry key="app/src/main/res/layout/streams_shimmer_linear_layout.xml" value="0.22008547008547008" />
         <entry key="app/src/main/res/layout/topic_item.xml" value="0.24017094017094018" />
         <entry key="app/src/main/res/menu/bottom_navigation_menu.xml" value="0.1" />
         <entry key="app/src/main/res/menu/search_action_menu.xml" value="0.26794871794871794" />
