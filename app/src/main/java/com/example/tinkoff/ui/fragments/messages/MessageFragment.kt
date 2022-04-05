@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tinkoff.R
@@ -34,8 +35,8 @@ class MessageFragment : Fragment() {
     private val binding: FragmentMessageBinding
         get() = _binding!!
     private val args: MessageFragmentArgs by navArgs()
-
-    private val viewModel: ReactionsViewModel by activityViewModels()
+    private val messageViewModel: MessagesViewModel by viewModels()
+    private val reactionsViewModel: ReactionsViewModel by activityViewModels()
     private lateinit var adapter: MessageRecyclerAdapter
     private val bottomSheetDialog = BottomSheetFragment.newInstance()
     private var messageIndex: Int = -1
@@ -131,7 +132,7 @@ class MessageFragment : Fragment() {
     }
 
 
-    private fun prepareList(): MutableList<MessageContentInterface> {
+    private fun prepareList(messagesList: MutableList<MessageContentInterface>): MutableList<MessageContentInterface> {
         val result: MutableList<MessageContentInterface> = mutableListOf()
         for (element in messagesList) {
             if (element is Date)
@@ -183,13 +184,13 @@ class MessageFragment : Fragment() {
 
 
     private fun updateAdapter() {
-        copiedMessagesList = prepareList()
+        copiedMessagesList = prepareList(messageViewModel.messageList ?: mutableListOf())
         adapter.updateList(copiedMessagesList)
     }
 
 
     private fun observeViewModels() {
-        viewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
+        reactionsViewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
             val messageIndexValue = messageIndex
             val reactionCondition = reactionIndexValue >= 0 &&
                     reactionIndexValue < ReactionsData.reactionsStringList.size
@@ -219,8 +220,6 @@ class MessageFragment : Fragment() {
             }
         }
     }
-
-
 
 
     override fun onDestroy() {

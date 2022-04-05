@@ -111,10 +111,12 @@ class PeopleFragment : Fragment() {
                 }
 
                 override fun onSuccess(list: List<User>) {
-                    binding.shimmerLayout.stopShimmer()
-                    binding.root.showNext()
                     viewModel.list = list
                     adapter.updateList(viewModel.list ?: emptyList())
+                    if (_binding != null) {
+                        binding.shimmerLayout.stopShimmer()
+                        binding.root.showNext()
+                    }
                 }
 
                 override fun onError(e: Throwable) {
@@ -128,6 +130,12 @@ class PeopleFragment : Fragment() {
     }
 
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
+
     private fun filterListByString(filter: String) {
         val filteredList: List<User>? = if (filter.isNotEmpty()) {
             viewModel.list?.filter { it.name.contains(filter, ignoreCase = true) }
@@ -135,12 +143,6 @@ class PeopleFragment : Fragment() {
             viewModel.list?.map { it.copy() }
         }
         adapter.updateList(filteredList ?: emptyList())
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     companion object {
