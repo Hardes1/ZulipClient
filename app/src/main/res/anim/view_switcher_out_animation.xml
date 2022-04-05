@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromAlpha="@integer/start_alpha_in"
+    android:toAlpha="@integer/end_alpha_out"
+    android:duration = "@integer/duration"
+    />

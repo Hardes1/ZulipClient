@@ -1,15 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/switcher"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:inAnimation="@anim/view_switcher_in_animation"
+    android:outAnimation="@anim/view_switcher_out_animation"
     tools:context=".ui.fragments.stream.StreamFragment">
 
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id = "@+id/streams_recycler_view"
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
-</FrameLayout>
+        app:shimmer_auto_start="false"
+        app:shimmer_direction="left_to_right">
+
+        <include layout="@layout/streams_shimmer_linear_layout" />
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/streams_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+    </FrameLayout>
+
+
+</ViewSwitcher>

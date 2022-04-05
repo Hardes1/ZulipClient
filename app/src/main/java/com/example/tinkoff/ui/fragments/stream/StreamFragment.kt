@@ -20,12 +20,14 @@ import com.example.tinkoff.network.Repository
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
 import com.example.tinkoff.ui.fragments.streamTabs.StreamTabsFragmentDirections
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 
 class StreamFragment : Fragment() {
@@ -129,8 +131,10 @@ class StreamFragment : Fragment() {
         )
         if (viewModel.list == null)
             initializeDataList()
-        else
+        else {
             adapter.updateList(prepareListForAdapter(viewModel.list ?: listOf()))
+            binding.root.showNext()
+        }
     }
 
 
@@ -141,7 +145,7 @@ class StreamFragment : Fragment() {
                     viewModel.type ?: StreamsType.SUBSCRIBED
                 )
             )
-        }
+        }.delay(DELAY_TIME, TimeUnit.MILLISECONDS)
             .subscribeOn(
                 Schedulers.computation()
             ).flatMap {
@@ -151,13 +155,26 @@ class StreamFragment : Fragment() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : SingleObserver<List<StreamsInterface>> {
                 override fun onSubscribe(d: Disposable?) {
+                    binding.shimmerLayout.startShimmer()
                 }
 
                 override fun onSuccess(value: List<StreamsInterface>) {
                     adapter.updateList(value)
+                    binding.shimmerLayout.stopShimmer()
+                    binding.root.showNext()
+                    /*     Snackbar.make(
+                             binding.streamsRecyclerView,
+                             "Loading finished",
+                             Snackbar.LENGTH_SHORT
+                         ).show()*/
                 }
 
                 override fun onError(e: Throwable?) {
+                    Snackbar.make(
+                        binding.streamsRecyclerView,
+                        getString(R.string.error_streams_loading),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 }
             })
     }
@@ -166,6 +183,7 @@ class StreamFragment : Fragment() {
     companion object {
 
         private const val STREAMS_TYPE = "STREAM_TYPE"
+        private const val DELAY_TIME: Long = 1000
 
         fun newInstance(type: StreamsType): StreamFragment {
             return StreamFragment().apply {

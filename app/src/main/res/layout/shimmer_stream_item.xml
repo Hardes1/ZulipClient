@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/stream_header_selector">
+
+
+    <View
+        android:id="@+id/stream_name_text_view"
+        style="@style/StreamHeader"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:background="@color/icon_not_selected_color"
+        android:layout_marginEnd="@dimen/stream_button_margin_horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/shimmer_button_stream"
+        tools:text="#general" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id = "@+id/shimmer_button_stream"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/stream_button_margin_horizontal"
+        android:scaleType="fitCenter"
+        android:src="@drawable/streams_selector"
+        app:layout_constraintBottom_toBottomOf="@+id/stream_name_text_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/stream_name_text_view" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
