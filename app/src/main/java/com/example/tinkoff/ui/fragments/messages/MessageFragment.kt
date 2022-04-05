@@ -26,6 +26,12 @@ import com.example.tinkoff.recyclerFeatures.adapters.MessageRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.MessageItemDecoration
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.example.tinkoff.ui.fragments.bottomSheet.BottomSheetFragment
+import io.reactivex.Single
+import io.reactivex.SingleObserver
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 
 
 class MessageFragment : Fragment() {
@@ -35,7 +41,7 @@ class MessageFragment : Fragment() {
     private val binding: FragmentMessageBinding
         get() = _binding!!
     private val args: MessageFragmentArgs by navArgs()
-    private val messageViewModel: MessagesViewModel by viewModels()
+    private val messagesViewModel: MessagesViewModel by viewModels()
     private val reactionsViewModel: ReactionsViewModel by activityViewModels()
     private lateinit var adapter: MessageRecyclerAdapter
     private val bottomSheetDialog = BottomSheetFragment.newInstance()
@@ -48,8 +54,7 @@ class MessageFragment : Fragment() {
         )
     }
     private lateinit var layoutManager: LinearLayoutManager
-    private var messagesList: MutableList<MessageContentInterface> = mutableListOf()
-    private var copiedMessagesList: MutableList<MessageContentInterface> = mutableListOf()
+
     private var counter = 0
 
     override fun onCreateView(
@@ -80,7 +85,7 @@ class MessageFragment : Fragment() {
         binding.sendButton.setOnClickListener {
             val text = (binding.messageContentTextView.text ?: "").trim()
             binding.messageContentTextView.text = SpannableStringBuilder("")
-            messagesList.add(
+            messagesViewModel.messagesList?.add(
                 MessageContent(
                     counter++,
                     text.toString(),
@@ -115,12 +120,11 @@ class MessageFragment : Fragment() {
 
 
     private fun initializeRecyclerView() {
-        messagesList = Repository.generateMessagesData()
         layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         adapter = MessageRecyclerAdapter(
             onMessageIndexChanged,
-            {
-                messagesList = copiedMessagesList
+            { updatedList ->
+                messagesViewModel.messagesList = copyList(updatedList.toMutableList())
                 binding.recyclerView.scrollToPosition(0)
             },
             updateElementCallBack
@@ -128,11 +132,38 @@ class MessageFragment : Fragment() {
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addItemDecoration(decorator)
         binding.recyclerView.layoutManager = layoutManager
-        updateAdapter()
+        if (messagesViewModel.messagesList == null) {
+            initializeDataList()
+        }
     }
 
 
-    private fun prepareList(messagesList: MutableList<MessageContentInterface>): MutableList<MessageContentInterface> {
+    private fun initializeDataList() {
+        Single.create<MutableList<MessageContentInterface>> { emitter ->
+            emitter.onSuccess(
+                Repository.generateMessagesData()
+            )
+        }
+            .subscribeOn(
+                Schedulers.computation()
+            ).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<MutableList<MessageContentInterface>> {
+                override fun onSubscribe(d: Disposable?) {
+
+                }
+
+                override fun onSuccess(value: MutableList<MessageContentInterface>) {
+                    messagesViewModel.messagesList = value
+                    updateAdapter()
+                }
+
+                override fun onError(e: Throwable?) {
+                }
+            })
+    }
+
+
+    private fun copyList(messagesList: MutableList<MessageContentInterface>): MutableList<MessageContentInterface> {
         val result: MutableList<MessageContentInterface> = mutableListOf()
         for (element in messagesList) {
             if (element is Date)
@@ -168,7 +199,10 @@ class MessageFragment : Fragment() {
 
     private val updateElementCallBack: (Int, Int, Boolean) -> Unit =
         { invertedAdapterPosition, reactionPosition, isAdd ->
-            val adapterPosition = messagesList.size - 1 - invertedAdapterPosition
+            val messagesList = messagesViewModel.messagesList
+            require(messagesList != null)
+            val adapterPosition =
+                messagesList.size - 1 - invertedAdapterPosition
             val currentReaction =
                 (messagesList[adapterPosition] as MessageContent).reactions[reactionPosition]
             if (isAdd) {
@@ -184,21 +218,29 @@ class MessageFragment : Fragment() {
 
 
     private fun updateAdapter() {
-        copiedMessagesList = prepareList(messageViewModel.messageList ?: mutableListOf())
-        adapter.updateList(copiedMessagesList)
+        val newList = copyList(messagesViewModel.messagesList ?: mutableListOf())
+        adapter.updateList(newList)
     }
 
 
     private fun observeViewModels() {
         reactionsViewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
+
             val messageIndexValue = messageIndex
             val reactionCondition = reactionIndexValue >= 0 &&
                     reactionIndexValue < ReactionsData.reactionsStringList.size
-            val messageCondition = messageIndexValue >= 0 && messageIndexValue < messagesList.size
+            val messageCondition =
+                messageIndexValue >= 0 && messageIndexValue < messagesViewModel.messagesList?.size ?: 0
             if (reactionCondition && messageCondition) {
+                val size = messagesViewModel.messagesList?.size ?: 0
+                Timber.d("DEBUG messagesViewModel ${messagesViewModel.messagesList}")
+                Timber.d("DEBUG messageIndexValue $messageIndexValue")
+                Timber.d("DEBUG reactionIndexValue $reactionIndexValue")
+                Timber.d("DEBUG size $size")
                 val currentReactions =
-                    (messagesList[messagesList.size - 1 - messageIndexValue] as MessageContent)
+                    (messagesViewModel.messagesList?.get(size - 1 - messageIndexValue) as MessageContent)
                         .reactions
+                Timber.d("reactions got")
                 val pressedReactionIndex =
                     currentReactions.indexOfFirst { reaction ->
                         reaction.emoji == ReactionsData.reactionsStringList[reactionIndexValue]
@@ -216,6 +258,7 @@ class MessageFragment : Fragment() {
                 ) {
                     currentReactions[pressedReactionIndex].usersId.add(MY_ID)
                 }
+                Timber.d("DEBUG reaction after changes ${messagesViewModel.messagesList}")
                 updateAdapter()
             }
         }
