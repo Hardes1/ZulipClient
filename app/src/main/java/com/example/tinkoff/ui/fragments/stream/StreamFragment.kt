@@ -15,7 +15,7 @@ import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.Stream
 import com.example.tinkoff.data.classes.StreamsInterface
 import com.example.tinkoff.data.states.StreamsType
-import com.example.tinkoff.databinding.FragmentStreamsBinding
+import com.example.tinkoff.databinding.FragmentStreamBinding
 import com.example.tinkoff.network.Repository
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
@@ -33,8 +33,8 @@ import java.util.concurrent.TimeUnit
 class StreamFragment : Fragment() {
 
 
-    private var _binding: FragmentStreamsBinding? = null
-    private val binding: FragmentStreamsBinding
+    private var _binding: FragmentStreamBinding? = null
+    private val binding: FragmentStreamBinding
         get() = _binding!!
 
     private val viewModel: StreamViewModel by viewModels()
@@ -70,7 +70,7 @@ class StreamFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         setHasOptionsMenu(true)
-        _binding = FragmentStreamsBinding.inflate(inflater, container, false)
+        _binding = FragmentStreamBinding.inflate(inflater, container, false)
         if (viewModel.type == null)
             viewModel.type = StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
         return binding.root

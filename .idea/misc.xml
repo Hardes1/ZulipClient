@@ -6,6 +6,7 @@
         <entry key="app/src/main/res/drawable/bottom_sheet.xml" value="0.1405" />
         <entry key="app/src/main/res/drawable/edit_text_shape.xml" value="0.1675" />
         <entry key="app/src/main/res/drawable/emoji_not_selected.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/emoji_selected.xml" value="0.241" />
         <entry key="app/src/main/res/drawable/emoji_state_selector.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_add.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_add_content.xml" value="0.1" />
@@ -13,8 +14,10 @@
         <entry key="app/src/main/res/drawable/ic_plank.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_search.xml" value="0.1675" />
         <entry key="app/src/main/res/drawable/icon_selected_color.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/message_own_bg.xml" value="0.241" />
         <entry key="app/src/main/res/drawable/online_status_selector.xml" value="0.104" />
         <entry key="app/src/main/res/drawable/profile_online_status_selector.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/rounder_shimmer_item.xml" value="0.241" />
         <entry key="app/src/main/res/drawable/stream_header_selector.xml" value="0.18" />
         <entry key="app/src/main/res/drawable/stream_item_decoration.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/streams_selector.xml" value="0.1" />
@@ -25,9 +28,12 @@
         <entry key="app/src/main/res/layout/fragment_message2.xml" value="0.26794871794871794" />
         <entry key="app/src/main/res/layout/fragment_people.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_stream.xml" value="0.2517094017094017" />
         <entry key="app/src/main/res/layout/fragment_streams.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_streams_tabs.xml" value="0.1" />
         <entry key="app/src/main/res/layout/people_recycler_item.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/people_shimmer_layout.xml" value="0.2572463768115942" />
+        <entry key="app/src/main/res/layout/people_shimmer_linear_layout.xml" value="0.25" />
         <entry key="app/src/main/res/layout/shimmer_stream_item.xml" value="0.25" />
         <entry key="app/src/main/res/layout/stream_item.xml" value="0.38651994497936726" />
         <entry key="app/src/main/res/layout/streams_shimmer_linear_layout.xml" value="0.22008547008547008" />

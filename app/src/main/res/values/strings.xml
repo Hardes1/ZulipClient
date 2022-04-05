@@ -25,4 +25,5 @@
     <string name="debug_fragment_recreated">Fragment recreated.</string>
     <string name="debug_view_recreated">View recreated.</string>
     <string name="error_streams_loading">Error happened during loading streams. Try again.</string>
+    <string name="error_people_loading">Error happened during loading contacts. Try again.</string>
 </resources>
