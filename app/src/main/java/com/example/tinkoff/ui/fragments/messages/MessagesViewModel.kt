@@ -4,5 +4,5 @@ import androidx.lifecycle.ViewModel
 import com.example.tinkoff.data.classes.MessageContentInterface
 
 class MessagesViewModel : ViewModel() {
-    var messageList: MutableList<MessageContentInterface>? = null
+    var messagesList: MutableList<MessageContentInterface>? = null
 }
