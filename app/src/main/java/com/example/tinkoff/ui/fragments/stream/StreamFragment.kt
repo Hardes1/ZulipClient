@@ -160,13 +160,10 @@ class StreamFragment : Fragment() {
 
                 override fun onSuccess(value: List<StreamsInterface>) {
                     adapter.updateList(value)
-                    binding.shimmerLayout.stopShimmer()
-                    binding.root.showNext()
-                    /*     Snackbar.make(
-                             binding.streamsRecyclerView,
-                             "Loading finished",
-                             Snackbar.LENGTH_SHORT
-                         ).show()*/
+                    if (_binding != null) {
+                        binding.shimmerLayout.stopShimmer()
+                        binding.root.showNext()
+                    }
                 }
 
                 override fun onError(e: Throwable?) {
