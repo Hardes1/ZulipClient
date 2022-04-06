@@ -9,8 +9,8 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/avatar_icon"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="@dimen/small_avatar_icon_width"
+        android:layout_height="@dimen/small_avatar_icon_height"
         android:layout_marginStart="15dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -19,8 +19,8 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/online_status"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/online_status_width"
+        android:layout_height="@dimen/online_status_height"
         android:background="@drawable/online_status_selector"
         app:layout_constraintBottom_toBottomOf="@id/avatar_icon"
         app:layout_constraintEnd_toEndOf="@id/avatar_icon"
@@ -32,9 +32,9 @@
         style="@style/NameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="18dp"
-        android:textSize="22sp"
+        android:layout_marginStart="@dimen/people_name_text_view_margin_start"
+        android:layout_marginTop="@dimen/people_name_text_view_margin_top"
+        android:textSize="@dimen/people_name_text_view_size"
         app:layout_constraintStart_toEndOf="@id/avatar_icon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Darrel steward" />
@@ -43,7 +43,7 @@
         android:id="@+id/email_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/people_email_text_view_margin_top"
         android:textColor="@color/email_text_color"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@id/name_text_view"

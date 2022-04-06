@@ -36,7 +36,7 @@
         <entry key="app/src/main/res/layout/people_shimmer_item.xml" value="0.12182971014492754" />
         <entry key="app/src/main/res/layout/people_shimmer_layout.xml" value="0.2572463768115942" />
         <entry key="app/src/main/res/layout/people_shimmer_linear_layout.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/profile_shimmer_layout.xml" value="0.11282264779350541" />
+        <entry key="app/src/main/res/layout/profile_shimmer_layout.xml" value="0.33" />
         <entry key="app/src/main/res/layout/shimmer_stream_item.xml" value="0.25" />
         <entry key="app/src/main/res/layout/stream_item.xml" value="0.38651994497936726" />
         <entry key="app/src/main/res/layout/stream_recycler_item.xml" value="0.1" />

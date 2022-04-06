@@ -10,9 +10,9 @@
         style="@style/StreamHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="33dp"
-        android:layout_marginTop="9dp"
-        android:layout_marginBottom="9dp"
+        android:layout_marginStart="@dimen/topic_name_text_view_margin_start"
+        android:layout_marginTop="@dimen/topic_name_text_view_margin_top"
+        android:layout_marginBottom="@dimen/topic_name_text_view_margin_bottom"
         android:fontFamily="@font/inter"
         tools:text="Testing" />
 

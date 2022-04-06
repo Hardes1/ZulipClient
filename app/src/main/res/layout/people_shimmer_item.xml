@@ -4,56 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/people_small_spacing_recycler_view"
-    >
+    android:paddingBottom="@dimen/people_small_spacing_recycler_view">
 
     <View
-        android:id = "@+id/avatar_icon_view"
-        android:layout_width="80dp"
-        android:layout_marginStart="15dp"
-        android:layout_height="80dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/avatar_icon_view"
+        android:layout_width="@dimen/avatar_icon_shimmer_width"
+        android:layout_height="@dimen/avatar_icon_shimmer_height"
+        android:layout_marginStart="@dimen/avatar_icon_shimmer_margin_start"
         android:background="@drawable/rounder_shimmer_item"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <View
-        android:id = "@+id/online_status"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        app:layout_constraintEnd_toEndOf="@id/avatar_icon_view"
+        android:id="@+id/online_status"
+        android:layout_width="@dimen/online_status_height"
+        android:layout_height="@dimen/online_status_width"
+        android:background="@drawable/rounder_shimmer_item"
         app:layout_constraintBottom_toBottomOf="@id/avatar_icon_view"
-        android:background="@drawable/rounder_shimmer_item"
-        />
+        app:layout_constraintEnd_toEndOf="@id/avatar_icon_view" />
 
 
     <View
         android:id="@+id/name_text_view"
         android:layout_width="0dp"
-        android:layout_height="25dp"
-        android:layout_marginTop="18dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="100dp"
+        android:layout_height="@dimen/people_name_view_shimmer_height"
+        android:layout_marginStart="@dimen/people_name_view_shimmer_start"
+        android:layout_marginTop="@dimen/people_name_view_shimmer_margin_top"
+        android:layout_marginEnd="@dimen/people_name_view_shimmer_margin_end"
         android:background="@color/icon_not_selected_color"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/avatar_icon_view"
-        tools:text="Darrel steward"
-        />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Darrel steward" />
 
     <View
-        android:id ="@+id/email_view"
+        android:id="@+id/email_view"
         android:layout_width="0dp"
-        android:layout_height="15dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="45dp"
+        android:layout_height="@dimen/people_email_view_shimmer_height"
+        android:layout_marginTop="@dimen/people_email_view_shimmer_margin_top"
+        android:layout_marginEnd="@dimen/people_email_view_shimmer_margin_end"
         android:background="@color/icon_not_selected_color"
         app:layout_constraintBottom_toBottomOf="@id/avatar_icon_view"
-        app:layout_constraintStart_toStartOf="@id/name_text_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/name_text_view"
-        />
-
+        app:layout_constraintStart_toStartOf="@id/name_text_view"
+        app:layout_constraintTop_toBottomOf="@id/name_text_view" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
