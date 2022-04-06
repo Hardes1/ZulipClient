@@ -1,9 +1,12 @@
 package com.example.tinkoff.network
 
+import android.content.Context
+import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.*
 import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.data.states.StreamsType
 import com.example.tinkoff.data.states.UserStatus
+import com.example.tinkoff.ui.fragments.messages.MessageFragment
 import timber.log.Timber
 
 object Repository {
@@ -12,16 +15,16 @@ object Repository {
     fun generateUsersData(): List<User> {
         counter = 0
         return listOf(
-            User(counter++, "Устинов Георгий", "abobaMail@mail.ru", UserStatus.ONLINE),
-            User(counter++, "Устинова Алёна", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Привет, как дела", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Проверяю текст", "abobaMail@mail.ru", UserStatus.ONLINE),
-            User(counter++, "Мельников Игорь", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Как же хочется прыгать", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Откуда я знаю", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "ABOBA spirs", "abobaMail@mail.ru", UserStatus.ONLINE),
-            User(counter++, "ABOBA pirs", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "ABOBA poso", "abobaMail@mail.ru", UserStatus.OFFLINE)
+            User(counter++, "Устинов Георгий", "abobaMail@mail.ru", UserStatus.ONLINE, R.drawable.union),
+            User(counter++, "Устинова Алёна", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "Привет, как дела", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "Проверяю текст", "abobaMail@mail.ru", UserStatus.ONLINE, R.drawable.union),
+            User(counter++, "Мельников Игорь", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "Как же хочется прыгать", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "Откуда я знаю", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "ABOBA spirs", "abobaMail@mail.ru", UserStatus.ONLINE, R.drawable.union),
+            User(counter++, "ABOBA pirs", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "ABOBA poso", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union)
         )
     }
 
@@ -101,6 +104,16 @@ object Repository {
         list.add(Date(counter++, "2 Feb"))
         list.add(MessageContent(counter++, "abobaaboba", mutableListOf(), SenderType.OTHER))
         return list
+    }
+
+    fun generatePersonalUserData(context: Context): User {
+        return User(
+            MessageFragment.MY_ID,
+            context.resources.getString(R.string.profile_name_text),
+            context.resources.getString(R.string.profile_email_text),
+            UserStatus.ONLINE,
+            R.drawable.union
+        )
     }
 
 }

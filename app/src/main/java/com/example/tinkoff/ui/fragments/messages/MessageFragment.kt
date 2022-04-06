@@ -155,7 +155,7 @@ class MessageFragment : Fragment() {
             .subscribe(
                 object : SingleObserver<MutableList<MessageContentInterface>> {
                     override fun onSubscribe(d: Disposable?) {
-                        compositeDisposable.dispose()
+                        compositeDisposable.add(d)
                         binding.progressBarIndicator.visibility = View.VISIBLE
                     }
 

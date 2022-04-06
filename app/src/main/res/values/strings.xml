@@ -27,4 +27,8 @@
     <string name="error_streams_loading">Error happened during loading streams. Try again.</string>
     <string name="error_people_loading">Error happened during loading contacts. Try again.</string>
     <string name="error_messages_loading">Error happened during loading topics messages. Try again.</string>
+    <string name="error_profile_loading">Error during loading user profile. Try again.</string>
+    <string name="profile_name_text">Darrel Steward</string>
+    <string name="profile_email_text">darrels@gmail.com</string>
+    <string name="call_user_status">In a meeting</string>
 </resources>
