@@ -24,6 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -38,7 +39,7 @@ class StreamFragment : Fragment() {
         get() = _binding!!
 
     private val viewModel: StreamViewModel by viewModels()
-
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     private val changeStateCallBack: (Int, Boolean) -> Unit = { id, isSelected ->
         viewModel.list?.find { it.streamHeader.id == id }?.streamHeader?.isSelected = isSelected
@@ -105,11 +106,6 @@ class StreamFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
-
     private fun initializeRecyclerView() {
         binding.streamsRecyclerView.adapter = adapter
         val topicDrawable =
@@ -156,14 +152,13 @@ class StreamFragment : Fragment() {
             .subscribe(object : SingleObserver<List<StreamsInterface>> {
                 override fun onSubscribe(d: Disposable?) {
                     binding.shimmerLayout.startShimmer()
+                    compositeDisposable.add(d)
                 }
 
                 override fun onSuccess(value: List<StreamsInterface>) {
                     adapter.updateList(value)
-                    if (_binding != null) {
-                        binding.shimmerLayout.stopShimmer()
-                        binding.root.showNext()
-                    }
+                    binding.shimmerLayout.stopShimmer()
+                    binding.root.showNext()
                 }
 
                 override fun onError(e: Throwable?) {
@@ -176,6 +171,12 @@ class StreamFragment : Fragment() {
             })
     }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+        compositeDisposable.dispose()
+    }
 
     companion object {
 

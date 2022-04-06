@@ -26,13 +26,14 @@ import com.example.tinkoff.recyclerFeatures.adapters.MessageRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.MessageItemDecoration
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.example.tinkoff.ui.fragments.bottomSheet.BottomSheetFragment
+import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
-
+import java.util.concurrent.TimeUnit
 
 class MessageFragment : Fragment() {
 
@@ -46,6 +47,7 @@ class MessageFragment : Fragment() {
     private lateinit var adapter: MessageRecyclerAdapter
     private val bottomSheetDialog = BottomSheetFragment.newInstance()
     private var messageIndex: Int = -1
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     private val decorator: MessageItemDecoration by lazy {
         MessageItemDecoration(
@@ -134,6 +136,8 @@ class MessageFragment : Fragment() {
         binding.recyclerView.layoutManager = layoutManager
         if (messagesViewModel.messagesList == null) {
             initializeDataList()
+        } else {
+            updateAdapter()
         }
     }
 
@@ -143,23 +147,33 @@ class MessageFragment : Fragment() {
             emitter.onSuccess(
                 Repository.generateMessagesData()
             )
-        }
+        }.delay(DELAY_TIME, TimeUnit.MILLISECONDS)
             .subscribeOn(
                 Schedulers.computation()
             ).observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : SingleObserver<MutableList<MessageContentInterface>> {
-                override fun onSubscribe(d: Disposable?) {
+            .subscribe(
+                object : SingleObserver<MutableList<MessageContentInterface>> {
+                    override fun onSubscribe(d: Disposable?) {
+                        compositeDisposable.dispose()
+                        binding.progressBarIndicator.visibility = View.VISIBLE
+                    }
 
-                }
+                    override fun onSuccess(value: MutableList<MessageContentInterface>) {
+                        messagesViewModel.messagesList = value
+                        binding.progressBarIndicator.visibility = View.INVISIBLE
+                        updateAdapter()
+                    }
 
-                override fun onSuccess(value: MutableList<MessageContentInterface>) {
-                    messagesViewModel.messagesList = value
-                    updateAdapter()
-                }
+                    override fun onError(e: Throwable?) {
+                        binding.progressBarIndicator.visibility = View.INVISIBLE
+                        Snackbar.make(
+                            binding.root,
+                            getString(R.string.error_messages_loading),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                })
 
-                override fun onError(e: Throwable?) {
-                }
-            })
     }
 
 
@@ -233,14 +247,9 @@ class MessageFragment : Fragment() {
                 messageIndexValue >= 0 && messageIndexValue < messagesViewModel.messagesList?.size ?: 0
             if (reactionCondition && messageCondition) {
                 val size = messagesViewModel.messagesList?.size ?: 0
-                Timber.d("DEBUG messagesViewModel ${messagesViewModel.messagesList}")
-                Timber.d("DEBUG messageIndexValue $messageIndexValue")
-                Timber.d("DEBUG reactionIndexValue $reactionIndexValue")
-                Timber.d("DEBUG size $size")
                 val currentReactions =
                     (messagesViewModel.messagesList?.get(size - 1 - messageIndexValue) as MessageContent)
                         .reactions
-                Timber.d("reactions got")
                 val pressedReactionIndex =
                     currentReactions.indexOfFirst { reaction ->
                         reaction.emoji == ReactionsData.reactionsStringList[reactionIndexValue]
@@ -258,7 +267,6 @@ class MessageFragment : Fragment() {
                 ) {
                     currentReactions[pressedReactionIndex].usersId.add(MY_ID)
                 }
-                Timber.d("DEBUG reaction after changes ${messagesViewModel.messagesList}")
                 updateAdapter()
             }
         }
@@ -268,9 +276,12 @@ class MessageFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+        compositeDisposable.dispose()
+
     }
 
     companion object {
+        private const val DELAY_TIME : Long = 1000
         private const val FRAGMENT_TAG = "TAG"
         const val MY_ID = 1
     }
