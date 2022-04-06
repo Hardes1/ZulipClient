@@ -87,7 +87,7 @@ class MessageFragment : Fragment() {
         binding.sendButton.setOnClickListener {
             val text = (binding.messageContentTextView.text ?: "").trim()
             binding.messageContentTextView.text = SpannableStringBuilder("")
-            messagesViewModel.messagesList?.add(
+            updateAdapter(
                 MessageContent(
                     counter++,
                     text.toString(),
@@ -95,7 +95,6 @@ class MessageFragment : Fragment() {
                     SenderType.OWN
                 )
             )
-            updateAdapter()
         }
     }
 
@@ -126,8 +125,10 @@ class MessageFragment : Fragment() {
         adapter = MessageRecyclerAdapter(
             onMessageIndexChanged,
             { updatedList ->
-                messagesViewModel.messagesList = copyList(updatedList.toMutableList())
-                binding.recyclerView.scrollToPosition(0)
+                val newList = copyList(updatedList.toMutableList())
+                if (newList.size != messagesViewModel.messagesList?.size ?: 0)
+                    binding.recyclerView.scrollToPosition(0)
+                messagesViewModel.messagesList = newList
             },
             updateElementCallBack
         )
@@ -231,8 +232,10 @@ class MessageFragment : Fragment() {
         }
 
 
-    private fun updateAdapter() {
+    private fun updateAdapter(message: MessageContentInterface? = null) {
         val newList = copyList(messagesViewModel.messagesList ?: mutableListOf())
+        if (message != null)
+            newList.add(message)
         adapter.updateList(newList)
     }
 
@@ -281,7 +284,7 @@ class MessageFragment : Fragment() {
     }
 
     companion object {
-        private const val DELAY_TIME : Long = 1000
+        private const val DELAY_TIME: Long = 1000
         private const val FRAGMENT_TAG = "TAG"
         const val MY_ID = 1
     }

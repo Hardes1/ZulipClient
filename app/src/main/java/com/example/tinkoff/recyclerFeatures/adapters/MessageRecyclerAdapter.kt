@@ -18,7 +18,6 @@ import com.example.tinkoff.databinding.MessageOwnItemBinding
 import com.example.tinkoff.ui.fragments.messages.MessageFragment.Companion.MY_ID
 import com.example.tinkoff.ui.views.FlexBoxLayout
 import com.google.android.material.textview.MaterialTextView
-import timber.log.Timber
 
 class MessageRecyclerAdapter(
     private val onPositionChanged: (Int) -> Unit,
@@ -27,6 +26,11 @@ class MessageRecyclerAdapter(
 ) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
 
+
+    abstract class MessageContentViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
+        abstract fun bind(content: MessageContentInterface)
+    }
 
     class MessageOtherViewHolder(
 
@@ -136,10 +140,6 @@ class MessageRecyclerAdapter(
         }
         get() = differ.currentList
 
-    abstract class MessageContentViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
-        abstract fun bind(content: MessageContentInterface)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageContentViewHolder {
         return when (viewType) {
