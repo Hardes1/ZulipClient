@@ -130,12 +130,9 @@ class MessageRecyclerAdapter(
     private val differ = AsyncListDiffer(this, MessagesDiffUtil())
     private var list: List<MessageContentInterface>
         private set(value) {
-            Timber.d("DEBUG adapter list before changes: $list")
             differ.submitList(value.reversed()) {
                 listChanged(value)
             }
-            Timber.d("DEBUG adapter list after changes: $list")
-
         }
         get() = differ.currentList
 

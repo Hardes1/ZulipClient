@@ -18,9 +18,11 @@ import com.example.tinkoff.network.Repository
 import com.example.tinkoff.recyclerFeatures.adapters.PeopleRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.UserItemDecoration
 import com.google.android.material.snackbar.Snackbar
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -37,6 +39,8 @@ class PeopleFragment : Fragment() {
         PeopleRecyclerAdapter(userClickCallBack)
     }
     private val viewModel: PeopleViewModel by viewModels()
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
+
     private val userClickCallBack: (Int) -> Unit = { index ->
         val user = viewModel.list?.find { it.id == index }
         val action = PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(user)
@@ -107,16 +111,15 @@ class PeopleFragment : Fragment() {
             .subscribeOn(Schedulers.computation()).observeOn(mainThread())
             .subscribe(object : SingleObserver<List<User>> {
                 override fun onSubscribe(d: Disposable) {
+                    compositeDisposable.add(d)
                     binding.shimmerLayout.startShimmer()
                 }
 
                 override fun onSuccess(list: List<User>) {
                     viewModel.list = list
                     adapter.updateList(viewModel.list ?: emptyList())
-                    if (_binding != null) {
-                        binding.shimmerLayout.stopShimmer()
-                        binding.root.showNext()
-                    }
+                    binding.shimmerLayout.stopShimmer()
+                    binding.root.showNext()
                 }
 
                 override fun onError(e: Throwable) {
@@ -133,6 +136,7 @@ class PeopleFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+        compositeDisposable.dispose()
     }
 
 
