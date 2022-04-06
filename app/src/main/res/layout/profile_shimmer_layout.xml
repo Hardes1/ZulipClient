@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.fragments.profile.ProfileFragment">
+
+
+    <View
+        android:id="@+id/avatar_view_shimmer"
+        android:layout_width="190dp"
+        android:layout_height="190dp"
+        android:layout_marginTop="120dp"
+        android:background="@drawable/square_shimmer_item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <View
+        android:id="@+id/name_textview_shimmer"
+        style="@style/NameTextView"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="70dp"
+        android:layout_marginEnd="70dp"
+        android:background="@color/icon_not_selected_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/avatar_view_shimmer"
+        tools:text="Darrel Steward" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/status_constraint_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/name_textview_shimmer">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/state_textview_shimmer"
+            android:layout_width="100dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:visibility="visible"
+            android:background="@color/icon_not_selected_color"
+            app:layout_constraintBottom_toBottomOf="@id/status_constraint_layout"
+            app:layout_constraintEnd_toStartOf="@id/online_status_view_shimmer"
+            app:layout_constraintStart_toStartOf="@id/status_constraint_layout"
+            app:layout_constraintTop_toTopOf="@id/status_constraint_layout"
+            tools:text="In a meeting" />
+
+        <View
+            android:id="@+id/online_status_view_shimmer"
+            android:layout_width="50dp"
+            android:layout_height="18dp"
+            android:layout_marginStart="25dp"
+            android:background="@color/icon_not_selected_color"
+            app:layout_constraintBottom_toBottomOf="@id/state_textview_shimmer"
+            app:layout_constraintEnd_toEndOf="@id/status_constraint_layout"
+            app:layout_constraintStart_toEndOf="@id/state_textview_shimmer"
+            tools:text="online" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/logout_button_shimmer"
+        style="@style/Widget.App.ButtonShimmerStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/log_out_horizontal_margin_button"
+        android:layout_marginEnd="@dimen/log_out_horizontal_margin_button"
+        android:layout_marginBottom="@dimen/log_out_vertical_margin_button"
+        android:fontFamily="@font/inter"
+        android:paddingTop="@dimen/log_out_vertical_padding_button"
+        android:paddingBottom="@dimen/log_out_vertical_padding_button"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:visibility="visible"
+        app:cornerRadius="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

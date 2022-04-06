@@ -17,7 +17,7 @@
         app:shimmer_auto_start="false"
         app:shimmer_direction="left_to_right">
 
-        <include layout="@layout/streams_shimmer_layout" />
+        <include layout="@layout/stream_shimmer_layout" />
     </com.facebook.shimmer.ShimmerFrameLayout>
 
 

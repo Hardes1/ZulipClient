@@ -53,11 +53,14 @@ class ProfileFragment : Fragment() {
         if (arguments != null) {
             val args: ProfileFragmentArgs by navArgs()
             initializeUser(args.user, View.INVISIBLE)
+            binding.root.showNext()
         } else {
             if (viewModel.ownUser == null)
                 getOwnUserFromWeb()
-            else
+            else {
                 initializeUser(viewModel.ownUser, View.VISIBLE)
+                binding.root.showNext()
+            }
         }
     }
 
@@ -69,11 +72,14 @@ class ProfileFragment : Fragment() {
             .subscribe(object : SingleObserver<User> {
                 override fun onSubscribe(d: Disposable?) {
                     compositeDisposable.add(d)
+                    binding.shimmerLayout.startShimmer()
                 }
 
                 override fun onSuccess(value: User) {
                     viewModel.ownUser = value
                     initializeUser(viewModel.ownUser, View.VISIBLE)
+                    binding.shimmerLayout.stopShimmer()
+                    binding.root.showNext()
                 }
 
                 override fun onError(e: Throwable?) {

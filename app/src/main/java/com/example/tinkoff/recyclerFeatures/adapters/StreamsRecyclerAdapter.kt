@@ -10,7 +10,7 @@ import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.StreamHeader
 import com.example.tinkoff.data.classes.StreamsInterface
 import com.example.tinkoff.data.classes.TopicHeader
-import com.example.tinkoff.databinding.StreamItemBinding
+import com.example.tinkoff.databinding.StreamRecyclerItemBinding
 import com.example.tinkoff.databinding.TopicItemBinding
 import com.example.tinkoff.recyclerFeatures.diffUtils.StreamsDiffUtil
 
@@ -29,7 +29,7 @@ class StreamsRecyclerAdapter(
     class StreamViewHolder(
         private val context: Context,
         private val selectCallBack: (Int, Boolean) -> Unit,
-        private val binding: StreamItemBinding
+        private val binding: StreamRecyclerItemBinding
     ) :
         StreamsInterfaceViewHolder(binding.root) {
         override fun bind(content: StreamsInterface) {
@@ -77,7 +77,7 @@ class StreamsRecyclerAdapter(
             STREAM -> StreamViewHolder(
                 parent.context,
                 selectCallBack,
-                StreamItemBinding.inflate(
+                StreamRecyclerItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
