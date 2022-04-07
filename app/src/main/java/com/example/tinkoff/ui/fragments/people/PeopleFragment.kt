@@ -1,11 +1,7 @@
 package com.example.tinkoff.ui.fragments.people
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
-import android.view.MenuInflater
+import android.view.*
 
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -40,7 +36,7 @@ class PeopleFragment : Fragment() {
     }
     private val viewModel: PeopleViewModel by viewModels()
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
-
+    private lateinit var searchItem: MenuItem
     private val userClickCallBack: (Int) -> Unit = { index ->
         val user = viewModel.list?.find { it.id == index }
         val action = PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(user)
@@ -72,7 +68,7 @@ class PeopleFragment : Fragment() {
 
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        val searchItem = menu.findItem(R.id.action_search)
+        searchItem = menu.findItem(R.id.action_search)
         searchItem.isVisible = true
         val searchView = searchItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -119,6 +115,9 @@ class PeopleFragment : Fragment() {
                     viewModel.list = list
                     adapter.updateList(viewModel.list ?: emptyList())
                     binding.shimmerLayout.stopShimmer()
+                    val searchView = searchItem.actionView
+                    require(searchView is SearchView)
+                    filterListByString(searchView.query.toString())
                     binding.root.showNext()
                 }
 
@@ -150,7 +149,7 @@ class PeopleFragment : Fragment() {
     }
 
     companion object {
-        private const val DELAY_TIME: Long = 1000
+        private const val DELAY_TIME: Long = 5000
     }
 
 

@@ -15,6 +15,7 @@ object Repository {
     fun generateUsersData(): List<User> {
         counter = 0
         return listOf(
+            User(counter++, "Могутова Ане4ка", "mannarts@gmail.com", UserStatus.ONLINE, R.drawable.union),
             User(counter++, "Устинов Георгий", "abobaMail@mail.ru", UserStatus.ONLINE, R.drawable.union),
             User(counter++, "Устинова Алёна", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
             User(counter++, "Привет, как дела", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
