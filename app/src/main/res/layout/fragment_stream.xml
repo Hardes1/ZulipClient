@@ -14,8 +14,7 @@
         android:id="@+id/shimmer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:shimmer_auto_start="false"
-        app:shimmer_direction="left_to_right">
+        >
 
         <include layout="@layout/stream_shimmer_layout" />
     </com.facebook.shimmer.ShimmerFrameLayout>

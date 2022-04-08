@@ -40,7 +40,7 @@ class PeopleViewModel : ViewModel() {
 
                     override fun onSuccess(users: List<User>) {
                         actualUsersList = users
-                        subject = publishSubjectBuilder()
+                        subject = usersSubjectBuilder()
                         state.value = LoadingData.FINISHED
                         isDownloaded.value = true
                     }
@@ -70,11 +70,11 @@ class PeopleViewModel : ViewModel() {
     }
 
 
-    private fun publishSubjectBuilder(): PublishSubject<String> {
+    private fun usersSubjectBuilder(): PublishSubject<String> {
         return PublishSubject.create<String>().apply {
             observeOn(Schedulers.computation()).map {
                 it.trim()
-            }.debounce(DEBOUNCE_TIME, TimeUnit.MILLISECONDS)
+            }.debounce(DEBOUNCE_TIME, TimeUnit.MILLISECONDS).distinctUntilChanged()
                 .switchMapSingle { queryString ->
                     Timber.d("DEBUG: in filtering \"$queryString\"")
                     if (queryString.isEmpty())

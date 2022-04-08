@@ -100,14 +100,14 @@ object Repository {
         }
     }
 
-    fun generateStreamsData(type: StreamsType): List<Stream> {
+    fun generateStreamsData(type: StreamsType): Single<List<Stream>> {
         counter = if (type == StreamsType.SUBSCRIBED) 0 else 50
         val list: MutableList<Stream> = mutableListOf()
         repeat(REPEAT_COUNT) {
             val header = generateStreamHeader()
             list.add(Stream(header, generateTopics(header.id)))
         }
-        return list
+        return Single.create { emitter -> emitter.onSuccess(list) }
     }
 
     private fun generateStreamHeader(): StreamHeader {

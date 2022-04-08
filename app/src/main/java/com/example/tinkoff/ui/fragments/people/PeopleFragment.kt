@@ -66,11 +66,6 @@ class PeopleFragment : Fragment() {
             viewModel.searchUsers(query)
         }
         initializeRecyclerView()
-        tryRefresh()
-    }
-
-
-    private fun tryRefresh() {
         viewModel.refresh()
     }
 
