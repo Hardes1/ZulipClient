@@ -6,5 +6,6 @@ import com.example.tinkoff.data.states.StreamsType
 
 class StreamViewModel : ViewModel() {
     var list: List<Stream>? = null
+    var filteredList: List<Stream> = emptyList()
     var type: StreamsType? = null
 }

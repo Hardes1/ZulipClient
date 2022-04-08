@@ -76,7 +76,8 @@ class PeopleFragment : Fragment() {
         val searchView = searchItem.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                return true
+                publishSubject.onNext(query)
+                return false
             }
 
             override fun onQueryTextChange(newText: String): Boolean {

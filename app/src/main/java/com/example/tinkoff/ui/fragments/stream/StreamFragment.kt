@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.MenuInflater
 import android.view.MenuItem
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,6 +20,7 @@ import com.example.tinkoff.databinding.FragmentStreamBinding
 import com.example.tinkoff.network.Repository
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
+import com.example.tinkoff.ui.fragments.people.PeopleFragment
 import com.example.tinkoff.ui.fragments.streamTabs.StreamTabsFragmentDirections
 import com.google.android.material.snackbar.Snackbar
 import io.reactivex.Single
@@ -26,7 +28,10 @@ import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -38,12 +43,18 @@ class StreamFragment : Fragment() {
     private val binding: FragmentStreamBinding
         get() = _binding!!
 
+    private lateinit var searchItem: MenuItem
     private val viewModel: StreamViewModel by viewModels()
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
+    private val streamPublishSubject: PublishSubject<String> =
+        PublishSubject.create()
 
     private val changeStateCallBack: (Int, Boolean) -> Unit = { id, isSelected ->
         viewModel.list?.find { it.streamHeader.id == id }?.streamHeader?.isSelected = isSelected
-        adapter.updateList(prepareListForAdapter(viewModel.list ?: listOf()))
+        val searchView = searchItem.actionView
+        require(searchView is SearchView)
+        Timber.d("debug: filteredList ${viewModel.filteredList}")
+        adapter.updateList(prepareListForAdapter(viewModel.filteredList))
     }
 
     private val navigateToMessageFragmentCallBack: (String, String) -> Unit =
@@ -87,6 +98,7 @@ class StreamFragment : Fragment() {
 
     private fun prepareListForAdapter(streams: List<Stream>): List<StreamsInterface> {
         val list: MutableList<StreamsInterface> = mutableListOf()
+        Timber.d("list $streams")
         streams.forEach { stream ->
             list.add(stream.streamHeader.copy())
             if (stream.streamHeader.isSelected) {
@@ -98,13 +110,6 @@ class StreamFragment : Fragment() {
         return list
     }
 
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        val item: MenuItem = menu.findItem(R.id.action_search)
-        item.isVisible = true
-
-        super.onCreateOptionsMenu(menu, inflater)
-    }
 
     private fun initializeRecyclerView() {
         binding.streamsRecyclerView.adapter = adapter
@@ -129,8 +134,42 @@ class StreamFragment : Fragment() {
             initializeDataList()
         else {
             adapter.updateList(prepareListForAdapter(viewModel.list ?: listOf()))
+            initializePublishSubject()
             binding.root.showNext()
         }
+    }
+
+    private fun initializePublishSubject() {
+        streamPublishSubject
+            .observeOn(Schedulers.computation())
+            .map { it.trim() }
+            .distinctUntilChanged().debounce(DEBOUNCE_TIME, TimeUnit.MILLISECONDS)
+            .switchMapSingle { queryString ->
+                viewModel.filteredList =
+                    (if (queryString.isEmpty() || queryString.isBlank())
+                        viewModel.list
+                    else
+                        (viewModel.list?.filter { stream ->
+                            stream.streamHeader.name.contains(queryString) || stream.topics.any { topicHeader ->
+                                topicHeader.name.contains(
+                                    queryString
+                                )
+                            }
+                        })) ?: emptyList()
+                Timber.d("debug: filteredList ${viewModel.filteredList}")
+                Single.just(prepareListForAdapter(viewModel.filteredList))
+            }
+            .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
+                onNext = { adapter.updateList(it) },
+                onError = {
+                    Snackbar.make(
+                        binding.root,
+                        getString(R.string.error_filtering_data),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            )
+            .addTo(compositeDisposable)
     }
 
 
@@ -146,6 +185,7 @@ class StreamFragment : Fragment() {
                 Schedulers.computation()
             ).flatMap {
                 viewModel.list = it
+                viewModel.filteredList = viewModel.list ?: emptyList()
                 Single.just(prepareListForAdapter(it))
             }
             .observeOn(AndroidSchedulers.mainThread())
@@ -157,6 +197,7 @@ class StreamFragment : Fragment() {
 
                 override fun onSuccess(value: List<StreamsInterface>) {
                     adapter.updateList(value)
+                    initializePublishSubject()
                     binding.shimmerLayout.stopShimmer()
                     binding.root.showNext()
                 }
@@ -178,11 +219,31 @@ class StreamFragment : Fragment() {
         compositeDisposable.dispose()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        searchItem = menu.findItem(R.id.action_search)
+        searchItem.isVisible = true
+        Timber.d("create menu called ${viewModel.type}")
+        val searchView = searchItem.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                streamPublishSubject.onNext(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                Timber.d("debug : called query with text: $newText")
+                streamPublishSubject.onNext(newText)
+                return false
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
     companion object {
 
         private const val STREAMS_TYPE = "STREAM_TYPE"
         private const val DELAY_TIME: Long = 1000
-
+        private const val DEBOUNCE_TIME: Long = 400
         fun newInstance(type: StreamsType): StreamFragment {
             return StreamFragment().apply {
                 arguments = Bundle().apply {
