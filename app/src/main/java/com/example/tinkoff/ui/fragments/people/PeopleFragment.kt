@@ -7,25 +7,12 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff.R
-import com.example.tinkoff.data.classes.User
+import com.example.tinkoff.data.states.LoadingData
 import com.example.tinkoff.databinding.FragmentPeopleBinding
-import com.example.tinkoff.network.Repository
 import com.example.tinkoff.recyclerFeatures.adapters.PeopleRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.UserItemDecoration
-import com.google.android.material.snackbar.Snackbar
-import io.reactivex.Single
-import io.reactivex.SingleObserver
-import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.rxkotlin.subscribeBy
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 
 class PeopleFragment : Fragment() {
@@ -38,9 +25,9 @@ class PeopleFragment : Fragment() {
         PeopleRecyclerAdapter(userClickCallBack)
     }
     private val viewModel: PeopleViewModel by viewModels()
-    private lateinit var searchItem: MenuItem
+    private var searchItem: MenuItem? = null
     private val userClickCallBack: (Int) -> Unit = { index ->
-        val user = viewModel.usersList.value?.find { it.id == index }
+        val user = viewModel.displayedUsersList.value?.find { it.id == index }
         val action = PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(user)
         findNavController().navigate(
             action
@@ -65,32 +52,47 @@ class PeopleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
+        viewModel.displayedUsersList.observe(viewLifecycleOwner) {
+            Timber.d("DEBUG: search size $it")
+            adapter.updateList(it)
+        }
+        viewModel.state.observe(viewLifecycleOwner) {
+            Timber.d("DEBUG: state - $it")
+            if (it != LoadingData.NONE)
+                binding.root.displayedChild = it.ordinal
+        }
+        viewModel.isDownloaded.observe(viewLifecycleOwner) {
+            val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
+            viewModel.searchUsers(query)
+        }
         initializeRecyclerView()
         tryRefresh()
-        viewModel.usersList.observe(viewLifecycleOwner) {
-            adapter.updateList(it)
-            binding.root.showNext()
-        }
     }
 
 
     private fun tryRefresh() {
-        if (viewModel.isFirstRefresh)
-            viewModel.refresh()
+        viewModel.refresh()
     }
 
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         searchItem = menu.findItem(R.id.action_search)
-        searchItem.isVisible = true
-        val searchView = searchItem.actionView as SearchView
+        searchItem?.isVisible = true
+        val searchView = searchItem?.actionView as SearchView
+        var firstCall = true
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-
+                viewModel.searchUsers(query)
                 return false
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
+                if (firstCall) {
+                    Timber.d("DEBUG: state - first call disabled")
+                    firstCall = false
+                } else {
+                    viewModel.searchUsers(newText)
+                }
                 return false
             }
         })
@@ -110,7 +112,7 @@ class PeopleFragment : Fragment() {
 
     override fun onDestroy() {
         Timber.d("fragment destroyed")
-        binding.root.showNext()
+        viewModel.state.value = LoadingData.NONE
         super.onDestroy()
         _binding = null
     }
