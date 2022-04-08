@@ -70,7 +70,8 @@ class ProfileFragment : Fragment() {
         }.delay(DELAY_TIME, TimeUnit.MILLISECONDS).subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : SingleObserver<User> {
-                override fun onSubscribe(d: Disposable?) {
+
+                override fun onSubscribe(d: Disposable) {
                     compositeDisposable.add(d)
                     binding.shimmerLayout.startShimmer()
                 }
@@ -82,7 +83,8 @@ class ProfileFragment : Fragment() {
                     binding.root.showNext()
                 }
 
-                override fun onError(e: Throwable?) {
+
+                override fun onError(e: Throwable) {
                     Snackbar.make(
                         binding.root,
                         getString(R.string.error_profile_loading),

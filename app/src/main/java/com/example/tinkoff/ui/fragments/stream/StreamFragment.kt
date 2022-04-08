@@ -150,7 +150,7 @@ class StreamFragment : Fragment() {
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : SingleObserver<List<StreamsInterface>> {
-                override fun onSubscribe(d: Disposable?) {
+                override fun onSubscribe(d: Disposable) {
                     binding.shimmerLayout.startShimmer()
                     compositeDisposable.add(d)
                 }
@@ -161,7 +161,7 @@ class StreamFragment : Fragment() {
                     binding.root.showNext()
                 }
 
-                override fun onError(e: Throwable?) {
+                override fun onError(e: Throwable) {
                     Snackbar.make(
                         binding.streamsRecyclerView,
                         getString(R.string.error_streams_loading),

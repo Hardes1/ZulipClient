@@ -31,4 +31,5 @@
     <string name="profile_name_text">Darrel Steward</string>
     <string name="profile_email_text">darrels@gmail.com</string>
     <string name="call_user_status">In a meeting</string>
+    <string name="error_filtering_data">Error during filtering data.</string>
 </resources>

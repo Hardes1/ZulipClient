@@ -154,7 +154,7 @@ class MessageFragment : Fragment() {
             ).observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 object : SingleObserver<MutableList<MessageContentInterface>> {
-                    override fun onSubscribe(d: Disposable?) {
+                    override fun onSubscribe(d: Disposable) {
                         compositeDisposable.add(d)
                         binding.progressBarIndicator.visibility = View.VISIBLE
                     }
@@ -165,7 +165,7 @@ class MessageFragment : Fragment() {
                         updateAdapter()
                     }
 
-                    override fun onError(e: Throwable?) {
+                    override fun onError(e: Throwable) {
                         binding.progressBarIndicator.visibility = View.INVISIBLE
                         Snackbar.make(
                             binding.root,

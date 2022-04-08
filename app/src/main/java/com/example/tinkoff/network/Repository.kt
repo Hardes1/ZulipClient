@@ -15,14 +15,14 @@ object Repository {
     fun generateUsersData(): List<User> {
         counter = 0
         return listOf(
-            User(counter++, "Могутова Ане4ка", "mannarts@gmail.com", UserStatus.ONLINE, R.drawable.union),
-            User(counter++, "Устинов Георгий", "abobaMail@mail.ru", UserStatus.ONLINE, R.drawable.union),
-            User(counter++, "Устинова Алёна", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
-            User(counter++, "Привет, как дела", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
-            User(counter++, "Проверяю текст", "abobaMail@mail.ru", UserStatus.ONLINE, R.drawable.union),
-            User(counter++, "Мельников Игорь", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
-            User(counter++, "Как же хочется прыгать", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
-            User(counter++, "Откуда я знаю", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "Ustinov George", "mannarts@gmail.com", UserStatus.ONLINE, R.drawable.union),
+            User(counter++, "Filatov Maxim", "abobaMail@mail.ru", UserStatus.ONLINE, R.drawable.union),
+            User(counter++, "Ustinova Anna", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "Here you are", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "What a shot", "abobaMail@mail.ru", UserStatus.ONLINE, R.drawable.union),
+            User(counter++, "Melnikov Igor", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "I want jump", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
+            User(counter++, "What is this", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
             User(counter++, "ABOBA spirs", "abobaMail@mail.ru", UserStatus.ONLINE, R.drawable.union),
             User(counter++, "ABOBA pirs", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union),
             User(counter++, "ABOBA poso", "abobaMail@mail.ru", UserStatus.OFFLINE, R.drawable.union)
