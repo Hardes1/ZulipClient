@@ -7,7 +7,6 @@ import com.example.tinkoff.data.states.LoadingData
 import com.example.tinkoff.network.Repository
 import io.reactivex.Single
 import io.reactivex.SingleObserver
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -42,6 +41,7 @@ class PeopleViewModel : ViewModel() {
                     override fun onSuccess(users: List<User>) {
                         actualUsersList = users
                         subject = publishSubjectBuilder()
+                        state.value = LoadingData.FINISHED
                         isDownloaded.value = true
                     }
 
@@ -49,7 +49,8 @@ class PeopleViewModel : ViewModel() {
                         Timber.d("Error happened")
                     }
                 })
-        }
+        } else
+            state.value = LoadingData.FINISHED
     }
 
 
@@ -90,7 +91,6 @@ class PeopleViewModel : ViewModel() {
                         Timber.d("viewModelCalled")
                         displayedUsersList.value = it
 
-                        state.value = LoadingData.FINISHED
                     },
                     onError = {
                         Timber.d("DEBUG: Error hapenned $it")

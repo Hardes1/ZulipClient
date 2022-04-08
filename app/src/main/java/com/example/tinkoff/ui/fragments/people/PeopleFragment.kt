@@ -79,7 +79,6 @@ class PeopleFragment : Fragment() {
         searchItem = menu.findItem(R.id.action_search)
         searchItem?.isVisible = true
         val searchView = searchItem?.actionView as SearchView
-        var firstCall = true
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.searchUsers(query)
@@ -87,12 +86,7 @@ class PeopleFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                if (firstCall) {
-                    Timber.d("DEBUG: state - first call disabled")
-                    firstCall = false
-                } else {
-                    viewModel.searchUsers(newText)
-                }
+                viewModel.searchUsers(newText)
                 return false
             }
         })
