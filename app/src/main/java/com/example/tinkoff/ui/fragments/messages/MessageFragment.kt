@@ -59,8 +59,8 @@ class MessageFragment : Fragment() {
         require(activity is AppCompatActivity)
         (activity as AppCompatActivity).supportActionBar?.title =
             resources.getString(R.string.stream_header, args.appBarHeader)
-       // setChangeTextListener()
-       //  setButtonSendClickListener()
+        setChangeTextListener()
+        setButtonSendClickListener()
         initializeRecyclerView()
         observeLiveData()
         messagesViewModel.refreshMessages()
@@ -111,7 +111,7 @@ class MessageFragment : Fragment() {
 
 
     private val onMessageIndexChanged: (Int) -> Unit = { position ->
-        messagesViewModel.messageIndex = position
+        messagesViewModel.setMessageIndex(position)
         if (!bottomSheetDialog.isAdded) {
             bottomSheetDialog.show(parentFragmentManager, FRAGMENT_TAG)
         }
@@ -125,6 +125,10 @@ class MessageFragment : Fragment() {
 
     private val listChangedCallBack: () -> Unit =
         {
+            if(messagesViewModel.needToScroll){
+                messagesViewModel.needToScroll = false
+                binding.recyclerView.smoothScrollToPosition(0)
+            }
         }
 
 
@@ -133,14 +137,17 @@ class MessageFragment : Fragment() {
             messagesViewModel.updateReactions(reactionIndexValue)
         }
         messagesViewModel.state.observe(viewLifecycleOwner) {
-            binding.progressBarIndicator.visibility = when (it) {
-                LoadingData.LOADING, LoadingData.NONE -> View.VISIBLE
-                LoadingData.FINISHED -> View.INVISIBLE
+            when(it){
+                LoadingData.LOADING, LoadingData.NONE -> {
+                    binding.progressBarIndicator.visibility =  View.VISIBLE
+                    binding.bottomConstraintLayout.visibility = View.INVISIBLE
+                }
+                LoadingData.FINISHED -> {
+                    binding.progressBarIndicator.visibility =  View.INVISIBLE
+                    binding.bottomConstraintLayout.visibility = View.VISIBLE
+                }
+                else -> throw NotImplementedError()
             }
-        /*    binding.bottomConstraintLayout.visibility = when (it) {
-                LoadingData.LOADING, LoadingData.NONE -> View.VISIBLE
-                LoadingData.FINISHED -> View.INVISIBLE
-            }*/
         }
         messagesViewModel.displayedMessagesList.observe(viewLifecycleOwner) {
             adapter.updateList(it)

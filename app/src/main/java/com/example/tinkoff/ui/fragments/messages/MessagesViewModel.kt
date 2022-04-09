@@ -19,7 +19,8 @@ class MessagesViewModel : ViewModel() {
     private var messagesList: MutableList<MessageContentInterface> = mutableListOf()
     val displayedMessagesList: MutableLiveData<List<MessageContentInterface>> = MutableLiveData()
     val state: MutableLiveData<LoadingData> = MutableLiveData(LoadingData.NONE)
-    var messageIndex: Int = -1
+    var needToScroll : Boolean = false
+    private var messageIndex: Int = -1
     private var disposable: Disposable? = null
 
 
@@ -134,7 +135,12 @@ class MessagesViewModel : ViewModel() {
     }
 
 
+    fun setMessageIndex(index : Int){
+        messageIndex = index
+    }
+
     fun addMessage(message: CharSequence) {
+        needToScroll = true
         messagesList.add(
             MessageContent(
                 messagesList.size,
