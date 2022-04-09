@@ -81,9 +81,8 @@ class StreamViewModel : ViewModel() {
         return PublishSubject.create<String>().apply {
             observeOn(Schedulers.computation()).map {
                 it.trim()
-            }.debounce(DEBOUNCE_TIME, TimeUnit.MILLISECONDS)
+            }.distinctUntilChanged().debounce(DEBOUNCE_TIME, TimeUnit.MILLISECONDS)
                 .switchMapSingle { queryString ->
-                    Timber.d("DEBUG: in filtering \"$queryString\"")
                     if (queryString.isEmpty())
                         Single.just(streamsList)
                     else
@@ -105,7 +104,7 @@ class StreamViewModel : ViewModel() {
                         streamInterfaceSubject.onNext(filteredStreamsList)
                     },
                     onError = {
-                        Timber.d("DEBUG: Error hapenned $it")
+                        Timber.d("Error hapenned $it")
                     },
                 ).addTo(compositeDisposable)
         }

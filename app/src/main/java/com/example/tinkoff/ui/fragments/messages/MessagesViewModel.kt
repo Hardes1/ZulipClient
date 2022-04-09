@@ -23,23 +23,23 @@ class MessagesViewModel : ViewModel() {
     private var messagesList: MutableList<MessageContentInterface> = mutableListOf()
     val displayedMessagesList: MutableLiveData<List<MessageContentInterface>> = MutableLiveData()
     val state: MutableLiveData<LoadingData> = MutableLiveData(LoadingData.NONE)
+    val needToCollapseMenuItem: MutableLiveData<Boolean> = MutableLiveData(false)
     var needToScroll: Boolean = false
-    private val messagePrepareSubject: PublishSubject<MutableList<MessageContentInterface>> =
+    private var filteredMessageSubject: PublishSubject<String>? = null
+    private val messagePrepareSubject: PublishSubject<List<MessageContentInterface>> =
         PublishSubject.create()
-    private var messageIndex: Int = -1
+    private var messageId: Int = -1
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-
     fun updateReactions(reactionIndexValue: Int) {
-        val messageIndexValue = messageIndex
+        messageId
         val reactionCondition = reactionIndexValue >= 0 &&
                 reactionIndexValue < ReactionsData.reactionsStringList.size
-        val messageCondition =
-            messageIndexValue >= 0 && messageIndexValue < messagesList.size
-        if (reactionCondition && messageCondition) {
-            val size = messagesList.size
+        if (reactionCondition) {
+            val currentMessage =
+                messagesList.find { it is MessageContent && it.id == messageId } as MessageContent
             val currentReactions =
-                (messagesList[size - 1 - messageIndexValue] as MessageContent)
+                currentMessage
                     .reactions
             val pressedReactionIndex =
                 currentReactions.indexOfFirst { reaction ->
@@ -58,20 +58,22 @@ class MessagesViewModel : ViewModel() {
             ) {
                 currentReactions[pressedReactionIndex].usersId.add(MY_ID)
             }
-            updateAdapter()
+            needToCollapseMenuItem.value = true
+            messagePrepareSubject.onNext(messagesList)
         }
     }
 
 
     fun updateElementCallBack(
-        invertedAdapterPosition: Int,
+        elementId: Int,
         reactionPosition: Int,
         isAdd: Boolean
     ) {
-        val adapterPosition =
-            messagesList.size - 1 - invertedAdapterPosition
+
+        val currentMessage =
+            messagesList.find { it is MessageContent && it.id == elementId } as MessageContent
         val currentReaction =
-            (messagesList[adapterPosition] as MessageContent).reactions[reactionPosition]
+            currentMessage.reactions[reactionPosition]
         if (isAdd) {
             if (currentReaction.usersId.find { it == MY_ID } == null)
                 currentReaction.usersId.add(MY_ID)
@@ -79,8 +81,9 @@ class MessagesViewModel : ViewModel() {
             currentReaction.usersId.removeIf { it == MY_ID }
         }
         if (currentReaction.usersId.size == 0)
-            (messagesList[adapterPosition] as MessageContent).reactions.remove(currentReaction)
-        updateAdapter()
+            currentMessage.reactions.remove(currentReaction)
+        needToCollapseMenuItem.value = true
+        messagePrepareSubject.onNext(messagesList)
     }
 
 
@@ -102,7 +105,8 @@ class MessagesViewModel : ViewModel() {
                         Timber.d("called onSuccess repository")
                         messagesList = value
                         initializePrepareSubject()
-                        updateAdapter()
+                        initializeFilteredSubject()
+                        messagePrepareSubject.onNext(messagesList)
                         state.value = LoadingData.FINISHED
                     }
 
@@ -114,7 +118,13 @@ class MessagesViewModel : ViewModel() {
     }
 
 
-    private fun copyList(messagesList: MutableList<MessageContentInterface>): MutableList<MessageContentInterface> {
+    fun searchMessages(query: String) {
+        Timber.d("called search messages with message $query")
+        filteredMessageSubject?.onNext(query)
+    }
+
+
+    private fun copyList(messagesList: List<MessageContentInterface>): MutableList<MessageContentInterface> {
         val result: MutableList<MessageContentInterface> = mutableListOf()
         for (element in messagesList) {
             if (element is Date)
@@ -140,10 +150,59 @@ class MessagesViewModel : ViewModel() {
     }
 
 
-    fun setMessageIndex(index: Int) {
-        messageIndex = index
+    fun setMessageId(id: Int) {
+        messageId = id
     }
 
+
+    private fun initializeFilteredSubject() {
+        filteredMessageSubject =
+            PublishSubject.create<String>().apply {
+                observeOn(Schedulers.computation()).map {
+                    Timber.d("DEBUG: entered to filtered list")
+                    it.trim()
+                }.distinctUntilChanged()
+                    .debounce(
+                        DEBOUNCE_TIME, TimeUnit.MILLISECONDS
+                    )
+                    .switchMapSingle { filter ->
+                        Single.just(
+                            if (filter.isEmpty()) {
+                                copyList(messagesList)
+                            } else {
+                                val filteredList: MutableList<MessageContentInterface> =
+                                    mutableListOf()
+                                var needToAddDate = false
+                                var lastDate = Date(-1, "")
+                                messagesList.forEach { element ->
+                                    when (element) {
+                                        is Date -> {
+                                            lastDate = element
+                                            needToAddDate = true
+                                        }
+                                        is MessageContent -> {
+                                            if (element.content.contains(
+                                                    filter,
+                                                    ignoreCase = true
+                                                )
+                                            ) {
+                                                if (needToAddDate) {
+                                                    filteredList.add(lastDate)
+                                                    needToAddDate = false
+                                                }
+                                                filteredList.add(element)
+                                            }
+                                        }
+                                    }
+                                }
+                                filteredList
+                            }
+                        )
+                    }.observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(onNext = { messagePrepareSubject.onNext(it) })
+                    .addTo(compositeDisposable)
+            }
+    }
 
     private fun initializePrepareSubject() {
         messagePrepareSubject.observeOn(Schedulers.computation())
@@ -166,14 +225,10 @@ class MessagesViewModel : ViewModel() {
                 SenderType.OWN
             )
         )
-        updateAdapter()
-    }
-
-
-    private fun updateAdapter() {
-        Timber.d("DEBUG: adapter updating...")
+        needToCollapseMenuItem.value = true
         messagePrepareSubject.onNext(messagesList)
     }
+
 
     override fun onCleared() {
         compositeDisposable.clear()
@@ -181,5 +236,6 @@ class MessagesViewModel : ViewModel() {
 
     companion object {
         private const val DELAY_TIME: Long = 1000
+        private const val DEBOUNCE_TIME: Long = 400
     }
 }

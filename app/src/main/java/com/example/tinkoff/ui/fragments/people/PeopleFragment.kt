@@ -57,11 +57,9 @@ class PeopleFragment : Fragment() {
         Timber.d(getString(R.string.debug_view_recreated))
         initializeRecyclerView()
         viewModel.displayedUsersList.observe(viewLifecycleOwner) {
-            Timber.d("DEBUG: search size ${it.size}")
             adapter.updateList(it)
         }
         viewModel.state.observe(viewLifecycleOwner) {
-            Timber.d("DEBUG: state - $it")
             if (it != LoadingData.NONE) {
                 binding.root.displayedChild = it.ordinal
             }

@@ -73,7 +73,6 @@ class PeopleViewModel : ViewModel() {
                 it.trim()
             }.debounce(DEBOUNCE_TIME, TimeUnit.MILLISECONDS).distinctUntilChanged()
                 .switchMapSingle { queryString ->
-                    Timber.d("DEBUG: in filtering \"$queryString\"")
                     if (queryString.isEmpty())
                         Single.just(actualUsersList)
                     else
@@ -90,7 +89,7 @@ class PeopleViewModel : ViewModel() {
 
                     },
                     onError = {
-                        Timber.d("DEBUG: Error hapenned $it")
+                        Timber.d("Error hapenned $it")
                     },
                 ).addTo(compositeDisposable)
         }

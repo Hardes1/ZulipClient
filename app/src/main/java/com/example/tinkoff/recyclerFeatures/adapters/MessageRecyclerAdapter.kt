@@ -20,7 +20,7 @@ import com.example.tinkoff.ui.views.FlexBoxLayout
 import com.google.android.material.textview.MaterialTextView
 
 class MessageRecyclerAdapter(
-    private val onPositionChanged: (Int) -> Unit,
+    private val onSelectedPositionChanged: (Int) -> Unit,
     private val listChanged: () -> Unit,
     private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
 ) :
@@ -45,7 +45,7 @@ class MessageRecyclerAdapter(
             val text =
                 binding.messageViewGroup.findViewById<MaterialTextView>(R.id.message_textview)
             binding.messageViewGroup.setOnClickListener {
-                onPositionChanged(adapterPosition)
+                onPositionChanged(content.id)
             }
             val flexBoxLayout =
                 binding.messageViewGroup.findViewById<FlexBoxLayout>(R.id.flex_box_layout)
@@ -67,14 +67,14 @@ class MessageRecyclerAdapter(
 
                 flexBoxLayout.getChildAt(index).setOnClickListener {
                     it.isSelected = !it.isSelected
-                    updateElementCallBack(adapterPosition, index, it.isSelected)
+                    updateElementCallBack(content.id, index, it.isSelected)
                 }
             }
             flexBoxLayout.requestLayout()
 
             flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
                 .setOnClickListener {
-                    onPositionChanged(adapterPosition)
+                    onPositionChanged(content.id)
                 }
 
 
@@ -93,7 +93,7 @@ class MessageRecyclerAdapter(
             require(content is MessageContent)
             binding.messageTextview.text = content.content
             binding.messageTextview.setOnClickListener {
-                onPositionChanged(adapterPosition)
+                onPositionChanged(content.id)
             }
             val flexBoxLayout = binding.flexBoxLayout
             while (flexBoxLayout.childCount > 1) {
@@ -110,13 +110,13 @@ class MessageRecyclerAdapter(
                 val index = flexBoxLayout.childCount - 2
                 flexBoxLayout.getChildAt(index).setOnClickListener {
                     it.isSelected = !it.isSelected
-                    updateElementCallBack(adapterPosition, index, it.isSelected)
+                    updateElementCallBack(content.id, index, it.isSelected)
                 }
             }
 
             flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
                 .setOnClickListener {
-                    onPositionChanged(adapterPosition)
+                    onPositionChanged(content.id)
                 }
         }
     }
@@ -154,7 +154,7 @@ class MessageRecyclerAdapter(
             }
             MESSAGE_OTHER -> {
                 MessageOtherViewHolder(
-                    onPositionChanged,
+                    onSelectedPositionChanged,
                     parent.context,
                     updateElementCallBack,
                     MessageOtherItemBinding.inflate(
@@ -166,7 +166,7 @@ class MessageRecyclerAdapter(
             }
             MESSAGE_OWN -> {
                 MessageOwnViewHolder(
-                    onPositionChanged,
+                    onSelectedPositionChanged,
                     parent.context,
                     updateElementCallBack,
                     MessageOwnItemBinding.inflate(

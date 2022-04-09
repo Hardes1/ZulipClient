@@ -83,7 +83,6 @@ class StreamFragment : Fragment() {
             adapter.updateList(it)
         }
         viewModel.state.observe(viewLifecycleOwner) {
-            Timber.d("DEBUG: state - $it")
             if (it != LoadingData.NONE && binding.root.displayedChild != it.ordinal)
                 binding.root.displayedChild = it.ordinal
         }

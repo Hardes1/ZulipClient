@@ -2,11 +2,10 @@ package com.example.tinkoff.ui.fragments.messages
 
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
@@ -32,7 +31,7 @@ class MessageFragment : Fragment() {
     private val reactionsViewModel: ReactionsViewModel by activityViewModels()
     private lateinit var adapter: MessageRecyclerAdapter
     private val bottomSheetDialog = BottomSheetFragment.newInstance()
-
+    private var searchItem: MenuItem? = null
 
     private val decorator: MessageItemDecoration by lazy {
         MessageItemDecoration(
@@ -47,6 +46,7 @@ class MessageFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        setHasOptionsMenu(true)
         _binding = FragmentMessageBinding.inflate(inflater, container, false)
         return binding.root
 
@@ -100,7 +100,7 @@ class MessageFragment : Fragment() {
     private fun initializeRecyclerView() {
         layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         adapter = MessageRecyclerAdapter(
-            onMessageIndexChanged,
+            onSelectedPositionChanged,
             listChangedCallBack,
             updateElementCallBack
         )
@@ -110,8 +110,8 @@ class MessageFragment : Fragment() {
     }
 
 
-    private val onMessageIndexChanged: (Int) -> Unit = { position ->
-        messagesViewModel.setMessageIndex(position)
+    private val onSelectedPositionChanged: (Int) -> Unit = { id ->
+        messagesViewModel.setMessageId(id)
         if (!bottomSheetDialog.isAdded) {
             bottomSheetDialog.show(parentFragmentManager, FRAGMENT_TAG)
         }
@@ -119,13 +119,13 @@ class MessageFragment : Fragment() {
 
 
     private val updateElementCallBack: (Int, Int, Boolean) -> Unit =
-        { adapterPosition, reactionPosition, isAdd ->
-            messagesViewModel.updateElementCallBack(adapterPosition, reactionPosition, isAdd)
+        { id, reactionPosition, isAdd ->
+            messagesViewModel.updateElementCallBack(id, reactionPosition, isAdd)
         }
 
     private val listChangedCallBack: () -> Unit =
         {
-            if(messagesViewModel.needToScroll){
+            if (messagesViewModel.needToScroll) {
                 messagesViewModel.needToScroll = false
                 binding.recyclerView.smoothScrollToPosition(0)
             }
@@ -137,13 +137,14 @@ class MessageFragment : Fragment() {
             messagesViewModel.updateReactions(reactionIndexValue)
         }
         messagesViewModel.state.observe(viewLifecycleOwner) {
-            when(it){
+            when (it) {
                 LoadingData.LOADING, LoadingData.NONE -> {
-                    binding.progressBarIndicator.visibility =  View.VISIBLE
+                    binding.progressBarIndicator.visibility = View.VISIBLE
                     binding.bottomConstraintLayout.visibility = View.INVISIBLE
                 }
                 LoadingData.FINISHED -> {
-                    binding.progressBarIndicator.visibility =  View.INVISIBLE
+                    searchItem?.isVisible = true
+                    binding.progressBarIndicator.visibility = View.INVISIBLE
                     binding.bottomConstraintLayout.visibility = View.VISIBLE
                 }
                 else -> throw NotImplementedError()
@@ -152,6 +153,28 @@ class MessageFragment : Fragment() {
         messagesViewModel.displayedMessagesList.observe(viewLifecycleOwner) {
             adapter.updateList(it)
         }
+        messagesViewModel.needToCollapseMenuItem.observe(viewLifecycleOwner) { collapse ->
+            if (collapse) {
+                searchItem?.collapseActionView()
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem?.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                messagesViewModel.searchMessages(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                messagesViewModel.searchMessages(newText)
+                return false
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
 

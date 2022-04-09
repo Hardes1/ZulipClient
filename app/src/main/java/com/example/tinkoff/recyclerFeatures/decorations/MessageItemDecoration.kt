@@ -15,7 +15,8 @@ class MessageItemDecoration(private val smallSpacing: Int, private val bigSpacin
     ) {
         parent.adapter?.let { adapter ->
             val position = parent.getChildAdapterPosition(view)
-            if (position != 0) {
+
+            if (position > 0) {
                 val currentType = adapter.getItemViewType(position)
                 val previousType = adapter.getItemViewType(position - 1)
                 val checkCurrentType = currentType == MessageRecyclerAdapter.MESSAGE_OTHER ||
