@@ -50,7 +50,6 @@ class StreamViewModel : ViewModel() {
                         streamsList = streams
                         streamSubject = streamSubjectBuilder()
                         streamDisplaySubjectBuilder()
-                        state.value = LoadingData.FINISHED
                         isDownloaded.value = true
                     }
 
@@ -58,8 +57,7 @@ class StreamViewModel : ViewModel() {
                         Timber.d("Error happened")
                     }
                 })
-        } else
-            state.value = LoadingData.FINISHED
+        }
     }
 
 

@@ -22,7 +22,7 @@ class PeopleFragment : Fragment() {
     private val binding: FragmentPeopleBinding
         get() = _binding!!
     private val adapter: PeopleRecyclerAdapter by lazy {
-        PeopleRecyclerAdapter(userClickCallBack)
+        PeopleRecyclerAdapter(userClickCallBack, shimmerCallBack)
     }
     private val viewModel: PeopleViewModel by viewModels()
     private var searchItem: MenuItem? = null
@@ -33,7 +33,10 @@ class PeopleFragment : Fragment() {
             action
         )
     }
-
+    private val shimmerCallBack = {
+        if (viewModel.state.value != LoadingData.FINISHED)
+            viewModel.state.value = LoadingData.FINISHED
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,13 +56,14 @@ class PeopleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
         viewModel.displayedUsersList.observe(viewLifecycleOwner) {
-            Timber.d("DEBUG: search size $it")
+            Timber.d("DEBUG: search size ${it.size}")
             adapter.updateList(it)
         }
         viewModel.state.observe(viewLifecycleOwner) {
             Timber.d("DEBUG: state - $it")
-            if (it != LoadingData.NONE)
+            if (it != LoadingData.NONE) {
                 binding.root.displayedChild = it.ordinal
+            }
         }
         viewModel.isDownloaded.observe(viewLifecycleOwner) {
             val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""

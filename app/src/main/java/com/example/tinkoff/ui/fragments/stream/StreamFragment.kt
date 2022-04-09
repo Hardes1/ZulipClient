@@ -36,6 +36,10 @@ class StreamFragment : Fragment() {
         viewModel.selectItem(id, isSelected)
     }
 
+    private val updateStreamsCallBack: () -> Unit = {
+        viewModel.state.value = LoadingData.FINISHED
+    }
+
     private val navigateToMessageFragmentCallBack: (String, String) -> Unit =
         { appBarHeader, topicHeader ->
             val action =
@@ -47,7 +51,7 @@ class StreamFragment : Fragment() {
         }
 
     private val adapter: StreamsRecyclerAdapter by lazy {
-        StreamsRecyclerAdapter(changeStateCallBack, navigateToMessageFragmentCallBack)
+        StreamsRecyclerAdapter(changeStateCallBack, navigateToMessageFragmentCallBack, updateStreamsCallBack)
     }
 
 
@@ -76,7 +80,7 @@ class StreamFragment : Fragment() {
         }
         viewModel.state.observe(viewLifecycleOwner) {
             Timber.d("DEBUG: state - $it")
-            if (it != LoadingData.NONE)
+            if (it != LoadingData.NONE && binding.root.displayedChild != it.ordinal)
                 binding.root.displayedChild = it.ordinal
         }
         viewModel.isDownloaded.observe(viewLifecycleOwner) {

@@ -41,7 +41,6 @@ class PeopleViewModel : ViewModel() {
                     override fun onSuccess(users: List<User>) {
                         actualUsersList = users
                         subject = usersSubjectBuilder()
-                        state.value = LoadingData.FINISHED
                         isDownloaded.value = true
                     }
 
@@ -49,8 +48,7 @@ class PeopleViewModel : ViewModel() {
                         Timber.d("Error happened")
                     }
                 })
-        } else
-            state.value = LoadingData.FINISHED
+        }
     }
 
 

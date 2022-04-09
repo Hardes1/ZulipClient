@@ -16,10 +16,10 @@ import com.example.tinkoff.recyclerFeatures.diffUtils.StreamsDiffUtil
 
 class StreamsRecyclerAdapter(
     private val selectCallBack: (Int, Boolean) -> Unit,
-    private val navigateToMessageFragmentCallBack: (String, String) -> Unit
+    private val navigateToMessageFragmentCallBack: (String, String) -> Unit,
+    private val updateListCallBack: () -> Unit
 ) :
     RecyclerView.Adapter<StreamsRecyclerAdapter.StreamsInterfaceViewHolder>() {
-
 
 
     abstract class StreamsInterfaceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -66,10 +66,9 @@ class StreamsRecyclerAdapter(
     private val differ = AsyncListDiffer(this, StreamsDiffUtil())
     private var list: List<StreamsInterface>
         private set(value) {
-            differ.submitList(value)
+            differ.submitList(value) { updateListCallBack() }
         }
         get() = differ.currentList
-
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StreamsInterfaceViewHolder {
