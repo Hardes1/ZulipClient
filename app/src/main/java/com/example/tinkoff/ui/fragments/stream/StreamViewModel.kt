@@ -30,11 +30,10 @@ class StreamViewModel : ViewModel() {
     private var streamSubject: PublishSubject<String>? = null
     private val streamInterfaceSubject: PublishSubject<List<Stream>> =
         PublishSubject.create()
-    private var disposable: Disposable? = null
 
     fun refresh() {
-        disposable?.dispose()
         if (isDownloaded.value == false) {
+            compositeDisposable.clear()
             state.value = LoadingData.LOADING
             Repository.generateStreamsData(type ?: StreamsType.SUBSCRIBED)
                 .subscribeOn(Schedulers.computation())
@@ -43,7 +42,7 @@ class StreamViewModel : ViewModel() {
                 )
                 .subscribe(object : SingleObserver<List<Stream>> {
                     override fun onSubscribe(d: Disposable) {
-                        disposable = d
+                        compositeDisposable.add(d)
                     }
 
                     override fun onSuccess(streams: List<Stream>) {
@@ -135,7 +134,6 @@ class StreamViewModel : ViewModel() {
 
 
     override fun onCleared() {
-        disposable?.dispose()
         compositeDisposable.dispose()
     }
 

@@ -10,8 +10,12 @@ import com.example.tinkoff.ui.fragments.messages.MessageFragment.Companion.MY_ID
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -19,9 +23,11 @@ class MessagesViewModel : ViewModel() {
     private var messagesList: MutableList<MessageContentInterface> = mutableListOf()
     val displayedMessagesList: MutableLiveData<List<MessageContentInterface>> = MutableLiveData()
     val state: MutableLiveData<LoadingData> = MutableLiveData(LoadingData.NONE)
-    var needToScroll : Boolean = false
+    var needToScroll: Boolean = false
+    private val messagePrepareSubject: PublishSubject<MutableList<MessageContentInterface>> =
+        PublishSubject.create()
     private var messageIndex: Int = -1
-    private var disposable: Disposable? = null
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
 
     fun updateReactions(reactionIndexValue: Int) {
@@ -79,24 +85,23 @@ class MessagesViewModel : ViewModel() {
 
 
     fun refreshMessages() {
-        disposable?.dispose()
+        compositeDisposable.clear()
         state.value = LoadingData.LOADING
-        Single.create<MutableList<MessageContentInterface>> { emitter ->
-            emitter.onSuccess(
-                Repository.generateMessagesData()
-            )
-        }.delay(DELAY_TIME, TimeUnit.MILLISECONDS)
+        Repository.generateMessagesData().delay(DELAY_TIME, TimeUnit.MILLISECONDS)
             .subscribeOn(
                 Schedulers.computation()
             ).observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 object : SingleObserver<MutableList<MessageContentInterface>> {
                     override fun onSubscribe(d: Disposable) {
-                        disposable = d
+                        Timber.d("DEBUG: added disposable")
+                        compositeDisposable.add(d)
                     }
 
                     override fun onSuccess(value: MutableList<MessageContentInterface>) {
+                        Timber.d("called onSuccess repository")
                         messagesList = value
+                        initializePrepareSubject()
                         updateAdapter()
                         state.value = LoadingData.FINISHED
                     }
@@ -135,8 +140,20 @@ class MessagesViewModel : ViewModel() {
     }
 
 
-    fun setMessageIndex(index : Int){
+    fun setMessageIndex(index: Int) {
         messageIndex = index
+    }
+
+
+    private fun initializePrepareSubject() {
+        messagePrepareSubject.observeOn(Schedulers.computation())
+            .switchMapSingle {
+                Timber.d("DEBUG: went in single")
+                Single.just(copyList(it))
+            }.observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { displayedMessagesList.value = it },
+                onError = { Timber.d("error happened") }).addTo(compositeDisposable)
     }
 
     fun addMessage(message: CharSequence) {
@@ -153,13 +170,13 @@ class MessagesViewModel : ViewModel() {
     }
 
 
-    fun updateAdapter() {
-        // TODO: rewrite it to reactive
-        displayedMessagesList.value = copyList(messagesList)
+    private fun updateAdapter() {
+        Timber.d("DEBUG: adapter updating...")
+        messagePrepareSubject.onNext(messagesList)
     }
 
     override fun onCleared() {
-        disposable?.dispose()
+        compositeDisposable.clear()
     }
 
     companion object {

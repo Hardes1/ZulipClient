@@ -70,7 +70,7 @@ class PeopleFragment : Fragment() {
             viewModel.searchUsers(query)
         }
         initializeRecyclerView()
-        viewModel.refresh()
+        viewModel.refreshPeopleData()
     }
 
 

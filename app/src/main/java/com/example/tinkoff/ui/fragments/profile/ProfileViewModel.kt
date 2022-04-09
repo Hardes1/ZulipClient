@@ -15,6 +15,7 @@ import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -27,9 +28,8 @@ class ProfileViewModel : ViewModel() {
         disposable?.dispose()
         if (state.value != LoadingData.FINISHED) {
             state.value = LoadingData.LOADING
-            Single.create<User> { emitter ->
-                emitter.onSuccess(Repository.generatePersonalUserData(context))
-            }.delay(ProfileFragment.DELAY_TIME, TimeUnit.MILLISECONDS)
+            Repository.generatePersonalUserData(context)
+                .delay(ProfileFragment.DELAY_TIME, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(object : SingleObserver<User> {

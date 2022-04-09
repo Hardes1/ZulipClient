@@ -125,67 +125,78 @@ object Repository {
     }
 
 
-    fun generateMessagesData(): MutableList<MessageContentInterface> {
-        counter = 0
-        val list: MutableList<MessageContentInterface> = mutableListOf()
-        list.add(Date(counter++, "1 Feb"))
-        list.add(
-            MessageContent(
-                counter++,
-                "Hello, my friend!",
-                mutableListOf(),
-                SenderType.OTHER
+    fun generateMessagesData(): Single<MutableList<MessageContentInterface>> {
+        return Single.create { emitter ->
+            counter = 0
+            val list: MutableList<MessageContentInterface> = mutableListOf()
+            list.add(Date(counter++, "1 Feb"))
+            list.add(
+                MessageContent(
+                    counter++,
+                    "Hello, my friend!",
+                    mutableListOf(),
+                    SenderType.OTHER
+                )
             )
-        )
-        list.add(
-            MessageContent(
-                counter++, "How are you?", mutableListOf(),
-                SenderType.OTHER
+            list.add(
+                MessageContent(
+                    counter++, "How are you?", mutableListOf(),
+                    SenderType.OTHER
+                )
             )
-        )
-        list.add(
-            MessageContent(
-                counter++, "Why are you ignoring me???",
-                mutableListOf(),
-                SenderType.OTHER
+            list.add(
+                MessageContent(
+                    counter++, "Why are you ignoring me???",
+                    mutableListOf(),
+                    SenderType.OTHER
+                )
             )
-        )
-        list.add(
-            MessageContent(
-                counter++, "I am tired....\nGoing bad now",
-                mutableListOf(Reaction(ReactionsData.reactionsStringList[0], mutableListOf(-1))),
-                SenderType.OTHER
-            ),
+            list.add(
+                MessageContent(
+                    counter++, "I am tired....\nGoing bad now",
+                    mutableListOf(
+                        Reaction(
+                            ReactionsData.reactionsStringList[0],
+                            mutableListOf(-1)
+                        )
+                    ),
+                    SenderType.OTHER
+                ),
 
+                )
+            list.add(
+                MessageContent(
+                    counter++,
+                    "Eoteogsdfkjsdfkcbvcnb hahahaha",
+                    mutableListOf(),
+                    SenderType.OTHER
+                )
             )
-        list.add(
-            MessageContent(
-                counter++,
-                "Eoteogsdfkjsdfkcbvcnb hahahaha",
-                mutableListOf(),
-                SenderType.OTHER
+            list.add(
+                MessageContent(
+                    counter++, "Hello, dude",
+                    mutableListOf(),
+                    SenderType.OWN
+                )
             )
-        )
-        list.add(
-            MessageContent(
-                counter++, "Hello, dude",
-                mutableListOf(),
-                SenderType.OWN
-            )
-        )
-        list.add(Date(counter++, "2 Feb"))
-        list.add(MessageContent(counter++, "abobaaboba", mutableListOf(), SenderType.OTHER))
-        return list
+            list.add(Date(counter++, "2 Feb"))
+            list.add(MessageContent(counter++, "abobaaboba", mutableListOf(), SenderType.OTHER))
+            emitter.onSuccess(list)
+        }
     }
 
-    fun generatePersonalUserData(context: Context): User {
-        return User(
-            MessageFragment.MY_ID,
-            context.resources.getString(R.string.profile_name_text),
-            context.resources.getString(R.string.profile_email_text),
-            UserStatus.ONLINE,
-            R.drawable.union
-        )
+    fun generatePersonalUserData(context: Context): Single<User> {
+        return Single.create { emitter ->
+            emitter.onSuccess(
+                User(
+                    MessageFragment.MY_ID,
+                    context.resources.getString(R.string.profile_name_text),
+                    context.resources.getString(R.string.profile_email_text),
+                    UserStatus.ONLINE,
+                    R.drawable.union
+                )
+            )
+        }
     }
 
 }

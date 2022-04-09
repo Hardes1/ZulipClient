@@ -22,20 +22,19 @@ class PeopleViewModel : ViewModel() {
     val displayedUsersList: MutableLiveData<List<User>> = MutableLiveData()
     val state: MutableLiveData<LoadingData> = MutableLiveData(LoadingData.NONE)
     val isDownloaded: MutableLiveData<Boolean> = MutableLiveData(false)
-    private var disposable: Disposable? = null
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var subject: PublishSubject<String>? = null
 
 
-    fun refresh() {
-        disposable?.dispose()
+    fun refreshPeopleData() {
         if (isDownloaded.value == false) {
+            compositeDisposable.clear()
             state.value = LoadingData.LOADING
             Repository.generateUsersData().subscribeOn(Schedulers.computation())
                 .delay(DELAY_TIME, TimeUnit.MILLISECONDS).observeOn(mainThread())
                 .subscribe(object : SingleObserver<List<User>> {
                     override fun onSubscribe(d: Disposable) {
-                        disposable = d
+                        compositeDisposable.add(d)
                     }
 
                     override fun onSuccess(users: List<User>) {
