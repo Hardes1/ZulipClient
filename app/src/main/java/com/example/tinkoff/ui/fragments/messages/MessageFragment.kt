@@ -3,6 +3,7 @@ package com.example.tinkoff.ui.fragments.messages
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -19,6 +20,7 @@ import com.example.tinkoff.recyclerFeatures.adapters.MessageRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.MessageItemDecoration
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.example.tinkoff.ui.fragments.bottomSheet.BottomSheetFragment
+import timber.log.Timber
 
 class MessageFragment : Fragment() {
 
@@ -32,7 +34,7 @@ class MessageFragment : Fragment() {
     private lateinit var adapter: MessageRecyclerAdapter
     private val bottomSheetDialog = BottomSheetFragment.newInstance()
     private var searchItem: MenuItem? = null
-
+    private var refreshItem: MenuItem? = null
     private val decorator: MessageItemDecoration by lazy {
         MessageItemDecoration(
             resources.getDimensionPixelSize(R.dimen.message_content_small_recycler_distance),
@@ -63,7 +65,6 @@ class MessageFragment : Fragment() {
         setButtonSendClickListener()
         initializeRecyclerView()
         observeLiveData()
-        messagesViewModel.refreshMessages()
     }
 
 
@@ -138,14 +139,28 @@ class MessageFragment : Fragment() {
         }
         messagesViewModel.state.observe(viewLifecycleOwner) {
             when (it) {
-                LoadingData.LOADING, LoadingData.NONE -> {
+                LoadingData.LOADING -> {
+                    searchItem?.isVisible = false
+                    refreshItem?.isVisible = false
                     binding.progressBarIndicator.visibility = View.VISIBLE
                     binding.bottomConstraintLayout.visibility = View.INVISIBLE
                 }
                 LoadingData.FINISHED -> {
                     searchItem?.isVisible = true
+                    refreshItem?.isVisible = false
                     binding.progressBarIndicator.visibility = View.INVISIBLE
                     binding.bottomConstraintLayout.visibility = View.VISIBLE
+                }
+                LoadingData.ERROR -> {
+                    searchItem?.isVisible = false
+                    refreshItem?.isVisible = true
+                    binding.progressBarIndicator.visibility = View.INVISIBLE
+                    binding.bottomConstraintLayout.visibility = View.INVISIBLE
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_messages_loading),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 else -> throw NotImplementedError()
             }
@@ -183,6 +198,12 @@ class MessageFragment : Fragment() {
                 return false
             }
         })
+        refreshItem = menu.findItem(R.id.action_refresh)
+        refreshItem?.setOnMenuItemClickListener {
+            messagesViewModel.refreshMessages()
+            true
+        }
+        messagesViewModel.refreshMessages()
         super.onCreateOptionsMenu(menu, inflater)
     }
 

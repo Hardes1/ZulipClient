@@ -24,7 +24,7 @@ class StreamViewModel : ViewModel() {
     private var filteredStreamsList: List<Stream> = emptyList()
     var type: StreamsType? = null
     val displayedStreamsList: MutableLiveData<List<StreamsInterface>> = MutableLiveData()
-    val state: MutableLiveData<LoadingData> = MutableLiveData(LoadingData.NONE)
+    val state: MutableLiveData<LoadingData> = MutableLiveData()
     val isDownloaded: MutableLiveData<Boolean> = MutableLiveData(false)
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var streamSubject: PublishSubject<String>? = null
@@ -53,6 +53,7 @@ class StreamViewModel : ViewModel() {
                     }
 
                     override fun onError(e: Throwable) {
+                        state.value = LoadingData.ERROR
                         Timber.d("Error happened")
                     }
                 })
@@ -104,6 +105,7 @@ class StreamViewModel : ViewModel() {
                         streamInterfaceSubject.onNext(filteredStreamsList)
                     },
                     onError = {
+
                         Timber.d("Error hapenned $it")
                     },
                 ).addTo(compositeDisposable)

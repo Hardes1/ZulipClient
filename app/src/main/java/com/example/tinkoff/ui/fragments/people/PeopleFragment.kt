@@ -2,6 +2,7 @@ package com.example.tinkoff.ui.fragments.people
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -60,8 +61,20 @@ class PeopleFragment : Fragment() {
             adapter.updateList(it)
         }
         viewModel.state.observe(viewLifecycleOwner) {
-            if (it != LoadingData.NONE) {
-                binding.root.displayedChild = it.ordinal
+            when (it) {
+                LoadingData.LOADING, LoadingData.FINISHED -> {
+                    binding.root.displayedChild =
+                        it.ordinal
+                }
+                LoadingData.ERROR -> {
+                    binding.root.displayedChild = LoadingData.FINISHED.ordinal
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_people_loading),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else -> throw NotImplementedError()
             }
         }
         viewModel.isDownloaded.observe(viewLifecycleOwner) { isDownloaded ->
@@ -89,6 +102,12 @@ class PeopleFragment : Fragment() {
                 return false
             }
         })
+        val refreshItem = menu.findItem(R.id.action_refresh)
+        refreshItem.isVisible = true
+        refreshItem.setOnMenuItemClickListener {
+            viewModel.isDownloaded.value = false
+            true
+        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -105,7 +124,6 @@ class PeopleFragment : Fragment() {
 
     override fun onDestroy() {
         Timber.d("fragment destroyed")
-        viewModel.state.value = LoadingData.NONE
         super.onDestroy()
         _binding = null
     }

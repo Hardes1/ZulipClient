@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 
 class ProfileViewModel : ViewModel() {
     val ownUser: MutableLiveData<User> = MutableLiveData()
-    val state: MutableLiveData<LoadingData> = MutableLiveData(LoadingData.NONE)
+    val state: MutableLiveData<LoadingData> = MutableLiveData()
     private var disposable: Disposable? = null
 
     fun refreshProfile(context: Context) {
@@ -43,6 +43,7 @@ class ProfileViewModel : ViewModel() {
                     }
 
                     override fun onError(e: Throwable) {
+                        state.value = LoadingData.ERROR
                         Timber.d(context.getString(R.string.error_profile_loading))
                     }
                 })

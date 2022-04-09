@@ -2,9 +2,8 @@ package com.example.tinkoff.ui.fragments.profile
 
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -24,6 +23,7 @@ class ProfileFragment : Fragment() {
     private val binding: FragmentProfileBinding
         get() = _binding!!
     private val viewModel: ProfileViewModel by viewModels()
+    private var searchItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,18 +46,33 @@ class ProfileFragment : Fragment() {
             val args: ProfileFragmentArgs by navArgs()
             viewModel.ownUser.value = args.user
             viewModel.state.value = LoadingData.FINISHED
-        } else {
-            viewModel.refreshProfile(requireContext())
         }
         viewModel.state.observe(viewLifecycleOwner) {
-            if (it != LoadingData.NONE && it.ordinal != binding.root.displayedChild)
-                binding.root.displayedChild = it.ordinal
+            when (it) {
+                LoadingData.LOADING, LoadingData.FINISHED -> {
+                    searchItem?.isVisible = false
+                    if (binding.root.displayedChild != it.ordinal)
+                        binding.root.displayedChild = it.ordinal
+                }
+                LoadingData.ERROR -> {
+                    Timber.d("search item is: $searchItem")
+                    searchItem?.isVisible = true
+                    if (binding.root.displayedChild != LoadingData.FINISHED.ordinal)
+                        binding.root.displayedChild = LoadingData.FINISHED.ordinal
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_profile_loading),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else -> throw NotImplementedError()
+            }
         }
 
-        viewModel.ownUser.observe(viewLifecycleOwner) {
+        viewModel.ownUser.observe(viewLifecycleOwner) { user ->
             initializeUser(
-                it,
-                when (it.id) {
+                user,
+                when (user.id) {
                     MessageFragment.MY_ID -> View.VISIBLE
                     else -> View.INVISIBLE
                 }
@@ -92,6 +107,19 @@ class ProfileFragment : Fragment() {
             }
         }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        searchItem = menu.findItem(R.id.action_refresh)
+        searchItem?.setOnMenuItemClickListener {
+            viewModel.state.value = LoadingData.LOADING
+            viewModel.refreshProfile(requireContext())
+            true
+        }
+        if (arguments == null)
+            viewModel.refreshProfile(requireContext())
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()

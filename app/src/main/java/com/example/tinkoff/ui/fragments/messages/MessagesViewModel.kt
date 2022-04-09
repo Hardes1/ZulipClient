@@ -23,7 +23,7 @@ class MessagesViewModel : ViewModel() {
     private var messagesList: MutableList<MessageContentInterface> = mutableListOf()
     private var filteredMessagesList: MutableList<MessageContentInterface> = mutableListOf()
     val displayedMessagesList: MutableLiveData<List<MessageContentInterface>> = MutableLiveData()
-    val state: MutableLiveData<LoadingData> = MutableLiveData(LoadingData.NONE)
+    val state: MutableLiveData<LoadingData> = MutableLiveData()
     var needToScroll: Boolean = false
     private var filteredMessageSubject: PublishSubject<String>? = null
     private val messagePrepareSubject: PublishSubject<List<MessageContentInterface>> =
@@ -106,6 +106,7 @@ class MessagesViewModel : ViewModel() {
                     }
 
                     override fun onError(e: Throwable) {
+                        state.value = LoadingData.ERROR
                         Timber.d("Error loading messages")
                     }
                 })

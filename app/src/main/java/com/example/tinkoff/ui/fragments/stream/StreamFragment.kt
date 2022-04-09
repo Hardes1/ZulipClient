@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -37,7 +38,8 @@ class StreamFragment : Fragment() {
     }
 
     private val updateStreamsCallBack: () -> Unit = {
-        viewModel.state.value = LoadingData.FINISHED
+        if (viewModel.state.value != LoadingData.FINISHED)
+            viewModel.state.value = LoadingData.FINISHED
     }
 
     private val navigateToMessageFragmentCallBack: (String, String) -> Unit =
@@ -83,8 +85,21 @@ class StreamFragment : Fragment() {
             adapter.updateList(it)
         }
         viewModel.state.observe(viewLifecycleOwner) {
-            if (it != LoadingData.NONE && binding.root.displayedChild != it.ordinal)
-                binding.root.displayedChild = it.ordinal
+            when (it) {
+                LoadingData.LOADING, LoadingData.FINISHED -> {
+                    binding.root.displayedChild = it.ordinal
+
+                }
+                LoadingData.ERROR -> {
+                    binding.root.displayedChild = 1
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_streams_loading),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else -> throw NotImplementedError()
+            }
         }
         viewModel.isDownloaded.observe(viewLifecycleOwner) { isDownloaded ->
             if (isDownloaded) {
@@ -121,7 +136,6 @@ class StreamFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
-        viewModel.state.value = LoadingData.NONE
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -139,6 +153,12 @@ class StreamFragment : Fragment() {
                 return false
             }
         })
+        val refreshItem = menu.findItem(R.id.action_refresh)
+        refreshItem.isVisible = true
+        refreshItem.setOnMenuItemClickListener {
+            viewModel.isDownloaded.value = false
+            true
+        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 class PeopleViewModel : ViewModel() {
     private var actualUsersList: List<User> = listOf()
     val displayedUsersList: MutableLiveData<List<User>> = MutableLiveData()
-    val state: MutableLiveData<LoadingData> = MutableLiveData(LoadingData.NONE)
+    val state: MutableLiveData<LoadingData> = MutableLiveData()
     val isDownloaded: MutableLiveData<Boolean> = MutableLiveData(false)
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var subject: PublishSubject<String>? = null
@@ -44,6 +44,7 @@ class PeopleViewModel : ViewModel() {
                     }
 
                     override fun onError(e: Throwable) {
+                        state.value = LoadingData.ERROR
                         Timber.d("Error happened")
                     }
                 })
