@@ -2,113 +2,126 @@ package com.example.tinkoff.network
 
 import android.content.Context
 import com.example.tinkoff.R
-import com.example.tinkoff.data.classes.*
+import com.example.tinkoff.data.classes.Date
+import com.example.tinkoff.data.classes.MessageContent
+import com.example.tinkoff.data.classes.MessageContentInterface
+import com.example.tinkoff.data.classes.Reaction
+import com.example.tinkoff.data.classes.ReactionsData
+import com.example.tinkoff.data.classes.Stream
+import com.example.tinkoff.data.classes.StreamHeader
+import com.example.tinkoff.data.classes.TopicHeader
+import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.data.states.StreamsType
 import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.ui.fragments.messages.MessageFragment
 import io.reactivex.Single
-import timber.log.Timber
 import kotlin.random.Random
 
 object Repository {
     private var counter = 0
     private const val REPEAT_COUNT = 3
+    const val ERROR = "Error happened"
+    const val MULTIPLE = 50
     val random = Random(2)
-    fun generateUsersData(): Single<List<User>> {
-        counter = 0
 
+    private fun generateUsersData(): List<User> {
+        counter = 0
+        return listOf(
+            User(
+                counter++,
+                "Ustinov George",
+                "mannarts@gmail.com",
+                UserStatus.ONLINE,
+                R.drawable.union
+            ),
+            User(
+                counter++,
+                "Filatov Maxim",
+                "abobaMail@mail.ru",
+                UserStatus.ONLINE,
+                R.drawable.union
+            ),
+            User(
+                counter++,
+                "Ustinova Anna",
+                "abobaMail@mail.ru",
+                UserStatus.OFFLINE,
+                R.drawable.union
+            ),
+            User(
+                counter++,
+                "Here you are",
+                "abobaMail@mail.ru",
+                UserStatus.OFFLINE,
+                R.drawable.union
+            ),
+            User(
+                counter++,
+                "What a shot",
+                "abobaMail@mail.ru",
+                UserStatus.ONLINE,
+                R.drawable.union
+            ),
+            User(
+                counter++,
+                "Melnikov Igor",
+                "abobaMail@mail.ru",
+                UserStatus.OFFLINE,
+                R.drawable.union
+            ),
+            User(
+                counter++,
+                "I want jump",
+                "abobaMail@mail.ru",
+                UserStatus.OFFLINE,
+                R.drawable.union
+            ),
+            User(
+                counter++,
+                "What is this",
+                "abobaMail@mail.ru",
+                UserStatus.OFFLINE,
+                R.drawable.union
+            ),
+            User(
+                counter++,
+                "ABOBA spirs",
+                "abobaMail@mail.ru",
+                UserStatus.ONLINE,
+                R.drawable.union
+            ),
+            User(
+                counter++,
+                "ABOBA pirs",
+                "abobaMail@mail.ru",
+                UserStatus.OFFLINE,
+                R.drawable.union
+            ),
+            User(
+                counter++,
+                "ABOBA poso",
+                "abobaMail@mail.ru",
+                UserStatus.OFFLINE,
+                R.drawable.union
+            )
+        )
+    }
+
+    fun tryGenerateUsersData(): Single<List<User>> {
         return Single.create { emitter ->
             if (random.nextBoolean()) {
                 emitter.onSuccess(
-                    listOf(
-                        User(
-                            counter++,
-                            "Ustinov George",
-                            "mannarts@gmail.com",
-                            UserStatus.ONLINE,
-                            R.drawable.union
-                        ),
-                        User(
-                            counter++,
-                            "Filatov Maxim",
-                            "abobaMail@mail.ru",
-                            UserStatus.ONLINE,
-                            R.drawable.union
-                        ),
-                        User(
-                            counter++,
-                            "Ustinova Anna",
-                            "abobaMail@mail.ru",
-                            UserStatus.OFFLINE,
-                            R.drawable.union
-                        ),
-                        User(
-                            counter++,
-                            "Here you are",
-                            "abobaMail@mail.ru",
-                            UserStatus.OFFLINE,
-                            R.drawable.union
-                        ),
-                        User(
-                            counter++,
-                            "What a shot",
-                            "abobaMail@mail.ru",
-                            UserStatus.ONLINE,
-                            R.drawable.union
-                        ),
-                        User(
-                            counter++,
-                            "Melnikov Igor",
-                            "abobaMail@mail.ru",
-                            UserStatus.OFFLINE,
-                            R.drawable.union
-                        ),
-                        User(
-                            counter++,
-                            "I want jump",
-                            "abobaMail@mail.ru",
-                            UserStatus.OFFLINE,
-                            R.drawable.union
-                        ),
-                        User(
-                            counter++,
-                            "What is this",
-                            "abobaMail@mail.ru",
-                            UserStatus.OFFLINE,
-                            R.drawable.union
-                        ),
-                        User(
-                            counter++,
-                            "ABOBA spirs",
-                            "abobaMail@mail.ru",
-                            UserStatus.ONLINE,
-                            R.drawable.union
-                        ),
-                        User(
-                            counter++,
-                            "ABOBA pirs",
-                            "abobaMail@mail.ru",
-                            UserStatus.OFFLINE,
-                            R.drawable.union
-                        ),
-                        User(
-                            counter++,
-                            "ABOBA poso",
-                            "abobaMail@mail.ru",
-                            UserStatus.OFFLINE,
-                            R.drawable.union
-                        )
-                    )
+                    generateUsersData()
                 )
             } else {
-                emitter.onError(Throwable())
+                emitter.onError(Throwable(ERROR))
             }
         }
     }
 
-    fun generateStreamsData(type: StreamsType): Single<List<Stream>> {
-        counter = if (type == StreamsType.SUBSCRIBED) 0 else 50
+    fun tryGenerateStreamsData(type: StreamsType): Single<List<Stream>> {
+        counter = type.ordinal * MULTIPLE
         return Single.create { emitter ->
             val list: MutableList<Stream> = mutableListOf()
             repeat(REPEAT_COUNT) {
@@ -118,13 +131,12 @@ object Repository {
             if (random.nextBoolean()) {
                 emitter.onSuccess(list)
             } else {
-                emitter.onError(Throwable())
+                emitter.onError(Throwable(ERROR))
             }
         }
     }
 
     private fun generateStreamHeader(): StreamHeader {
-        Timber.d("current header counter is $counter")
         return StreamHeader(counter++, "$counter")
     }
 
@@ -137,69 +149,58 @@ object Repository {
         return list
     }
 
-
-    fun generateMessagesData(): Single<MutableList<MessageContentInterface>> {
-        return Single.create { emitter ->
-            counter = 0
-
-            val list: MutableList<MessageContentInterface> = mutableListOf()
-            list.add(Date(counter++, "1 Feb"))
-            list.add(
-                MessageContent(
-                    counter++,
-                    "Hello, my friend!",
-                    mutableListOf(),
-                    SenderType.OTHER
-                )
+    private fun generateMessagesData(): MutableList<MessageContentInterface> {
+        counter = 0
+        val list: MutableList<MessageContentInterface> = mutableListOf()
+        list.add(Date(counter++, "1 Feb"))
+        list.add(
+            MessageContent(counter++, "Hello, my friend!", mutableListOf(), SenderType.OTHER)
+        )
+        list.add(
+            MessageContent(counter++, "How are you?", mutableListOf(), SenderType.OTHER)
+        )
+        list.add(
+            MessageContent(
+                counter++,
+                "Why are you ignoring me???",
+                mutableListOf(),
+                SenderType.OTHER
             )
-            list.add(
-                MessageContent(
-                    counter++, "How are you?", mutableListOf(),
-                    SenderType.OTHER
-                )
-            )
-            list.add(
-                MessageContent(
-                    counter++, "Why are you ignoring me???",
-                    mutableListOf(),
-                    SenderType.OTHER
-                )
-            )
-            list.add(
-                MessageContent(
-                    counter++, "I am tired....\nGoing bad now",
-                    mutableListOf(
-                        Reaction(
-                            ReactionsData.reactionsStringList[0],
-                            mutableListOf(-1)
-                        )
-                    ),
-                    SenderType.OTHER
+        )
+        list.add(
+            MessageContent(
+                counter++, "I am tired....\nGoing bad now",
+                mutableListOf(
+                    Reaction(
+                        ReactionsData.reactionsStringList[0],
+                        mutableListOf(-1)
+                    )
                 ),
+                SenderType.OTHER
+            ),
 
-                )
-            list.add(
-                MessageContent(
-                    counter++,
-                    "Eoteogsdfkjsdfkcbvcnb hahahaha",
-                    mutableListOf(),
-                    SenderType.OTHER
-                )
             )
-            list.add(
-                MessageContent(
-                    counter++, "Hello, dude",
-                    mutableListOf(),
-                    SenderType.OWN
-                )
+        list.add(
+            MessageContent(
+                counter++,
+                "Eoteogsdfkjsdfkcbvcnb hahahaha", mutableListOf(), SenderType.OTHER
             )
-            list.add(Date(counter++, "2 Feb"))
-            list.add(MessageContent(counter++, "abobaaboba", mutableListOf(), SenderType.OTHER))
-            if(random.nextBoolean()) {
-                emitter.onSuccess(list)
-            }
-            else{
-                emitter.onError(Throwable())
+        )
+        list.add(
+            MessageContent(counter++, "Hello, dude", mutableListOf(), SenderType.OWN)
+        )
+        list.add(Date(counter++, "2 Feb"))
+        list.add(MessageContent(counter++, "abobaaboba", mutableListOf(), SenderType.OTHER))
+        return list
+    }
+
+
+    fun tryGenerateMessagesData(): Single<MutableList<MessageContentInterface>> {
+        return Single.create { emitter ->
+            if (random.nextBoolean()) {
+                emitter.onSuccess(generateMessagesData())
+            } else {
+                emitter.onError(Throwable(ERROR))
             }
         }
     }
@@ -217,7 +218,7 @@ object Repository {
                     )
                 )
             } else {
-                emitter.onError(Throwable())
+                emitter.onError(Throwable(ERROR))
             }
         }
     }

@@ -1,7 +1,9 @@
 package com.example.tinkoff.ui.fragments.stream
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.Stream
 import com.example.tinkoff.data.classes.StreamsInterface
 import com.example.tinkoff.data.states.LoadingData
@@ -31,11 +33,11 @@ class StreamViewModel : ViewModel() {
     private val streamInterfaceSubject: PublishSubject<List<Stream>> =
         PublishSubject.create()
 
-    fun refresh() {
+    fun refresh(context: Context) {
         if (isDownloaded.value == false) {
             compositeDisposable.clear()
             state.value = LoadingData.LOADING
-            Repository.generateStreamsData(type ?: StreamsType.SUBSCRIBED)
+            Repository.tryGenerateStreamsData(type ?: StreamsType.SUBSCRIBED)
                 .subscribeOn(Schedulers.computation())
                 .delay(DELAY_TIME, TimeUnit.MILLISECONDS).observeOn(
                     AndroidSchedulers.mainThread()
@@ -48,13 +50,12 @@ class StreamViewModel : ViewModel() {
                     override fun onSuccess(streams: List<Stream>) {
                         streamsList = streams
                         streamSubject = initializeSearchSubject()
-                        initializeDisplaySubject()
+                        initializeDisplaySubject(context)
                         isDownloaded.value = true
                     }
 
                     override fun onError(e: Throwable) {
                         state.value = LoadingData.ERROR
-                        Timber.d("Error happened")
                     }
                 })
         }
@@ -66,13 +67,13 @@ class StreamViewModel : ViewModel() {
     }
 
 
-    private fun initializeDisplaySubject() {
+    private fun initializeDisplaySubject(context : Context) {
         streamInterfaceSubject.apply {
             observeOn(Schedulers.computation())
                 .switchMapSingle { Single.just(prepareListForAdapter(it)) }
                 .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                     onNext = { displayedStreamsList.value = it },
-                    onError = { Timber.d("Error happened") }
+                    onError = { Timber.d(context.getString(R.string.error_streams_loading)) }
                 ).addTo(compositeDisposable)
         }
     }
@@ -100,13 +101,10 @@ class StreamViewModel : ViewModel() {
                         })
                 }.observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                     onNext = {
-                        Timber.d("viewModelCalled")
                         filteredStreamsList = it
                         streamInterfaceSubject.onNext(filteredStreamsList)
                     },
                     onError = {
-
-                        Timber.d("Error hapenned $it")
                     },
                 ).addTo(compositeDisposable)
         }
@@ -115,7 +113,6 @@ class StreamViewModel : ViewModel() {
 
     private fun prepareListForAdapter(streams: List<Stream>): List<StreamsInterface> {
         val list: MutableList<StreamsInterface> = mutableListOf()
-        Timber.d("list $streams")
         streams.forEach { stream ->
             list.add(stream.streamHeader.copy())
             if (stream.streamHeader.isSelected) {

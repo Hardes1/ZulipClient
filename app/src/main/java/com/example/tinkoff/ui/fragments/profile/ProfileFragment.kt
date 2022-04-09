@@ -2,7 +2,12 @@ package com.example.tinkoff.ui.fragments.profile
 
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -47,6 +52,10 @@ class ProfileFragment : Fragment() {
             viewModel.ownUser.value = args.user
             viewModel.state.value = LoadingData.FINISHED
         }
+        initializeLiveDataObservers()
+    }
+
+    private fun initializeLiveDataObservers(){
         viewModel.state.observe(viewLifecycleOwner) {
             when (it) {
                 LoadingData.LOADING, LoadingData.FINISHED -> {
@@ -55,7 +64,6 @@ class ProfileFragment : Fragment() {
                         binding.root.displayedChild = it.ordinal
                 }
                 LoadingData.ERROR -> {
-                    Timber.d("search item is: $searchItem")
                     searchItem?.isVisible = true
                     if (binding.root.displayedChild != LoadingData.FINISHED.ordinal)
                         binding.root.displayedChild = LoadingData.FINISHED.ordinal
@@ -78,7 +86,6 @@ class ProfileFragment : Fragment() {
                 }
             )
         }
-
     }
 
 

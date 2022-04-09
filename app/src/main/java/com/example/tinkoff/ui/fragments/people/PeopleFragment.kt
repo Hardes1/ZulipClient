@@ -1,7 +1,12 @@
 package com.example.tinkoff.ui.fragments.people
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 
 import androidx.appcompat.widget.SearchView
@@ -60,6 +65,11 @@ class PeopleFragment : Fragment() {
         viewModel.displayedUsersList.observe(viewLifecycleOwner) {
             adapter.updateList(it)
         }
+        initializeLiveDataObservers()
+    }
+
+
+    private fun initializeLiveDataObservers() {
         viewModel.state.observe(viewLifecycleOwner) {
             when (it) {
                 LoadingData.LOADING, LoadingData.FINISHED -> {
@@ -82,7 +92,7 @@ class PeopleFragment : Fragment() {
                 val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
                 viewModel.searchUsers(query)
             } else
-                viewModel.refreshPeopleData()
+                viewModel.refreshPeopleData(requireContext())
         }
     }
 
@@ -123,7 +133,6 @@ class PeopleFragment : Fragment() {
 
 
     override fun onDestroy() {
-        Timber.d("fragment destroyed")
         super.onDestroy()
         _binding = null
     }

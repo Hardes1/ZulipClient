@@ -81,6 +81,11 @@ class StreamFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
         initializeRecyclerView()
+        initializeLiveDataObservers()
+    }
+
+
+    private fun initializeLiveDataObservers(){
         viewModel.displayedStreamsList.observe(viewLifecycleOwner) {
             adapter.updateList(it)
         }
@@ -106,10 +111,9 @@ class StreamFragment : Fragment() {
                 val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
                 viewModel.searchStreamsAndTopics(query)
             } else
-                viewModel.refresh()
+                viewModel.refresh(requireContext())
         }
     }
-
 
     private fun initializeRecyclerView() {
         binding.streamsRecyclerView.adapter = adapter

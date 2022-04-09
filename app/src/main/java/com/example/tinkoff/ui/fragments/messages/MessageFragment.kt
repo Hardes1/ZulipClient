@@ -2,7 +2,12 @@ package com.example.tinkoff.ui.fragments.messages
 
 import android.os.Bundle
 import android.text.SpannableStringBuilder
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
@@ -64,7 +69,7 @@ class MessageFragment : Fragment() {
         setChangeTextListener()
         setButtonSendClickListener()
         initializeRecyclerView()
-        observeLiveData()
+        initializeLiveDataObservers()
     }
 
 
@@ -132,7 +137,7 @@ class MessageFragment : Fragment() {
         }
 
 
-    private fun observeLiveData() {
+    private fun initializeLiveDataObservers() {
         messagesViewModel.messageState.observe(viewLifecycleOwner) {
             when (it) {
                 MessageState.FAILED -> {
@@ -219,10 +224,10 @@ class MessageFragment : Fragment() {
         })
         refreshItem = menu.findItem(R.id.action_refresh)
         refreshItem?.setOnMenuItemClickListener {
-            messagesViewModel.refreshMessages()
+            messagesViewModel.refreshMessages(requireContext())
             true
         }
-        messagesViewModel.refreshMessages()
+        messagesViewModel.refreshMessages(requireContext())
         super.onCreateOptionsMenu(menu, inflater)
     }
 

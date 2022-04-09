@@ -1,8 +1,14 @@
 package com.example.tinkoff.ui.fragments.messages
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.tinkoff.data.classes.*
+import com.example.tinkoff.R
+import com.example.tinkoff.data.classes.Date
+import com.example.tinkoff.data.classes.MessageContent
+import com.example.tinkoff.data.classes.MessageContentInterface
+import com.example.tinkoff.data.classes.Reaction
+import com.example.tinkoff.data.classes.ReactionsData
 import com.example.tinkoff.data.states.LoadingData
 import com.example.tinkoff.data.states.MessageState
 import com.example.tinkoff.data.states.SenderType
@@ -85,10 +91,10 @@ class MessagesViewModel : ViewModel() {
     }
 
 
-    fun refreshMessages() {
+    fun refreshMessages(context : Context) {
         compositeDisposable.clear()
         loadingDataState.value = LoadingData.LOADING
-        Repository.generateMessagesData().delay(DELAY_TIME, TimeUnit.MILLISECONDS)
+        Repository.tryGenerateMessagesData().delay(DELAY_TIME, TimeUnit.MILLISECONDS)
             .subscribeOn(
                 Schedulers.computation()
             ).observeOn(AndroidSchedulers.mainThread())
@@ -101,13 +107,12 @@ class MessagesViewModel : ViewModel() {
                     override fun onSuccess(value: MutableList<MessageContentInterface>) {
                         messagesList = value
                         initializeDisplaySubject()
-                        initializeSearchSubject()
+                        initializeSearchSubject(context)
                         loadingDataState.value = LoadingData.FINISHED
                     }
 
                     override fun onError(e: Throwable) {
                         loadingDataState.value = LoadingData.ERROR
-                        Timber.d("Error loading messages")
                     }
                 })
 
@@ -150,18 +155,16 @@ class MessagesViewModel : ViewModel() {
     }
 
 
-    private fun initializeSearchSubject() {
+    private fun initializeSearchSubject(context : Context) {
         filteredMessageSubject =
             PublishSubject.create<String>().apply {
                 observeOn(Schedulers.computation()).map {
-                    Timber.d("DEBUG: entered to filtered list")
                     it.trim()
                 }.distinctUntilChanged()
                     .debounce(
                         DEBOUNCE_TIME, TimeUnit.MILLISECONDS
                     )
                     .switchMapSingle { filter ->
-                        Timber.d("DEBUG: filter string is \"$filter\"")
                         filteredMessagesList =
                             if (filter.isEmpty()) {
                                 messagesList
@@ -195,7 +198,12 @@ class MessagesViewModel : ViewModel() {
                             }
                         Single.just(filteredMessagesList)
                     }.observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(onNext = { messageDisplaySubject?.onNext(it) })
+                    .subscribeBy(onNext = {
+                        messageDisplaySubject?.onNext(it)
+                                          },
+                        onError = {
+                        Timber.d(context.getString(R.string.error_messages_loading))
+                    })
                     .addTo(compositeDisposable)
             }
     }
@@ -205,14 +213,10 @@ class MessagesViewModel : ViewModel() {
         messageDisplaySubject = PublishSubject.create<List<MessageContentInterface>>().apply {
             observeOn(Schedulers.computation())
                 .switchMapSingle {
-                    Timber.d("DEBUG: called transformation map")
-                    Timber.d("DEBUG: list before operations $it")
                     Single.just(copyList(it))
                 }.observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = {
-                        Timber.d("DEBUG: ${messageState.value}")
-                        Timber.d("DEBUG: list after operations: $it")
                         displayedMessagesList.value = it
                         if (messageState.value == MessageState.SENDING)
                             messageState.value = MessageState.SUCCESSFUL
@@ -240,7 +244,7 @@ class MessagesViewModel : ViewModel() {
         if (Repository.random.nextBoolean())
             messageDisplaySubject?.onNext(messagesList)
         else
-            messageDisplaySubject?.onError(Throwable())
+            messageDisplaySubject?.onError(Throwable(Repository.ERROR))
     }
 
 

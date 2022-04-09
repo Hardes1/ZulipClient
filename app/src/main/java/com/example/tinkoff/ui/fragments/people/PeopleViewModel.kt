@@ -1,7 +1,9 @@
 package com.example.tinkoff.ui.fragments.people
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.LoadingData
 import com.example.tinkoff.network.Repository
@@ -26,11 +28,11 @@ class PeopleViewModel : ViewModel() {
     private var subject: PublishSubject<String>? = null
 
 
-    fun refreshPeopleData() {
+    fun refreshPeopleData(context: Context) {
         if (isDownloaded.value == false) {
             compositeDisposable.clear()
             state.value = LoadingData.LOADING
-            Repository.generateUsersData().subscribeOn(Schedulers.computation())
+            Repository.tryGenerateUsersData().subscribeOn(Schedulers.computation())
                 .delay(DELAY_TIME, TimeUnit.MILLISECONDS).observeOn(mainThread())
                 .subscribe(object : SingleObserver<List<User>> {
                     override fun onSubscribe(d: Disposable) {
@@ -39,13 +41,12 @@ class PeopleViewModel : ViewModel() {
 
                     override fun onSuccess(users: List<User>) {
                         actualUsersList = users
-                        subject = initializeDisplaySubject()
+                        subject = initializeDisplaySubject(context)
                         isDownloaded.value = true
                     }
 
                     override fun onError(e: Throwable) {
                         state.value = LoadingData.ERROR
-                        Timber.d("Error happened")
                     }
                 })
         }
@@ -68,7 +69,7 @@ class PeopleViewModel : ViewModel() {
     }
 
 
-    private fun initializeDisplaySubject(): PublishSubject<String> {
+    private fun initializeDisplaySubject(context: Context): PublishSubject<String> {
         return PublishSubject.create<String>().apply {
             observeOn(Schedulers.computation()).map {
                 it.trim()
@@ -85,12 +86,11 @@ class PeopleViewModel : ViewModel() {
                         })
                 }.observeOn(mainThread()).subscribeBy(
                     onNext = {
-                        Timber.d("viewModelCalled")
                         displayedUsersList.value = it
 
                     },
                     onError = {
-                        Timber.d("Error hapenned $it")
+                        Timber.d(context.getString(R.string.error_people_loading))
                     },
                 ).addTo(compositeDisposable)
         }

@@ -98,7 +98,6 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onSupportNavigateUp(): Boolean {
-        Timber.d("navigated up")
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
