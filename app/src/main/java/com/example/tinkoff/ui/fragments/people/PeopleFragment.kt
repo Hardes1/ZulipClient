@@ -55,6 +55,7 @@ class PeopleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
+        initializeRecyclerView()
         viewModel.displayedUsersList.observe(viewLifecycleOwner) {
             Timber.d("DEBUG: search size ${it.size}")
             adapter.updateList(it)
@@ -65,12 +66,13 @@ class PeopleFragment : Fragment() {
                 binding.root.displayedChild = it.ordinal
             }
         }
-        viewModel.isDownloaded.observe(viewLifecycleOwner) {
-            val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
-            viewModel.searchUsers(query)
+        viewModel.isDownloaded.observe(viewLifecycleOwner) { isDownloaded ->
+            if (isDownloaded) {
+                val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
+                viewModel.searchUsers(query)
+            } else
+                viewModel.refreshPeopleData()
         }
-        initializeRecyclerView()
-        viewModel.refreshPeopleData()
     }
 
 

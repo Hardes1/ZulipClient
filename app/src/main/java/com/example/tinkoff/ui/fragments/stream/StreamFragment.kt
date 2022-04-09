@@ -51,7 +51,11 @@ class StreamFragment : Fragment() {
         }
 
     private val adapter: StreamsRecyclerAdapter by lazy {
-        StreamsRecyclerAdapter(changeStateCallBack, navigateToMessageFragmentCallBack, updateStreamsCallBack)
+        StreamsRecyclerAdapter(
+            changeStateCallBack,
+            navigateToMessageFragmentCallBack,
+            updateStreamsCallBack
+        )
     }
 
 
@@ -83,11 +87,13 @@ class StreamFragment : Fragment() {
             if (it != LoadingData.NONE && binding.root.displayedChild != it.ordinal)
                 binding.root.displayedChild = it.ordinal
         }
-        viewModel.isDownloaded.observe(viewLifecycleOwner) {
-            val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
-            viewModel.searchStreamsAndTopics(query)
+        viewModel.isDownloaded.observe(viewLifecycleOwner) { isDownloaded ->
+            if (isDownloaded) {
+                val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
+                viewModel.searchStreamsAndTopics(query)
+            } else
+                viewModel.refresh()
         }
-        viewModel.refresh()
     }
 
 
