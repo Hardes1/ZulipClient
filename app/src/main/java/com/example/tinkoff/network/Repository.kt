@@ -14,7 +14,7 @@ import kotlin.random.Random
 object Repository {
     private var counter = 0
     private const val REPEAT_COUNT = 3
-    private val random = Random(2)
+    val random = Random(2)
     fun generateUsersData(): Single<List<User>> {
         counter = 0
 

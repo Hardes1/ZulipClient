@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.tinkoff.data.classes.*
 import com.example.tinkoff.data.states.LoadingData
+import com.example.tinkoff.data.states.MessageState
 import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.network.Repository
 import com.example.tinkoff.ui.fragments.messages.MessageFragment.Companion.MY_ID
@@ -23,11 +24,11 @@ class MessagesViewModel : ViewModel() {
     private var messagesList: MutableList<MessageContentInterface> = mutableListOf()
     private var filteredMessagesList: MutableList<MessageContentInterface> = mutableListOf()
     val displayedMessagesList: MutableLiveData<List<MessageContentInterface>> = MutableLiveData()
-    val state: MutableLiveData<LoadingData> = MutableLiveData()
+    val messageState: MutableLiveData<MessageState> = MutableLiveData(MessageState.SUCCESSFUL)
+    val loadingDataState: MutableLiveData<LoadingData> = MutableLiveData()
     var needToScroll: Boolean = false
     private var filteredMessageSubject: PublishSubject<String>? = null
-    private val messagePrepareSubject: PublishSubject<List<MessageContentInterface>> =
-        PublishSubject.create()
+    private var messageDisplaySubject: PublishSubject<List<MessageContentInterface>>? = null
     private var messageId: Int = -1
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -57,7 +58,7 @@ class MessagesViewModel : ViewModel() {
             ) {
                 currentReactions[pressedReactionIndex].usersId.add(MY_ID)
             }
-            messagePrepareSubject.onNext(filteredMessagesList)
+            messageDisplaySubject?.onNext(filteredMessagesList)
         }
     }
 
@@ -80,13 +81,13 @@ class MessagesViewModel : ViewModel() {
         }
         if (currentReaction.usersId.size == 0)
             currentMessage.reactions.remove(currentReaction)
-        messagePrepareSubject.onNext(filteredMessagesList)
+        messageDisplaySubject?.onNext(filteredMessagesList)
     }
 
 
     fun refreshMessages() {
         compositeDisposable.clear()
-        state.value = LoadingData.LOADING
+        loadingDataState.value = LoadingData.LOADING
         Repository.generateMessagesData().delay(DELAY_TIME, TimeUnit.MILLISECONDS)
             .subscribeOn(
                 Schedulers.computation()
@@ -99,14 +100,13 @@ class MessagesViewModel : ViewModel() {
 
                     override fun onSuccess(value: MutableList<MessageContentInterface>) {
                         messagesList = value
-                        initializePrepareSubject()
-                        initializeFilteredSubject()
-                        searchMessages("")
-                        state.value = LoadingData.FINISHED
+                        initializeDisplaySubject()
+                        initializeSearchSubject()
+                        loadingDataState.value = LoadingData.FINISHED
                     }
 
                     override fun onError(e: Throwable) {
-                        state.value = LoadingData.ERROR
+                        loadingDataState.value = LoadingData.ERROR
                         Timber.d("Error loading messages")
                     }
                 })
@@ -150,7 +150,7 @@ class MessagesViewModel : ViewModel() {
     }
 
 
-    private fun initializeFilteredSubject() {
+    private fun initializeSearchSubject() {
         filteredMessageSubject =
             PublishSubject.create<String>().apply {
                 observeOn(Schedulers.computation()).map {
@@ -195,23 +195,40 @@ class MessagesViewModel : ViewModel() {
                             }
                         Single.just(filteredMessagesList)
                     }.observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(onNext = { messagePrepareSubject.onNext(it) })
+                    .subscribeBy(onNext = { messageDisplaySubject?.onNext(it) })
                     .addTo(compositeDisposable)
             }
     }
 
-    private fun initializePrepareSubject() {
-        messagePrepareSubject.observeOn(Schedulers.computation())
-            .switchMapSingle {
-                Single.just(copyList(it))
-            }.observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = { displayedMessagesList.value = it },
-                onError = { Timber.d("error happened") }).addTo(compositeDisposable)
+
+    fun initializeDisplaySubject() {
+        messageDisplaySubject = PublishSubject.create<List<MessageContentInterface>>().apply {
+            observeOn(Schedulers.computation())
+                .switchMapSingle {
+                    Timber.d("DEBUG: called transformation map")
+                    Timber.d("DEBUG: list before operations $it")
+                    Single.just(copyList(it))
+                }.observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        Timber.d("DEBUG: ${messageState.value}")
+                        Timber.d("DEBUG: list after operations: $it")
+                        displayedMessagesList.value = it
+                        if (messageState.value == MessageState.SENDING)
+                            messageState.value = MessageState.SUCCESSFUL
+                    },
+                    onError = {
+                        messagesList.removeLastOrNull()
+                        messageState.value = MessageState.FAILED
+                    }
+                )
+                .addTo(compositeDisposable)
+        }
     }
 
     fun addMessage(message: CharSequence) {
         needToScroll = true
+        messageState.value = MessageState.SENDING
         messagesList.add(
             MessageContent(
                 messagesList.size,
@@ -220,7 +237,10 @@ class MessagesViewModel : ViewModel() {
                 SenderType.OWN
             )
         )
-        messagePrepareSubject.onNext(messagesList)
+        if (Repository.random.nextBoolean())
+            messageDisplaySubject?.onNext(messagesList)
+        else
+            messageDisplaySubject?.onError(Throwable())
     }
 
 

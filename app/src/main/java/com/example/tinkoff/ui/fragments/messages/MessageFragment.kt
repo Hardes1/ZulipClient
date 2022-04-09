@@ -15,12 +15,12 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tinkoff.R
 import com.example.tinkoff.data.states.LoadingData
+import com.example.tinkoff.data.states.MessageState
 import com.example.tinkoff.databinding.FragmentMessageBinding
 import com.example.tinkoff.recyclerFeatures.adapters.MessageRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.MessageItemDecoration
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.example.tinkoff.ui.fragments.bottomSheet.BottomSheetFragment
-import timber.log.Timber
 
 class MessageFragment : Fragment() {
 
@@ -71,7 +71,6 @@ class MessageFragment : Fragment() {
     private fun setButtonSendClickListener() {
         binding.sendButton.setOnClickListener {
             val text = (binding.messageContentTextView.text ?: "").trim()
-            binding.messageContentTextView.text = SpannableStringBuilder("")
             messagesViewModel.addMessage(text)
         }
     }
@@ -134,10 +133,29 @@ class MessageFragment : Fragment() {
 
 
     private fun observeLiveData() {
+        messagesViewModel.messageState.observe(viewLifecycleOwner) {
+            when (it) {
+                MessageState.FAILED -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Error sending message to server",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    messagesViewModel.initializeDisplaySubject()
+                }
+                MessageState.SUCCESSFUL -> {
+                    binding.messageContentTextView.text = SpannableStringBuilder("")
+                }
+                MessageState.SENDING -> {
+
+                }
+                else -> throw NotImplementedError()
+            }
+        }
         reactionsViewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
             messagesViewModel.updateReactions(reactionIndexValue)
         }
-        messagesViewModel.state.observe(viewLifecycleOwner) {
+        messagesViewModel.loadingDataState.observe(viewLifecycleOwner) {
             when (it) {
                 LoadingData.LOADING -> {
                     searchItem?.isVisible = false
@@ -150,6 +168,7 @@ class MessageFragment : Fragment() {
                     refreshItem?.isVisible = false
                     binding.progressBarIndicator.visibility = View.INVISIBLE
                     binding.bottomConstraintLayout.visibility = View.VISIBLE
+                    messagesViewModel.searchMessages("")
                 }
                 LoadingData.ERROR -> {
                     searchItem?.isVisible = false

@@ -39,7 +39,7 @@ class PeopleViewModel : ViewModel() {
 
                     override fun onSuccess(users: List<User>) {
                         actualUsersList = users
-                        subject = usersSubjectBuilder()
+                        subject = initializeDisplaySubject()
                         isDownloaded.value = true
                     }
 
@@ -68,7 +68,7 @@ class PeopleViewModel : ViewModel() {
     }
 
 
-    private fun usersSubjectBuilder(): PublishSubject<String> {
+    private fun initializeDisplaySubject(): PublishSubject<String> {
         return PublishSubject.create<String>().apply {
             observeOn(Schedulers.computation()).map {
                 it.trim()

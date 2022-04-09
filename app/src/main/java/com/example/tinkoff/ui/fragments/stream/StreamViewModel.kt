@@ -47,8 +47,8 @@ class StreamViewModel : ViewModel() {
 
                     override fun onSuccess(streams: List<Stream>) {
                         streamsList = streams
-                        streamSubject = streamSubjectBuilder()
-                        streamDisplaySubjectBuilder()
+                        streamSubject = initializeSearchSubject()
+                        initializeDisplaySubject()
                         isDownloaded.value = true
                     }
 
@@ -66,7 +66,7 @@ class StreamViewModel : ViewModel() {
     }
 
 
-    private fun streamDisplaySubjectBuilder() {
+    private fun initializeDisplaySubject() {
         streamInterfaceSubject.apply {
             observeOn(Schedulers.computation())
                 .switchMapSingle { Single.just(prepareListForAdapter(it)) }
@@ -78,7 +78,7 @@ class StreamViewModel : ViewModel() {
     }
 
 
-    private fun streamSubjectBuilder(): PublishSubject<String> {
+    private fun initializeSearchSubject(): PublishSubject<String> {
         return PublishSubject.create<String>().apply {
             observeOn(Schedulers.computation()).map {
                 it.trim()
