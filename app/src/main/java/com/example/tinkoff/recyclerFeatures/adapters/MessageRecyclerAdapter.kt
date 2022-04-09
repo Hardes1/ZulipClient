@@ -21,7 +21,7 @@ import com.google.android.material.textview.MaterialTextView
 
 class MessageRecyclerAdapter(
     private val onPositionChanged: (Int) -> Unit,
-    private val listChanged: (List<MessageContentInterface>) -> Unit,
+    private val listChanged: () -> Unit,
     private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
 ) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
@@ -135,7 +135,7 @@ class MessageRecyclerAdapter(
     private var list: List<MessageContentInterface>
         private set(value) {
             differ.submitList(value.reversed()) {
-                listChanged(value)
+                listChanged()
             }
         }
         get() = differ.currentList
