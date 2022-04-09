@@ -21,9 +21,9 @@ import java.util.concurrent.TimeUnit
 
 class MessagesViewModel : ViewModel() {
     private var messagesList: MutableList<MessageContentInterface> = mutableListOf()
+    private var filteredMessagesList: MutableList<MessageContentInterface> = mutableListOf()
     val displayedMessagesList: MutableLiveData<List<MessageContentInterface>> = MutableLiveData()
     val state: MutableLiveData<LoadingData> = MutableLiveData(LoadingData.NONE)
-    val needToCollapseMenuItem: MutableLiveData<Boolean> = MutableLiveData(false)
     var needToScroll: Boolean = false
     private var filteredMessageSubject: PublishSubject<String>? = null
     private val messagePrepareSubject: PublishSubject<List<MessageContentInterface>> =
@@ -32,10 +32,9 @@ class MessagesViewModel : ViewModel() {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     fun updateReactions(reactionIndexValue: Int) {
-        messageId
         val reactionCondition = reactionIndexValue >= 0 &&
                 reactionIndexValue < ReactionsData.reactionsStringList.size
-        if (reactionCondition) {
+        if (reactionCondition && messageId != -1) {
             val currentMessage =
                 messagesList.find { it is MessageContent && it.id == messageId } as MessageContent
             val currentReactions =
@@ -58,8 +57,7 @@ class MessagesViewModel : ViewModel() {
             ) {
                 currentReactions[pressedReactionIndex].usersId.add(MY_ID)
             }
-            needToCollapseMenuItem.value = true
-            messagePrepareSubject.onNext(messagesList)
+            messagePrepareSubject.onNext(filteredMessagesList)
         }
     }
 
@@ -82,8 +80,7 @@ class MessagesViewModel : ViewModel() {
         }
         if (currentReaction.usersId.size == 0)
             currentMessage.reactions.remove(currentReaction)
-        needToCollapseMenuItem.value = true
-        messagePrepareSubject.onNext(messagesList)
+        messagePrepareSubject.onNext(filteredMessagesList)
     }
 
 
@@ -97,16 +94,14 @@ class MessagesViewModel : ViewModel() {
             .subscribe(
                 object : SingleObserver<MutableList<MessageContentInterface>> {
                     override fun onSubscribe(d: Disposable) {
-                        Timber.d("DEBUG: added disposable")
                         compositeDisposable.add(d)
                     }
 
                     override fun onSuccess(value: MutableList<MessageContentInterface>) {
-                        Timber.d("called onSuccess repository")
                         messagesList = value
                         initializePrepareSubject()
                         initializeFilteredSubject()
-                        messagePrepareSubject.onNext(messagesList)
+                        searchMessages("")
                         state.value = LoadingData.FINISHED
                     }
 
@@ -119,7 +114,6 @@ class MessagesViewModel : ViewModel() {
 
 
     fun searchMessages(query: String) {
-        Timber.d("called search messages with message $query")
         filteredMessageSubject?.onNext(query)
     }
 
@@ -166,9 +160,10 @@ class MessagesViewModel : ViewModel() {
                         DEBOUNCE_TIME, TimeUnit.MILLISECONDS
                     )
                     .switchMapSingle { filter ->
-                        Single.just(
+                        Timber.d("DEBUG: filter string is \"$filter\"")
+                        filteredMessagesList =
                             if (filter.isEmpty()) {
-                                copyList(messagesList)
+                                messagesList
                             } else {
                                 val filteredList: MutableList<MessageContentInterface> =
                                     mutableListOf()
@@ -197,7 +192,7 @@ class MessagesViewModel : ViewModel() {
                                 }
                                 filteredList
                             }
-                        )
+                        Single.just(filteredMessagesList)
                     }.observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(onNext = { messagePrepareSubject.onNext(it) })
                     .addTo(compositeDisposable)
@@ -207,7 +202,6 @@ class MessagesViewModel : ViewModel() {
     private fun initializePrepareSubject() {
         messagePrepareSubject.observeOn(Schedulers.computation())
             .switchMapSingle {
-                Timber.d("DEBUG: went in single")
                 Single.just(copyList(it))
             }.observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -225,7 +219,6 @@ class MessagesViewModel : ViewModel() {
                 SenderType.OWN
             )
         )
-        needToCollapseMenuItem.value = true
         messagePrepareSubject.onNext(messagesList)
     }
 

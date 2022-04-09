@@ -153,16 +153,25 @@ class MessageFragment : Fragment() {
         messagesViewModel.displayedMessagesList.observe(viewLifecycleOwner) {
             adapter.updateList(it)
         }
-        messagesViewModel.needToCollapseMenuItem.observe(viewLifecycleOwner) { collapse ->
-            if (collapse) {
-                searchItem?.collapseActionView()
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         searchItem = menu.findItem(R.id.action_search)
+
+        searchItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
+                binding.bottomConstraintLayout.visibility = View.GONE
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
+                binding.bottomConstraintLayout.visibility = View.VISIBLE
+                return true
+            }
+
+        })
         val searchView = searchItem?.actionView as SearchView
+        searchView.setIconifiedByDefault(true)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 messagesViewModel.searchMessages(query)
