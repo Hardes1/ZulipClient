@@ -30,13 +30,13 @@ class MessagesViewModel : ViewModel() {
     val displayedMessagesList: MutableLiveData<List<MessageContentInterface>> = MutableLiveData()
     val messageState: MutableLiveData<MessageState> = MutableLiveData(MessageState.SUCCESSFUL)
     val loadingDataState: MutableLiveData<LoadingData> = MutableLiveData()
-    var needToScroll: Boolean = false
+    val needToScroll: MutableLiveData<Boolean> = MutableLiveData()
     private var filteredMessageSubject: PublishSubject<String>? = null
     private var messageDisplaySubject: PublishSubject<List<MessageContentInterface>>? = null
     private var messageId: Int = -1
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-    fun updateReactions(reactionIndexValue: Int) {
+    fun reactionAddedCallBack(reactionIndexValue: Int) {
         val reactionCondition = reactionIndexValue >= 0 &&
             reactionIndexValue < ReactionsData.reactionsStringList.size
         if (reactionCondition && messageId != -1) {
@@ -61,11 +61,12 @@ class MessagesViewModel : ViewModel() {
             ) {
                 currentReactions[pressedReactionIndex].usersId.add(MY_ID)
             }
+            needToScroll.value = false
             messageDisplaySubject?.onNext(filteredMessagesList)
         }
     }
 
-    fun updateElementCallBack(
+    fun reactionClickedCallBack(
         elementId: Int,
         reactionPosition: Int,
         isAdd: Boolean
@@ -83,6 +84,7 @@ class MessagesViewModel : ViewModel() {
         }
         if (currentReaction.usersId.size == 0)
             currentMessage.reactions.remove(currentReaction)
+        needToScroll.value = false
         messageDisplaySubject?.onNext(filteredMessagesList)
     }
 
@@ -218,7 +220,7 @@ class MessagesViewModel : ViewModel() {
     }
 
     fun addMessage(message: CharSequence) {
-        needToScroll = true
+        needToScroll.value = true
         messageState.value = MessageState.SENDING
         messagesList.add(
             MessageContent(

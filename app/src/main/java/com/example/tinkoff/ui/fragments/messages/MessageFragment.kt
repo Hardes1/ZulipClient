@@ -102,7 +102,6 @@ class MessageFragment : Fragment() {
         layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         adapter = MessageRecyclerAdapter(
             onSelectedPositionChanged,
-            listChangedCallBack,
             updateElementCallBack
         )
         binding.recyclerView.adapter = adapter
@@ -119,18 +118,22 @@ class MessageFragment : Fragment() {
 
     private val updateElementCallBack: (Int, Int, Boolean) -> Unit =
         { id, reactionPosition, isAdd ->
-            messagesViewModel.updateElementCallBack(id, reactionPosition, isAdd)
-        }
-
-    private val listChangedCallBack: () -> Unit =
-        {
-            if (messagesViewModel.needToScroll) {
-                messagesViewModel.needToScroll = false
-                binding.recyclerView.smoothScrollToPosition(0)
-            }
+            messagesViewModel.reactionClickedCallBack(id, reactionPosition, isAdd)
         }
 
     private fun initializeLiveDataObservers() {
+
+        messagesViewModel.needToScroll.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> adapter.setChangedPositionCallBack {
+                    binding.recyclerView.smoothScrollToPosition(
+                        0
+                    )
+                }
+                false -> adapter.setChangedPositionCallBack(null)
+            }
+        }
+
         messagesViewModel.messageState.observe(viewLifecycleOwner) {
             when (it) {
                 MessageState.FAILED -> {
@@ -150,7 +153,7 @@ class MessageFragment : Fragment() {
             }
         }
         reactionsViewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
-            messagesViewModel.updateReactions(reactionIndexValue)
+            messagesViewModel.reactionAddedCallBack(reactionIndexValue)
         }
         messagesViewModel.loadingDataState.observe(viewLifecycleOwner) {
             when (it) {

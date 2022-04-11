@@ -70,8 +70,9 @@ class StreamFragment : Fragment() {
     ): View {
         setHasOptionsMenu(true)
         _binding = FragmentStreamBinding.inflate(inflater, container, false)
-        if (viewModel.type == null)
-            viewModel.type = StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
+        viewModel.trySetStreamType(
+            StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
+        )
         return binding.root
     }
 

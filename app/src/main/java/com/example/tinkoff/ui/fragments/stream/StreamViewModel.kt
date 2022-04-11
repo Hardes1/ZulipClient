@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 class StreamViewModel : ViewModel() {
     private var streamsList: List<Stream> = emptyList()
     private var filteredStreamsList: List<Stream> = emptyList()
-    var type: StreamsType? = null
+    private var type: StreamsType? = null
     val displayedStreamsList: MutableLiveData<List<StreamsInterface>> = MutableLiveData()
     val state: MutableLiveData<LoadingData> = MutableLiveData()
     val isDownloaded: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -122,6 +122,12 @@ class StreamViewModel : ViewModel() {
         }
         return list
     }
+
+    fun trySetStreamType(type: StreamsType) {
+        if (this.type == null)
+            this.type = type
+    }
+
 
     fun selectItem(id: Int, isSelected: Boolean) {
         streamsList.find { it.streamHeader.id == id }?.streamHeader?.isSelected = isSelected

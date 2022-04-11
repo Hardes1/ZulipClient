@@ -22,7 +22,6 @@ import timber.log.Timber
 
 class MessageRecyclerAdapter(
     private val onSelectedPositionChanged: (Int) -> Unit,
-    private val listChanged: () -> Unit,
     private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
 ) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
@@ -128,13 +127,14 @@ class MessageRecyclerAdapter(
         }
     }
 
+    private var listChangedCallBack : (() -> Unit)? = null
     private val differ = AsyncListDiffer(this, MessagesDiffUtil())
     private var list: List<MessageContentInterface>
         private set(value) {
             Timber.d("DEBUG: list before changes: $list")
             Timber.d("DEBUG: value is $value")
             differ.submitList(value.reversed()) {
-                listChanged()
+                listChangedCallBack?.invoke()
             }
             Timber.d("DEBUG: list after changes: $list")
         }
@@ -200,6 +200,10 @@ class MessageRecyclerAdapter(
 
     fun updateList(otherList: List<MessageContentInterface>) {
         list = otherList
+    }
+
+    fun setChangedPositionCallBack(callBack : (() -> Unit)?){
+        listChangedCallBack = callBack
     }
 
     companion object {
