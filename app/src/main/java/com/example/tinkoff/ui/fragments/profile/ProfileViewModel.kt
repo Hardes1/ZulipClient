@@ -7,9 +7,9 @@ import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.LoadingData
 import com.example.tinkoff.network.Repository
-import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -23,25 +23,20 @@ class ProfileViewModel : ViewModel() {
         disposable?.dispose()
         if (state.value != LoadingData.FINISHED) {
             state.value = LoadingData.LOADING
-            Repository.generatePersonalUserData(context)
+            disposable = Repository.generatePersonalUserData(context)
                 .delay(ProfileFragment.DELAY_TIME, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : SingleObserver<User> {
-                    override fun onSubscribe(d: Disposable) {
-                        disposable = d
-                    }
-
-                    override fun onSuccess(value: User) {
+                .subscribeBy(
+                    onSuccess = { value ->
                         ownUser.value = value
                         state.value = LoadingData.FINISHED
-                    }
-
-                    override fun onError(e: Throwable) {
+                    },
+                    onError = {
                         state.value = LoadingData.ERROR
                         Timber.d(context.getString(R.string.error_profile_loading))
                     }
-                })
+                )
         }
     }
 

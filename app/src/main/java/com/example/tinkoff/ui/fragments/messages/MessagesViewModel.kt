@@ -15,10 +15,8 @@ import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.network.Repository
 import com.example.tinkoff.ui.fragments.messages.MessageFragment.Companion.MY_ID
 import io.reactivex.Single
-import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -95,23 +93,17 @@ class MessagesViewModel : ViewModel() {
             .subscribeOn(
                 Schedulers.computation()
             ).observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                object : SingleObserver<MutableList<MessageContentInterface>> {
-                    override fun onSubscribe(d: Disposable) {
-                        compositeDisposable.add(d)
-                    }
-
-                    override fun onSuccess(value: MutableList<MessageContentInterface>) {
-                        messagesList = value
-                        initializeDisplaySubject()
-                        initializeSearchSubject(context)
-                        loadingDataState.value = LoadingData.FINISHED
-                    }
-
-                    override fun onError(e: Throwable) {
-                        loadingDataState.value = LoadingData.ERROR
-                    }
-                })
+            .subscribeBy(
+                onSuccess = {
+                    messagesList = it
+                    initializeDisplaySubject()
+                    initializeSearchSubject(context)
+                    loadingDataState.value = LoadingData.FINISHED
+                },
+                onError = {
+                    loadingDataState.value = LoadingData.ERROR
+                }
+            ).addTo(compositeDisposable)
     }
 
     fun searchMessages(query: String) {
@@ -147,6 +139,40 @@ class MessagesViewModel : ViewModel() {
         messageId = id
     }
 
+
+    private fun findMessagesByFilter(filter: String): MutableList<MessageContentInterface> {
+        return if (filter.isEmpty()) {
+            messagesList
+        } else {
+            val filteredList: MutableList<MessageContentInterface> =
+                mutableListOf()
+            var needToAddDate = false
+            var lastDate = Date(-1, "")
+            messagesList.forEach { element ->
+                when (element) {
+                    is Date -> {
+                        lastDate = element
+                        needToAddDate = true
+                    }
+                    is MessageContent -> {
+                        if (element.content.contains(
+                                filter,
+                                ignoreCase = true
+                            )
+                        ) {
+                            if (needToAddDate) {
+                                filteredList.add(lastDate)
+                                needToAddDate = false
+                            }
+                            filteredList.add(element)
+                        }
+                    }
+                }
+            }
+            filteredList
+        }
+    }
+
     private fun initializeSearchSubject(context: Context) {
         filteredMessageSubject =
             PublishSubject.create<String>().apply {
@@ -157,37 +183,7 @@ class MessagesViewModel : ViewModel() {
                         DEBOUNCE_TIME, TimeUnit.MILLISECONDS
                     )
                     .switchMapSingle { filter ->
-                        filteredMessagesList =
-                            if (filter.isEmpty()) {
-                                messagesList
-                            } else {
-                                val filteredList: MutableList<MessageContentInterface> =
-                                    mutableListOf()
-                                var needToAddDate = false
-                                var lastDate = Date(-1, "")
-                                messagesList.forEach { element ->
-                                    when (element) {
-                                        is Date -> {
-                                            lastDate = element
-                                            needToAddDate = true
-                                        }
-                                        is MessageContent -> {
-                                            if (element.content.contains(
-                                                    filter,
-                                                    ignoreCase = true
-                                                )
-                                            ) {
-                                                if (needToAddDate) {
-                                                    filteredList.add(lastDate)
-                                                    needToAddDate = false
-                                                }
-                                                filteredList.add(element)
-                                            }
-                                        }
-                                    }
-                                }
-                                filteredList
-                            }
+                        filteredMessagesList = findMessagesByFilter(filter)
                         Single.just(filteredMessagesList)
                     }.observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(onNext = {
@@ -232,7 +228,7 @@ class MessagesViewModel : ViewModel() {
                 SenderType.OWN
             )
         )
-        if (Repository.random.nextBoolean())
+        if (true)
             messageDisplaySubject?.onNext(messagesList)
         else
             messageDisplaySubject?.onError(Throwable(Repository.ERROR))

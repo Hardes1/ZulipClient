@@ -18,11 +18,12 @@ import com.example.tinkoff.recyclerFeatures.diffUtils.MessagesDiffUtil
 import com.example.tinkoff.ui.fragments.messages.MessageFragment.Companion.MY_ID
 import com.example.tinkoff.ui.views.FlexBoxLayout
 import com.google.android.material.textview.MaterialTextView
+import timber.log.Timber
 
 class MessageRecyclerAdapter(
     private val onSelectedPositionChanged: (Int) -> Unit,
     private val listChanged: () -> Unit,
-    private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
+    private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
 ) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
 
@@ -35,7 +36,7 @@ class MessageRecyclerAdapter(
 
         private val onPositionChanged: (Int) -> Unit,
         private val context: Context,
-        private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
+        private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
         private val binding: MessageOtherItemBinding
     ) :
         MessageContentViewHolder(binding.root) {
@@ -83,7 +84,7 @@ class MessageRecyclerAdapter(
     class MessageOwnViewHolder(
         private val onPositionChanged: (Int) -> Unit,
         private val context: Context,
-        private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
+        private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
         private val binding: MessageOwnItemBinding
     ) :
         MessageContentViewHolder(binding.root) {
@@ -130,9 +131,12 @@ class MessageRecyclerAdapter(
     private val differ = AsyncListDiffer(this, MessagesDiffUtil())
     private var list: List<MessageContentInterface>
         private set(value) {
+            Timber.d("DEBUG: list before changes: $list")
+            Timber.d("DEBUG: value is $value")
             differ.submitList(value.reversed()) {
                 listChanged()
             }
+            Timber.d("DEBUG: list after changes: $list")
         }
         get() = differ.currentList
 

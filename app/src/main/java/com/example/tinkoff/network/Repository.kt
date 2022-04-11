@@ -195,7 +195,7 @@ object Repository {
 
     fun tryGenerateMessagesData(): Single<MutableList<MessageContentInterface>> {
         return Single.create { emitter ->
-            if (random.nextBoolean()) {
+            if (true) {
                 emitter.onSuccess(generateMessagesData())
             } else {
                 emitter.onError(Throwable(ERROR))

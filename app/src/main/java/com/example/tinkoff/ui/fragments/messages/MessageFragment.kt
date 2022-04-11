@@ -26,6 +26,7 @@ import com.example.tinkoff.recyclerFeatures.adapters.MessageRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.MessageItemDecoration
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.example.tinkoff.ui.fragments.bottomSheet.BottomSheetFragment
+import timber.log.Timber
 
 class MessageFragment : Fragment() {
 
@@ -181,6 +182,7 @@ class MessageFragment : Fragment() {
             }
         }
         messagesViewModel.displayedMessagesList.observe(viewLifecycleOwner) {
+            Timber.d("DEBUG: list in viewModel $it")
             adapter.updateList(it)
         }
     }

@@ -10,7 +10,6 @@ import com.example.tinkoff.data.states.LoadingData
 import com.example.tinkoff.data.states.StreamsType
 import com.example.tinkoff.network.Repository
 import io.reactivex.Single
-import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -42,22 +41,17 @@ class StreamViewModel : ViewModel() {
                 .delay(DELAY_TIME, TimeUnit.MILLISECONDS).observeOn(
                     AndroidSchedulers.mainThread()
                 )
-                .subscribe(object : SingleObserver<List<Stream>> {
-                    override fun onSubscribe(d: Disposable) {
-                        compositeDisposable.add(d)
-                    }
-
-                    override fun onSuccess(streams: List<Stream>) {
+                .subscribeBy(
+                    onSuccess = { streams ->
                         streamsList = streams
                         streamSubject = initializeSearchSubject()
                         initializeDisplaySubject(context)
                         isDownloaded.value = true
-                    }
-
-                    override fun onError(e: Throwable) {
+                    },
+                    onError = {
                         state.value = LoadingData.ERROR
                     }
-                })
+                ).addTo(compositeDisposable)
         }
     }
 
@@ -70,10 +64,31 @@ class StreamViewModel : ViewModel() {
             observeOn(Schedulers.computation())
                 .switchMapSingle { Single.just(prepareListForAdapter(it)) }
                 .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-                    onNext = { displayedStreamsList.value = it },
-                    onError = { Timber.d(context.getString(R.string.error_streams_loading)) }
+                    onNext = {
+                        displayedStreamsList.value = it
+                    },
+                    onError = {
+                        Timber.d(context.getString(R.string.error_streams_loading))
+                    }
                 ).addTo(compositeDisposable)
         }
+    }
+
+    private fun searchStreamsByFilter(filter: String): Single<List<Stream>> {
+        return if (filter.isEmpty())
+            Single.just(streamsList)
+        else
+            Single.just(streamsList.filter { stream ->
+                stream.streamHeader.name.contains(
+                    filter,
+                    ignoreCase = true
+                ) || stream.topics.any { topic ->
+                    topic.name.contains(
+                        filter,
+                        ignoreCase = true
+                    )
+                }
+            })
     }
 
     private fun initializeSearchSubject(): PublishSubject<String> {
@@ -82,21 +97,9 @@ class StreamViewModel : ViewModel() {
                 it.trim()
             }.distinctUntilChanged().debounce(DEBOUNCE_TIME, TimeUnit.MILLISECONDS)
                 .switchMapSingle { queryString ->
-                    if (queryString.isEmpty())
-                        Single.just(streamsList)
-                    else
-                        Single.just(streamsList.filter { stream ->
-                            stream.streamHeader.name.contains(
-                                queryString,
-                                ignoreCase = true
-                            ) || stream.topics.any { topic ->
-                                topic.name.contains(
-                                    queryString,
-                                    ignoreCase = true
-                                )
-                            }
-                        })
-                }.observeOn(AndroidSchedulers.mainThread()).subscribeBy(
+                    searchStreamsByFilter(queryString)
+                }
+                .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                     onNext = {
                         filteredStreamsList = it
                         streamInterfaceSubject.onNext(filteredStreamsList)
