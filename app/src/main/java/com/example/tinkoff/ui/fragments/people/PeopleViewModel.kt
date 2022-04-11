@@ -27,7 +27,6 @@ class PeopleViewModel : ViewModel() {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var subject: PublishSubject<String>? = null
 
-
     fun refreshPeopleData(context: Context) {
         if (isDownloaded.value == false) {
             compositeDisposable.clear()
@@ -52,11 +51,9 @@ class PeopleViewModel : ViewModel() {
         }
     }
 
-
     fun searchUsers(query: String = "") {
         subject?.onNext(query)
     }
-
 
     override fun onCleared() {
         compositeDisposable.dispose()
@@ -67,7 +64,6 @@ class PeopleViewModel : ViewModel() {
         private const val DELAY_TIME: Long = 2500
         private const val DEBOUNCE_TIME: Long = 500
     }
-
 
     private fun initializeDisplaySubject(context: Context): PublishSubject<String> {
         return PublishSubject.create<String>().apply {
@@ -87,7 +83,6 @@ class PeopleViewModel : ViewModel() {
                 }.observeOn(mainThread()).subscribeBy(
                     onNext = {
                         displayedUsersList.value = it
-
                     },
                     onError = {
                         Timber.d(context.getString(R.string.error_people_loading))

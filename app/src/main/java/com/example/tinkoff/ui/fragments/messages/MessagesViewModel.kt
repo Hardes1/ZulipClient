@@ -40,7 +40,7 @@ class MessagesViewModel : ViewModel() {
 
     fun updateReactions(reactionIndexValue: Int) {
         val reactionCondition = reactionIndexValue >= 0 &&
-                reactionIndexValue < ReactionsData.reactionsStringList.size
+            reactionIndexValue < ReactionsData.reactionsStringList.size
         if (reactionCondition && messageId != -1) {
             val currentMessage =
                 messagesList.find { it is MessageContent && it.id == messageId } as MessageContent
@@ -58,7 +58,6 @@ class MessagesViewModel : ViewModel() {
                         mutableListOf(MY_ID)
                     )
                 )
-
             } else if (currentReactions[pressedReactionIndex].usersId.firstOrNull
                 { id -> id == MY_ID } == null
             ) {
@@ -67,7 +66,6 @@ class MessagesViewModel : ViewModel() {
             messageDisplaySubject?.onNext(filteredMessagesList)
         }
     }
-
 
     fun updateElementCallBack(
         elementId: Int,
@@ -90,8 +88,7 @@ class MessagesViewModel : ViewModel() {
         messageDisplaySubject?.onNext(filteredMessagesList)
     }
 
-
-    fun refreshMessages(context : Context) {
+    fun refreshMessages(context: Context) {
         compositeDisposable.clear()
         loadingDataState.value = LoadingData.LOADING
         Repository.tryGenerateMessagesData().delay(DELAY_TIME, TimeUnit.MILLISECONDS)
@@ -115,14 +112,11 @@ class MessagesViewModel : ViewModel() {
                         loadingDataState.value = LoadingData.ERROR
                     }
                 })
-
     }
-
 
     fun searchMessages(query: String) {
         filteredMessageSubject?.onNext(query)
     }
-
 
     private fun copyList(messagesList: List<MessageContentInterface>): MutableList<MessageContentInterface> {
         val result: MutableList<MessageContentInterface> = mutableListOf()
@@ -149,13 +143,11 @@ class MessagesViewModel : ViewModel() {
         return result
     }
 
-
     fun setMessageId(id: Int) {
         messageId = id
     }
 
-
-    private fun initializeSearchSubject(context : Context) {
+    private fun initializeSearchSubject(context: Context) {
         filteredMessageSubject =
             PublishSubject.create<String>().apply {
                 observeOn(Schedulers.computation()).map {
@@ -200,14 +192,13 @@ class MessagesViewModel : ViewModel() {
                     }.observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(onNext = {
                         messageDisplaySubject?.onNext(it)
-                                          },
+                    },
                         onError = {
-                        Timber.d(context.getString(R.string.error_messages_loading))
-                    })
+                            Timber.d(context.getString(R.string.error_messages_loading))
+                        })
                     .addTo(compositeDisposable)
             }
     }
-
 
     fun initializeDisplaySubject() {
         messageDisplaySubject = PublishSubject.create<List<MessageContentInterface>>().apply {
@@ -246,7 +237,6 @@ class MessagesViewModel : ViewModel() {
         else
             messageDisplaySubject?.onError(Throwable(Repository.ERROR))
     }
-
 
     override fun onCleared() {
         compositeDisposable.clear()

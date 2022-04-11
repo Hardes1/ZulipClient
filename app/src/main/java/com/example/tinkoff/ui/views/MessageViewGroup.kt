@@ -115,6 +115,4 @@ class MessageViewGroup @JvmOverloads constructor(context: Context, attrs: Attrib
             val params = layoutParams as MarginLayoutParams
             return measuredHeight + params.topMargin + params.bottomMargin
         }
-
-
 }

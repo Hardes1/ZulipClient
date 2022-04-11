@@ -178,8 +178,7 @@ object Repository {
                 ),
                 SenderType.OTHER
             ),
-
-            )
+        )
         list.add(
             MessageContent(
                 counter++,
@@ -193,7 +192,6 @@ object Repository {
         list.add(MessageContent(counter++, "abobaaboba", mutableListOf(), SenderType.OTHER))
         return list
     }
-
 
     fun tryGenerateMessagesData(): Single<MutableList<MessageContentInterface>> {
         return Single.create { emitter ->
@@ -222,5 +220,4 @@ object Repository {
             }
         }
     }
-
 }

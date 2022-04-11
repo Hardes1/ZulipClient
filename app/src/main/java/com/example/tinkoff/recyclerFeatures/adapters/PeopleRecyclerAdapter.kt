@@ -52,10 +52,7 @@ class PeopleRecyclerAdapter(
 
     override fun getItemCount(): Int = list.size
 
-
     fun updateList(otherList: List<User>) {
         list = otherList
     }
-
-
 }

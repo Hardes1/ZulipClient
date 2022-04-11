@@ -3,10 +3,10 @@ package com.example.tinkoff.ui.fragments.stream
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
@@ -22,9 +22,7 @@ import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
 import com.example.tinkoff.ui.fragments.streamTabs.StreamTabsFragmentDirections
 import timber.log.Timber
 
-
 class StreamFragment : Fragment() {
-
 
     private var _binding: FragmentStreamBinding? = null
     private val binding: FragmentStreamBinding
@@ -60,14 +58,14 @@ class StreamFragment : Fragment() {
         )
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d(getString(R.string.debug_fragment_recreated))
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         setHasOptionsMenu(true)
@@ -77,15 +75,13 @@ class StreamFragment : Fragment() {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
         initializeRecyclerView()
         initializeLiveDataObservers()
     }
 
-
-    private fun initializeLiveDataObservers(){
+    private fun initializeLiveDataObservers() {
         viewModel.displayedStreamsList.observe(viewLifecycleOwner) {
             adapter.updateList(it)
         }
@@ -93,7 +89,6 @@ class StreamFragment : Fragment() {
             when (it) {
                 LoadingData.LOADING, LoadingData.FINISHED -> {
                     binding.root.displayedChild = it.ordinal
-
                 }
                 LoadingData.ERROR -> {
                     binding.root.displayedChild = 1
@@ -136,7 +131,6 @@ class StreamFragment : Fragment() {
         )
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
@@ -177,5 +171,4 @@ class StreamFragment : Fragment() {
             }
         }
     }
-
 }

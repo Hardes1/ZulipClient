@@ -2,15 +2,15 @@ package com.example.tinkoff.ui.fragments.streamTabs
 
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.tinkoff.R
-import com.example.tinkoff.recyclerFeatures.adapters.StreamsViewPagerAdapter
 import com.example.tinkoff.databinding.FragmentStreamsTabsBinding
+import com.example.tinkoff.recyclerFeatures.adapters.StreamsViewPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import timber.log.Timber
@@ -28,7 +28,8 @@ class StreamTabsFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentStreamsTabsBinding.inflate(inflater, container, false)
@@ -57,7 +58,6 @@ class StreamTabsFragment : Fragment() {
         })
     }
 
-
     private fun initializeTabLayout() {
         TabLayoutMediator(binding.tabLayout, binding.viewPager2) { tab, position ->
             tab.text = when (position) {
@@ -68,16 +68,13 @@ class StreamTabsFragment : Fragment() {
         }.attach()
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         searchItem = menu.findItem(R.id.action_search)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
     }
-
 }

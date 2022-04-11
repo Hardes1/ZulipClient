@@ -53,4 +53,5 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
     implementation "com.facebook.shimmer:shimmer:$shimmer"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
+    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detektFormatting"
 }

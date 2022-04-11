@@ -9,11 +9,11 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
@@ -28,7 +28,6 @@ import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.example.tinkoff.ui.fragments.bottomSheet.BottomSheetFragment
 
 class MessageFragment : Fragment() {
-
 
     private var _binding: FragmentMessageBinding? = null
     private val binding: FragmentMessageBinding
@@ -48,15 +47,14 @@ class MessageFragment : Fragment() {
     }
     private lateinit var layoutManager: LinearLayoutManager
 
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         setHasOptionsMenu(true)
         _binding = FragmentMessageBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -72,14 +70,12 @@ class MessageFragment : Fragment() {
         initializeLiveDataObservers()
     }
 
-
     private fun setButtonSendClickListener() {
         binding.sendButton.setOnClickListener {
             val text = (binding.messageContentTextView.text ?: "").trim()
             messagesViewModel.addMessage(text)
         }
     }
-
 
     private fun setChangeTextListener() {
         binding.messageContentTextView.addTextChangedListener {
@@ -101,7 +97,6 @@ class MessageFragment : Fragment() {
         }
     }
 
-
     private fun initializeRecyclerView() {
         layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         adapter = MessageRecyclerAdapter(
@@ -114,14 +109,12 @@ class MessageFragment : Fragment() {
         binding.recyclerView.layoutManager = layoutManager
     }
 
-
     private val onSelectedPositionChanged: (Int) -> Unit = { id ->
         messagesViewModel.setMessageId(id)
         if (!bottomSheetDialog.isAdded) {
             bottomSheetDialog.show(parentFragmentManager, FRAGMENT_TAG)
         }
     }
-
 
     private val updateElementCallBack: (Int, Int, Boolean) -> Unit =
         { id, reactionPosition, isAdd ->
@@ -135,7 +128,6 @@ class MessageFragment : Fragment() {
                 binding.recyclerView.smoothScrollToPosition(0)
             }
         }
-
 
     private fun initializeLiveDataObservers() {
         messagesViewModel.messageState.observe(viewLifecycleOwner) {
@@ -152,7 +144,6 @@ class MessageFragment : Fragment() {
                     binding.messageContentTextView.text = SpannableStringBuilder("")
                 }
                 MessageState.SENDING -> {
-
                 }
                 else -> throw NotImplementedError()
             }
@@ -207,7 +198,6 @@ class MessageFragment : Fragment() {
                 binding.bottomConstraintLayout.visibility = View.VISIBLE
                 return true
             }
-
         })
         val searchView = searchItem?.actionView as SearchView
         searchView.setIconifiedByDefault(true)
@@ -231,7 +221,6 @@ class MessageFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
@@ -241,5 +230,4 @@ class MessageFragment : Fragment() {
         private const val FRAGMENT_TAG = "TAG"
         const val MY_ID = 1
     }
-
 }

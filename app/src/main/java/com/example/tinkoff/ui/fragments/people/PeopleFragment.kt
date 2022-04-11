@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,10 +19,7 @@ import com.example.tinkoff.recyclerFeatures.adapters.PeopleRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.UserItemDecoration
 import timber.log.Timber
 
-
 class PeopleFragment : Fragment() {
-
-
     private var _binding: FragmentPeopleBinding? = null
     private val binding: FragmentPeopleBinding
         get() = _binding!!
@@ -49,9 +45,9 @@ class PeopleFragment : Fragment() {
         Timber.d(getString(R.string.debug_fragment_recreated))
     }
 
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         setHasOptionsMenu(true)
@@ -67,7 +63,6 @@ class PeopleFragment : Fragment() {
         }
         initializeLiveDataObservers()
     }
-
 
     private fun initializeLiveDataObservers() {
         viewModel.state.observe(viewLifecycleOwner) {
@@ -95,7 +90,6 @@ class PeopleFragment : Fragment() {
                 viewModel.refreshPeopleData(requireContext())
         }
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         searchItem = menu.findItem(R.id.action_search)
@@ -131,10 +125,8 @@ class PeopleFragment : Fragment() {
         binding.peopleRecyclerView.adapter = adapter
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
     }
-
 }

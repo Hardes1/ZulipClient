@@ -21,7 +21,6 @@ class StreamsRecyclerAdapter(
 ) :
     RecyclerView.Adapter<StreamsRecyclerAdapter.StreamsInterfaceViewHolder>() {
 
-
     abstract class StreamsInterfaceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         abstract fun bind(content: StreamsInterface)
     }
@@ -69,7 +68,6 @@ class StreamsRecyclerAdapter(
             differ.submitList(value) { updateListCallBack() }
         }
         get() = differ.currentList
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StreamsInterfaceViewHolder {
         return when (viewType) {
@@ -122,6 +120,4 @@ class StreamsRecyclerAdapter(
         const val STREAM = 1
         const val TOPIC = 2
     }
-
-
 }

@@ -18,7 +18,7 @@ class UserItemDecoration(private val smallSpacing: Int, private val bigSpacing: 
                 outRect.top = bigSpacing
             } else if (position == it.itemCount - 1)
                 outRect.bottom = smallSpacing
-            if (position != 0){
+            if (position != 0) {
                 outRect.top = smallSpacing
             }
         }

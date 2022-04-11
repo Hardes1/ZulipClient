@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff.R
-import com.example.tinkoff.recyclerFeatures.diffUtils.MessagesDiffUtil
 import com.example.tinkoff.data.classes.Date
 import com.example.tinkoff.data.classes.MessageContent
 import com.example.tinkoff.data.classes.MessageContentInterface
@@ -15,6 +14,7 @@ import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.databinding.DateItemBinding
 import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
+import com.example.tinkoff.recyclerFeatures.diffUtils.MessagesDiffUtil
 import com.example.tinkoff.ui.fragments.messages.MessageFragment.Companion.MY_ID
 import com.example.tinkoff.ui.views.FlexBoxLayout
 import com.google.android.material.textview.MaterialTextView
@@ -25,7 +25,6 @@ class MessageRecyclerAdapter(
     private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
 ) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
-
 
     abstract class MessageContentViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
@@ -77,7 +76,6 @@ class MessageRecyclerAdapter(
                     onPositionChanged(content.id)
                 }
 
-
             text.text = content.content
         }
     }
@@ -121,7 +119,6 @@ class MessageRecyclerAdapter(
         }
     }
 
-
     class DateViewHolder(private val binding: DateItemBinding) :
         MessageContentViewHolder(binding.root) {
         override fun bind(content: MessageContentInterface) {
@@ -129,7 +126,6 @@ class MessageRecyclerAdapter(
             binding.dateText.text = content.date
         }
     }
-
 
     private val differ = AsyncListDiffer(this, MessagesDiffUtil())
     private var list: List<MessageContentInterface>
@@ -139,7 +135,6 @@ class MessageRecyclerAdapter(
             }
         }
         get() = differ.currentList
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageContentViewHolder {
         return when (viewType) {
@@ -186,7 +181,6 @@ class MessageRecyclerAdapter(
 
     override fun getItemCount(): Int = list.size
 
-
     override fun getItemViewType(position: Int): Int {
         val item = list[position]
         return if (item is Date) {
@@ -204,11 +198,9 @@ class MessageRecyclerAdapter(
         list = otherList
     }
 
-
     companion object {
         const val DATE: Int = 1
         const val MESSAGE_OTHER: Int = 2
         const val MESSAGE_OWN: Int = 3
     }
-
 }

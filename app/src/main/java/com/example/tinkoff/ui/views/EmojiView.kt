@@ -1,6 +1,5 @@
 package com.example.tinkoff.ui.views
 
-
 import android.content.Context
 import android.content.res.Resources
 import android.content.res.TypedArray
@@ -14,7 +13,6 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import com.example.tinkoff.R
-
 
 class EmojiView @JvmOverloads constructor(
     context: Context,
@@ -51,7 +49,6 @@ class EmojiView @JvmOverloads constructor(
         typedArray.recycle()
     }
 
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         textPaint.getTextBounds(text, 0, text.length, tempBounds)
@@ -66,9 +63,7 @@ class EmojiView @JvmOverloads constructor(
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         tempViewPoint.y = h / 2f + tempBounds.height() / 2f - textPaint.descent()
         tempViewPoint.x = w / 2f - tempBounds.width() / 2f
-
     }
-
 
     override fun onDraw(canvas: Canvas?) {
         canvas?.drawText(text, tempViewPoint.x, tempViewPoint.y, textPaint)
@@ -81,7 +76,6 @@ class EmojiView @JvmOverloads constructor(
         }
         return drawableState
     }
-
 
     companion object {
         private const val TEXT_SIZE = 14f
@@ -110,9 +104,8 @@ class EmojiView @JvmOverloads constructor(
         }
     }
 
-    fun setTextAndDraw(s : String){
+    fun setTextAndDraw(s: String) {
         text = s
         requestLayout()
     }
-
 }

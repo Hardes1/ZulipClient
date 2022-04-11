@@ -20,9 +20,9 @@ class MessageItemDecoration(private val smallSpacing: Int, private val bigSpacin
                 val currentType = adapter.getItemViewType(position)
                 val previousType = adapter.getItemViewType(position - 1)
                 val checkCurrentType = currentType == MessageRecyclerAdapter.MESSAGE_OTHER ||
-                        currentType == MessageRecyclerAdapter.MESSAGE_OWN
+                    currentType == MessageRecyclerAdapter.MESSAGE_OWN
                 val checkPreviousType = previousType == MessageRecyclerAdapter.MESSAGE_OTHER ||
-                        previousType == MessageRecyclerAdapter.MESSAGE_OWN
+                    previousType == MessageRecyclerAdapter.MESSAGE_OWN
                 if (checkCurrentType && checkPreviousType)
                     outRect.bottom = bigSpacing
                 else
@@ -38,6 +38,5 @@ class MessageItemDecoration(private val smallSpacing: Int, private val bigSpacin
                 else -> return
             }
         }
-
     }
 }

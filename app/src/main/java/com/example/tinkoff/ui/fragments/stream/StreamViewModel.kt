@@ -61,13 +61,11 @@ class StreamViewModel : ViewModel() {
         }
     }
 
-
     fun searchStreamsAndTopics(query: String = "") {
         streamSubject?.onNext(query)
     }
 
-
-    private fun initializeDisplaySubject(context : Context) {
+    private fun initializeDisplaySubject(context: Context) {
         streamInterfaceSubject.apply {
             observeOn(Schedulers.computation())
                 .switchMapSingle { Single.just(prepareListForAdapter(it)) }
@@ -77,7 +75,6 @@ class StreamViewModel : ViewModel() {
                 ).addTo(compositeDisposable)
         }
     }
-
 
     private fun initializeSearchSubject(): PublishSubject<String> {
         return PublishSubject.create<String>().apply {
@@ -110,7 +107,6 @@ class StreamViewModel : ViewModel() {
         }
     }
 
-
     private fun prepareListForAdapter(streams: List<Stream>): List<StreamsInterface> {
         val list: MutableList<StreamsInterface> = mutableListOf()
         streams.forEach { stream ->
@@ -124,17 +120,14 @@ class StreamViewModel : ViewModel() {
         return list
     }
 
-
     fun selectItem(id: Int, isSelected: Boolean) {
         streamsList.find { it.streamHeader.id == id }?.streamHeader?.isSelected = isSelected
         streamInterfaceSubject.onNext(filteredStreamsList)
     }
 
-
     override fun onCleared() {
         compositeDisposable.dispose()
     }
-
 
     companion object {
         private const val DELAY_TIME: Long = 1000

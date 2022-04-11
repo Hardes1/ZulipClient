@@ -1,6 +1,5 @@
 package com.example.tinkoff.ui.fragments.profile
 
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -20,9 +19,7 @@ import com.example.tinkoff.databinding.FragmentProfileBinding
 import com.example.tinkoff.ui.fragments.messages.MessageFragment
 import timber.log.Timber
 
-
 class ProfileFragment : Fragment() {
-
 
     private var _binding: FragmentProfileBinding? = null
     private val binding: FragmentProfileBinding
@@ -36,14 +33,14 @@ class ProfileFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         setHasOptionsMenu(true)
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
@@ -55,7 +52,7 @@ class ProfileFragment : Fragment() {
         initializeLiveDataObservers()
     }
 
-    private fun initializeLiveDataObservers(){
+    private fun initializeLiveDataObservers() {
         viewModel.state.observe(viewLifecycleOwner) {
             when (it) {
                 LoadingData.LOADING, LoadingData.FINISHED -> {
@@ -88,7 +85,6 @@ class ProfileFragment : Fragment() {
         }
     }
 
-
     private fun initializeUser(user: User, exitButtonVisibility: Int) {
         binding.nameTextview.text = user.name
         binding.logoutButton.visibility = exitButtonVisibility
@@ -103,7 +99,6 @@ class ProfileFragment : Fragment() {
                         resources.getString(R.string.user_online_text)
                     isEnabled = true
                 }
-
             }
             UserStatus.OFFLINE -> {
                 binding.onlineStatusTextview.apply {
@@ -127,7 +122,6 @@ class ProfileFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
@@ -137,5 +131,4 @@ class ProfileFragment : Fragment() {
 
         const val DELAY_TIME: Long = 1000
     }
-
 }
