@@ -25,7 +25,7 @@ class ProfileFragment : Fragment() {
     private val binding: FragmentProfileBinding
         get() = _binding!!
     private val viewModel: ProfileViewModel by viewModels()
-    private var searchItem: MenuItem? = null
+    private var refreshItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,12 +56,12 @@ class ProfileFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) {
             when (it) {
                 LoadingData.LOADING, LoadingData.FINISHED -> {
-                    searchItem?.isVisible = false
+                    refreshItem?.isVisible = false
                     if (binding.root.displayedChild != it.ordinal)
                         binding.root.displayedChild = it.ordinal
                 }
                 LoadingData.ERROR -> {
-                    searchItem?.isVisible = true
+                    refreshItem?.isVisible = true
                     if (binding.root.displayedChild != LoadingData.FINISHED.ordinal)
                         binding.root.displayedChild = LoadingData.FINISHED.ordinal
                     Toast.makeText(
@@ -111,8 +111,8 @@ class ProfileFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        searchItem = menu.findItem(R.id.action_refresh)
-        searchItem?.setOnMenuItemClickListener {
+        refreshItem = menu.findItem(R.id.action_refresh)
+        refreshItem?.setOnMenuItemClickListener {
             viewModel.state.value = LoadingData.LOADING
             viewModel.refreshProfile(requireContext())
             true

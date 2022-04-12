@@ -20,14 +20,14 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class StreamViewModel : ViewModel() {
-    private var streamsList: List<Stream> = emptyList()
-    private var filteredStreamsList: List<Stream> = emptyList()
+    private var streamsList: List<Stream> = listOf()
+    private var filteredStreamsList: List<Stream> = listOf()
     private var type: StreamsType? = null
     val displayedStreamsList: MutableLiveData<List<StreamsInterface>> = MutableLiveData()
     val state: MutableLiveData<LoadingData> = MutableLiveData()
     val isDownloaded: MutableLiveData<Boolean> = MutableLiveData(false)
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
-    private var streamSubject: PublishSubject<String>? = null
+    private val streamSubject: PublishSubject<String> = PublishSubject.create()
     private val streamInterfaceSubject: PublishSubject<List<Stream>> =
         PublishSubject.create()
 
@@ -43,7 +43,7 @@ class StreamViewModel : ViewModel() {
                 .subscribeBy(
                     onSuccess = { streams ->
                         streamsList = streams
-                        streamSubject = initializeSearchSubject()
+                        initializeSearchSubject()
                         initializeDisplaySubject(context)
                         isDownloaded.value = true
                     },
@@ -54,8 +54,8 @@ class StreamViewModel : ViewModel() {
         }
     }
 
-    fun searchStreamsAndTopics(query: String = "") {
-        streamSubject?.onNext(query)
+    fun searchStreamsAndTopics(query: String) {
+        streamSubject.onNext(query)
     }
 
     private fun initializeDisplaySubject(context: Context) {
@@ -90,8 +90,8 @@ class StreamViewModel : ViewModel() {
             })
     }
 
-    private fun initializeSearchSubject(): PublishSubject<String> {
-        return PublishSubject.create<String>().apply {
+    private fun initializeSearchSubject() {
+        streamSubject.apply {
             observeOn(Schedulers.computation()).map {
                 it.trim()
             }.distinctUntilChanged().debounce(DEBOUNCE_TIME, TimeUnit.MILLISECONDS)

@@ -58,13 +58,17 @@ class PeopleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
         initializeRecyclerView()
+        initializeDisplayedUsersListLiveData()
+        initializeStateLiveData()
+    }
+
+    private fun initializeDisplayedUsersListLiveData(){
         viewModel.displayedUsersList.observe(viewLifecycleOwner) {
             adapter.updateList(it)
         }
-        initializeLiveDataObservers()
     }
 
-    private fun initializeLiveDataObservers() {
+    private fun initializeStateLiveData() {
         viewModel.state.observe(viewLifecycleOwner) {
             when (it) {
                 LoadingData.LOADING, LoadingData.FINISHED -> {
@@ -82,6 +86,9 @@ class PeopleFragment : Fragment() {
                 else -> throw NotImplementedError()
             }
         }
+    }
+
+    private fun initializeIsDownloadedLiveData(){
         viewModel.isDownloaded.observe(viewLifecycleOwner) { isDownloaded ->
             if (isDownloaded) {
                 val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
@@ -112,6 +119,7 @@ class PeopleFragment : Fragment() {
             viewModel.isDownloaded.value = false
             true
         }
+        initializeIsDownloadedLiveData()
         super.onCreateOptionsMenu(menu, inflater)
     }
 

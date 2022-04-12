@@ -70,22 +70,36 @@ class StreamFragment : Fragment() {
     ): View {
         setHasOptionsMenu(true)
         _binding = FragmentStreamBinding.inflate(inflater, container, false)
-        viewModel.trySetStreamType(
-            StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
-        )
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
+        viewModel.trySetStreamType(
+            StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
+        )
         initializeRecyclerView()
-        initializeLiveDataObservers()
+        initializeStateLiveData()
+        initializeDisplayedStreamsListLiveData()
     }
 
-    private fun initializeLiveDataObservers() {
+    private fun initializeIsDownloadedLiveData() {
+        viewModel.isDownloaded.observe(viewLifecycleOwner) { isDownloaded ->
+            if (isDownloaded) {
+                val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
+                viewModel.searchStreamsAndTopics(query)
+            } else
+                viewModel.refresh(requireContext())
+        }
+    }
+
+    private fun initializeDisplayedStreamsListLiveData() {
         viewModel.displayedStreamsList.observe(viewLifecycleOwner) {
             adapter.updateList(it)
         }
+    }
+
+    private fun initializeStateLiveData() {
         viewModel.state.observe(viewLifecycleOwner) {
             when (it) {
                 LoadingData.LOADING, LoadingData.FINISHED -> {
@@ -101,13 +115,6 @@ class StreamFragment : Fragment() {
                 }
                 else -> throw NotImplementedError()
             }
-        }
-        viewModel.isDownloaded.observe(viewLifecycleOwner) { isDownloaded ->
-            if (isDownloaded) {
-                val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
-                viewModel.searchStreamsAndTopics(query)
-            } else
-                viewModel.refresh(requireContext())
         }
     }
 
@@ -158,6 +165,7 @@ class StreamFragment : Fragment() {
             viewModel.isDownloaded.value = false
             true
         }
+        initializeIsDownloadedLiveData()
         super.onCreateOptionsMenu(menu, inflater)
     }
 

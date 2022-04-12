@@ -23,7 +23,7 @@ class PeopleViewModel : ViewModel() {
     val state: MutableLiveData<LoadingData> = MutableLiveData()
     val isDownloaded: MutableLiveData<Boolean> = MutableLiveData(false)
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
-    private var subject: PublishSubject<String>? = null
+    private val subject: PublishSubject<String> = PublishSubject.create()
 
     fun refreshPeopleData(context: Context) {
         if (isDownloaded.value == false) {
@@ -34,7 +34,7 @@ class PeopleViewModel : ViewModel() {
                 .subscribeBy(
                     onSuccess = { users ->
                         actualUsersList = users
-                        subject = initializeDisplaySubject(context)
+                        initializeDisplaySubject(context)
                         isDownloaded.value = true
                     },
                     onError = {
@@ -44,8 +44,8 @@ class PeopleViewModel : ViewModel() {
         }
     }
 
-    fun searchUsers(query: String = "") {
-        subject?.onNext(query)
+    fun searchUsers(query: String) {
+        subject.onNext(query)
     }
 
     override fun onCleared() {
@@ -65,8 +65,8 @@ class PeopleViewModel : ViewModel() {
             })
     }
 
-    private fun initializeDisplaySubject(context: Context): PublishSubject<String> {
-        return PublishSubject.create<String>().apply {
+    private fun initializeDisplaySubject(context: Context) {
+        subject.apply {
             observeOn(Schedulers.computation()).map {
                 it.trim()
             }.debounce(DEBOUNCE_TIME, TimeUnit.MILLISECONDS).distinctUntilChanged()
