@@ -61,8 +61,8 @@ class StreamTabsFragment : Fragment() {
     private fun initializeTabLayout() {
         TabLayoutMediator(binding.tabLayout, binding.viewPager2) { tab, position ->
             tab.text = when (position) {
-                0 -> getString(R.string.subscribed_header)
-                1 -> getString(R.string.all_streams_header)
+                SUBSCRIBED -> getString(R.string.subscribed_header)
+                ALL_STREAMS -> getString(R.string.all_streams_header)
                 else -> throw NotImplementedError(getString(R.string.error_tab_layout))
             }
         }.attach()
@@ -76,5 +76,10 @@ class StreamTabsFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    companion object {
+        private const val SUBSCRIBED = 0
+        private const val ALL_STREAMS = 1
     }
 }

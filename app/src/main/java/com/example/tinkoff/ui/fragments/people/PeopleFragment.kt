@@ -24,18 +24,20 @@ class PeopleFragment : Fragment() {
     private val binding: FragmentPeopleBinding
         get() = _binding!!
     private val adapter: PeopleRecyclerAdapter by lazy {
-        PeopleRecyclerAdapter(userClickCallBack, shimmerCallBack)
+        PeopleRecyclerAdapter(::userClickCallBack, ::shimmerCallBack)
     }
     private val viewModel: PeopleViewModel by viewModels()
     private var searchItem: MenuItem? = null
-    private val userClickCallBack: (Int) -> Unit = { index ->
+
+    private fun userClickCallBack(index: Int) {
         val user = viewModel.displayedUsersList.value?.find { it.id == index }
         val action = PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(user)
         findNavController().navigate(
             action
         )
     }
-    private val shimmerCallBack = {
+
+    private fun shimmerCallBack() {
         if (viewModel.state.value != LoadingData.FINISHED)
             viewModel.state.value = LoadingData.FINISHED
     }
@@ -62,7 +64,7 @@ class PeopleFragment : Fragment() {
         initializeStateLiveData()
     }
 
-    private fun initializeDisplayedUsersListLiveData(){
+    private fun initializeDisplayedUsersListLiveData() {
         viewModel.displayedUsersList.observe(viewLifecycleOwner) {
             adapter.updateList(it)
         }
@@ -88,7 +90,7 @@ class PeopleFragment : Fragment() {
         }
     }
 
-    private fun initializeIsDownloadedLiveData(){
+    private fun initializeIsDownloadedLiveData() {
         viewModel.isDownloaded.observe(viewLifecycleOwner) { isDownloaded ->
             if (isDownloaded) {
                 val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""

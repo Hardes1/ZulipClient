@@ -31,30 +31,29 @@ class StreamFragment : Fragment() {
     private var searchItem: MenuItem? = null
     private val viewModel: StreamViewModel by viewModels()
 
-    private val changeStateCallBack: (Int, Boolean) -> Unit = { id, isSelected ->
+    private fun changeStateCallBack(id: Int, isSelected: Boolean) {
         viewModel.selectItem(id, isSelected)
     }
 
-    private val updateStreamsCallBack: () -> Unit = {
+    private fun updateStreamsCallBack() {
         if (viewModel.state.value != LoadingData.FINISHED)
             viewModel.state.value = LoadingData.FINISHED
     }
 
-    private val navigateToMessageFragmentCallBack: (String, String) -> Unit =
-        { appBarHeader, topicHeader ->
-            val action =
-                StreamTabsFragmentDirections.actionNavigationStreamTabsToMessageFragment(
-                    appBarHeader,
-                    topicHeader
-                )
-            findNavController().navigate(action)
-        }
+    private fun navigateToMessageFragmentCallBack(appBarHeader: String, topicHeader: String) {
+        val action =
+            StreamTabsFragmentDirections.actionNavigationStreamTabsToMessageFragment(
+                appBarHeader,
+                topicHeader
+            )
+        findNavController().navigate(action)
+    }
 
     private val adapter: StreamsRecyclerAdapter by lazy {
         StreamsRecyclerAdapter(
-            changeStateCallBack,
-            navigateToMessageFragmentCallBack,
-            updateStreamsCallBack
+            ::changeStateCallBack,
+            ::navigateToMessageFragmentCallBack,
+            ::updateStreamsCallBack
         )
     }
 

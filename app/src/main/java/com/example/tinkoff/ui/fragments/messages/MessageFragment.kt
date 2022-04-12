@@ -100,26 +100,25 @@ class MessageFragment : Fragment() {
     private fun initializeRecyclerView() {
         layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         adapter = MessageRecyclerAdapter(
-            onSelectedPositionChanged,
-            updateElementCallBack
+            ::onSelectedPositionChanged,
+            ::updateElementCallBack
         )
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addItemDecoration(decorator)
         binding.recyclerView.layoutManager = layoutManager
     }
 
-    private val onSelectedPositionChanged: (Int) -> Unit = { id ->
+    private fun onSelectedPositionChanged(id: Int) {
         messagesViewModel.setMessageId(id)
         if (!bottomSheetDialog.isAdded) {
             bottomSheetDialog.show(parentFragmentManager, FRAGMENT_TAG)
         }
     }
 
-    private val updateElementCallBack: (Int, Int, Boolean) -> Unit =
-        { id, reactionPosition, isAdd ->
-            messagesViewModel.setMessageId(id)
-            messagesViewModel.reactionClickedCallBack(reactionPosition, isAdd)
-        }
+    private fun updateElementCallBack(id: Int, reactionPosition: Int, isAdd: Boolean) {
+        messagesViewModel.setMessageId(id)
+        messagesViewModel.reactionClickedCallBack(reactionPosition, isAdd)
+    }
 
     private fun initializeReactionsViewModelLiveData() {
         reactionsViewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
