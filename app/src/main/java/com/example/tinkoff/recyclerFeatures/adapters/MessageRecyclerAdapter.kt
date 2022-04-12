@@ -21,7 +21,7 @@ import com.google.android.material.textview.MaterialTextView
 import timber.log.Timber
 
 class MessageRecyclerAdapter(
-    private val onSelectedPositionChanged: (Int) -> Unit,
+    private val onSelectedPositionChanged: (messageId: Int) -> Unit,
     private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
 ) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
@@ -127,7 +127,7 @@ class MessageRecyclerAdapter(
         }
     }
 
-    private var listChangedCallBack : (() -> Unit)? = null
+    private var listChangedCallBack: (() -> Unit)? = null
     private val differ = AsyncListDiffer(this, MessagesDiffUtil())
     private var list: List<MessageContentInterface>
         private set(value) {
@@ -202,7 +202,7 @@ class MessageRecyclerAdapter(
         list = otherList
     }
 
-    fun setChangedPositionCallBack(callBack : (() -> Unit)?){
+    fun setChangedPositionCallBack(callBack: (() -> Unit)?) {
         listChangedCallBack = callBack
     }
 

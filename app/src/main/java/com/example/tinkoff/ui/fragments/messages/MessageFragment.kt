@@ -26,7 +26,6 @@ import com.example.tinkoff.recyclerFeatures.adapters.MessageRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.MessageItemDecoration
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.example.tinkoff.ui.fragments.bottomSheet.BottomSheetFragment
-import timber.log.Timber
 
 class MessageFragment : Fragment() {
 
@@ -118,22 +117,22 @@ class MessageFragment : Fragment() {
 
     private val updateElementCallBack: (Int, Int, Boolean) -> Unit =
         { id, reactionPosition, isAdd ->
-            messagesViewModel.reactionClickedCallBack(id, reactionPosition, isAdd)
+            messagesViewModel.setMessageId(id)
+            messagesViewModel.reactionClickedCallBack(reactionPosition, isAdd)
         }
 
-    private fun initializeLiveDataObservers() {
-
-        messagesViewModel.needToScroll.observe(viewLifecycleOwner) {
-            when (it) {
-                true -> adapter.setChangedPositionCallBack {
-                    binding.recyclerView.smoothScrollToPosition(
-                        0
-                    )
-                }
-                false -> adapter.setChangedPositionCallBack(null)
-            }
+    private fun initializeReactionsViewModelLiveData() {
+        reactionsViewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
+            messagesViewModel.tryAddReaction(reactionIndexValue)
         }
+    }
 
+    private fun initializeMessagesViewModelLiveData() {
+        initializeFragmentViewLifeData()
+        initializeRecyclerLiveData()
+    }
+
+    private fun initializeFragmentViewLifeData() {
         messagesViewModel.messageState.observe(viewLifecycleOwner) {
             when (it) {
                 MessageState.FAILED -> {
@@ -151,9 +150,6 @@ class MessageFragment : Fragment() {
                 }
                 else -> throw NotImplementedError()
             }
-        }
-        reactionsViewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
-            messagesViewModel.reactionAddedCallBack(reactionIndexValue)
         }
         messagesViewModel.loadingDataState.observe(viewLifecycleOwner) {
             when (it) {
@@ -184,10 +180,27 @@ class MessageFragment : Fragment() {
                 else -> throw NotImplementedError()
             }
         }
+    }
+
+    private fun initializeRecyclerLiveData() {
         messagesViewModel.displayedMessagesList.observe(viewLifecycleOwner) {
-            Timber.d("DEBUG: list in viewModel $it")
             adapter.updateList(it)
         }
+        messagesViewModel.needToScroll.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> adapter.setChangedPositionCallBack {
+                    binding.recyclerView.smoothScrollToPosition(
+                        0
+                    )
+                }
+                false -> adapter.setChangedPositionCallBack(null)
+            }
+        }
+    }
+
+    private fun initializeLiveDataObservers() {
+        initializeReactionsViewModelLiveData()
+        initializeMessagesViewModelLiveData()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

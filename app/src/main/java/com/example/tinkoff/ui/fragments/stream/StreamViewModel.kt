@@ -12,7 +12,6 @@ import com.example.tinkoff.network.Repository
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -127,7 +126,6 @@ class StreamViewModel : ViewModel() {
         if (this.type == null)
             this.type = type
     }
-
 
     fun selectItem(id: Int, isSelected: Boolean) {
         streamsList.find { it.streamHeader.id == id }?.streamHeader?.isSelected = isSelected

@@ -5,7 +5,7 @@ import com.example.tinkoff.data.states.SenderType
 data class MessageContent(
     val id: Int,
     val content: String,
-    val reactions: MutableList<Reaction>,
+    var reactions: List<Reaction>,
     val type: SenderType
 ) :
     MessageContentInterface

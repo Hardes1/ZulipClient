@@ -25,21 +25,27 @@ import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class MessagesViewModel : ViewModel() {
-    private var messagesList: MutableList<MessageContentInterface> = mutableListOf()
-    private var filteredMessagesList: MutableList<MessageContentInterface> = mutableListOf()
+    private var messagesList: List<MessageContentInterface> = listOf()
+    private var filteredMessagesList: List<MessageContentInterface> = listOf()
     val displayedMessagesList: MutableLiveData<List<MessageContentInterface>> = MutableLiveData()
     val messageState: MutableLiveData<MessageState> = MutableLiveData(MessageState.SUCCESSFUL)
     val loadingDataState: MutableLiveData<LoadingData> = MutableLiveData()
     val needToScroll: MutableLiveData<Boolean> = MutableLiveData()
-    private var filteredMessageSubject: PublishSubject<String>? = null
-    private var messageDisplaySubject: PublishSubject<List<MessageContentInterface>>? = null
+    private val filteredMessageSubject: PublishSubject<String> = PublishSubject.create()
+    private val messageDisplaySubject: PublishSubject<List<MessageContentInterface>> =
+        PublishSubject.create()
     private var messageId: Int = -1
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
-    fun reactionAddedCallBack(reactionIndexValue: Int) {
+    fun tryAddReaction(reactionIndexValue: Int) {
         val reactionCondition = reactionIndexValue >= 0 &&
             reactionIndexValue < ReactionsData.reactionsStringList.size
         if (reactionCondition && messageId != -1) {
+            val indexInMessages =
+                messagesList.indexOfFirst { it is MessageContent && it.id == messageId }
+            val indexInFilteredMessages =
+                filteredMessagesList.indexOfFirst { it is MessageContent && it.id == messageId }
+            require(indexInMessages != -1)
             val currentMessage =
                 messagesList.find { it is MessageContent && it.id == messageId } as MessageContent
             val currentReactions =
@@ -50,42 +56,98 @@ class MessagesViewModel : ViewModel() {
                     reaction.emoji == ReactionsData.reactionsStringList[reactionIndexValue]
                 }
             if (pressedReactionIndex == -1) {
-                currentReactions.add(
-                    Reaction(
-                        ReactionsData.reactionsStringList[reactionIndexValue],
-                        mutableListOf(MY_ID)
+                messagesList =
+                    messagesList.updated(
+                        indexInMessages,
+                        currentMessage.copy(
+                            reactions = currentReactions + Reaction(
+                                ReactionsData.reactionsStringList[reactionIndexValue],
+                                mutableListOf(MY_ID)
+                            )
+                        )
                     )
-                )
             } else if (currentReactions[pressedReactionIndex].usersId.firstOrNull
                 { id -> id == MY_ID } == null
             ) {
-                currentReactions[pressedReactionIndex].usersId.add(MY_ID)
+                messagesList = messagesList.updated(
+                    indexInMessages,
+                    currentMessage.copy(
+                        reactions = currentReactions.updated(
+                            pressedReactionIndex,
+                            currentReactions[pressedReactionIndex]
+                                .copy(
+                                    usersId =
+                                    currentReactions[pressedReactionIndex].usersId + MY_ID
+                                )
+                        )
+                    )
+                )
+            }
+
+            if (indexInFilteredMessages != -1) {
+                filteredMessagesList = filteredMessagesList.updated(
+                    indexInFilteredMessages,
+                    messagesList[indexInMessages]
+                )
             }
             needToScroll.value = false
-            messageDisplaySubject?.onNext(filteredMessagesList)
+            messageDisplaySubject.onNext(filteredMessagesList)
         }
     }
 
     fun reactionClickedCallBack(
-        elementId: Int,
         reactionPosition: Int,
         isAdd: Boolean
     ) {
-
+        val indexInMessages =
+            messagesList.indexOfFirst { it is MessageContent && it.id == messageId }
+        val indexInFilteredMessages =
+            filteredMessagesList.indexOfFirst { it is MessageContent && it.id == messageId }
+        require(indexInMessages != -1)
         val currentMessage =
-            messagesList.find { it is MessageContent && it.id == elementId } as MessageContent
+            messagesList.find { it is MessageContent && it.id == messageId } as MessageContent
         val currentReaction =
             currentMessage.reactions[reactionPosition]
         if (isAdd) {
-            if (currentReaction.usersId.find { it == MY_ID } == null)
-                currentReaction.usersId.add(MY_ID)
+            if (currentReaction.usersId.find { it == MY_ID } == null) {
+                val copiedList = currentReaction.usersId + MY_ID
+                messagesList =
+                    messagesList.updated(
+                        indexInMessages,
+                        currentMessage.copy(
+                            reactions = currentMessage.reactions.updated(
+                                reactionPosition,
+                                currentReaction.copy(usersId = copiedList)
+                            )
+                        )
+                    )
+            }
         } else {
-            currentReaction.usersId.removeIf { it == MY_ID }
+            val reactionsWithoutMyId = currentReaction.usersId.filter { it != MY_ID }
+            messagesList = messagesList.updated(
+                indexInMessages,
+                currentMessage.copy(
+                    reactions = currentMessage.reactions.updated(
+                        reactionPosition,
+                        currentReaction.copy(usersId = reactionsWithoutMyId)
+                    )
+                )
+            )
         }
-        if (currentReaction.usersId.size == 0)
-            currentMessage.reactions.remove(currentReaction)
+        val listWithRemovedReaction =
+            (messagesList[indexInMessages] as MessageContent).reactions.filter { it.usersId.isNotEmpty() }
+        messagesList = messagesList.updated(
+            indexInMessages,
+            currentMessage.copy(reactions = listWithRemovedReaction)
+        )
+        if (indexInFilteredMessages != -1) {
+            filteredMessagesList = filteredMessagesList.updated(
+                indexInFilteredMessages,
+                messagesList[indexInMessages]
+            )
+        }
         needToScroll.value = false
-        messageDisplaySubject?.onNext(filteredMessagesList)
+        messageDisplaySubject.onNext(filteredMessagesList)
     }
 
     fun refreshMessages(context: Context) {
@@ -109,40 +171,14 @@ class MessagesViewModel : ViewModel() {
     }
 
     fun searchMessages(query: String) {
-        filteredMessageSubject?.onNext(query)
-    }
-
-    private fun copyList(messagesList: List<MessageContentInterface>): MutableList<MessageContentInterface> {
-        val result: MutableList<MessageContentInterface> = mutableListOf()
-        for (element in messagesList) {
-            if (element is Date)
-                result.add(Date(element.id, element.date))
-            else if (element is MessageContent) {
-                val reactionsContent = mutableListOf<Reaction>()
-                for (reaction in element.reactions) {
-                    val usersId = mutableListOf<Int>()
-                    usersId.addAll(reaction.usersId)
-                    reactionsContent.add(Reaction(reaction.emoji, usersId))
-                }
-                result.add(
-                    MessageContent(
-                        element.id,
-                        element.content,
-                        reactionsContent,
-                        element.type
-                    )
-                )
-            }
-        }
-        return result
+        filteredMessageSubject.onNext(query)
     }
 
     fun setMessageId(id: Int) {
         messageId = id
     }
 
-
-    private fun findMessagesByFilter(filter: String): MutableList<MessageContentInterface> {
+    private fun findMessagesByFilter(filter: String): List<MessageContentInterface> {
         return if (filter.isEmpty()) {
             messagesList
         } else {
@@ -176,45 +212,42 @@ class MessagesViewModel : ViewModel() {
     }
 
     private fun initializeSearchSubject(context: Context) {
-        filteredMessageSubject =
-            PublishSubject.create<String>().apply {
-                observeOn(Schedulers.computation()).map {
-                    it.trim()
-                }.distinctUntilChanged()
-                    .debounce(
-                        DEBOUNCE_TIME, TimeUnit.MILLISECONDS
-                    )
-                    .switchMapSingle { filter ->
-                        filteredMessagesList = findMessagesByFilter(filter)
-                        Single.just(filteredMessagesList)
-                    }.observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(onNext = {
-                        messageDisplaySubject?.onNext(it)
-                    },
-                        onError = {
-                            Timber.d(context.getString(R.string.error_messages_loading))
-                        })
-                    .addTo(compositeDisposable)
-            }
+        filteredMessageSubject.apply {
+            observeOn(Schedulers.computation()).map {
+                it.trim()
+            }.distinctUntilChanged()
+                .debounce(
+                    DEBOUNCE_TIME, TimeUnit.MILLISECONDS
+                )
+                .switchMapSingle { filter ->
+                    filteredMessagesList = findMessagesByFilter(filter)
+                    Single.just(filteredMessagesList)
+                }.observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(onNext = {
+                    messageDisplaySubject.onNext(it)
+                },
+                    onError = {
+                        Timber.d(context.getString(R.string.error_messages_loading))
+                    })
+                .addTo(compositeDisposable)
+        }
     }
 
     fun initializeDisplaySubject() {
-        messageDisplaySubject = PublishSubject.create<List<MessageContentInterface>>().apply {
-            observeOn(Schedulers.computation())
-                .switchMapSingle {
-                    Single.just(copyList(it))
-                }.observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = {
-                        displayedMessagesList.value = it
-                        if (messageState.value == MessageState.SENDING)
-                            messageState.value = MessageState.SUCCESSFUL
-                    },
-                    onError = {
-                        messagesList.removeLastOrNull()
-                        messageState.value = MessageState.FAILED
+        messageDisplaySubject.apply {
+            subscribeBy(
+                onNext = {
+                    if (messageState.value == MessageState.SENDING) {
+                        filteredMessagesList = messagesList
+                        messageState.value = MessageState.SUCCESSFUL
                     }
-                )
+                    displayedMessagesList.value = it
+                },
+                onError = {
+                    messagesList = messagesList.subList(0, messagesList.size - 1)
+                    messageState.value = MessageState.FAILED
+                }
+            )
                 .addTo(compositeDisposable)
         }
     }
@@ -222,18 +255,16 @@ class MessagesViewModel : ViewModel() {
     fun addMessage(message: CharSequence) {
         needToScroll.value = true
         messageState.value = MessageState.SENDING
-        messagesList.add(
-            MessageContent(
-                messagesList.size,
-                message.toString(),
-                mutableListOf(),
-                SenderType.OWN
-            )
+        messagesList = messagesList + MessageContent(
+            messagesList.size,
+            message.toString(),
+            mutableListOf(),
+            SenderType.OWN
         )
         if (true)
-            messageDisplaySubject?.onNext(messagesList)
+            messageDisplaySubject.onNext(messagesList)
         else
-            messageDisplaySubject?.onError(Throwable(Repository.ERROR))
+            messageDisplaySubject.onError(Throwable(Repository.ERROR))
     }
 
     override fun onCleared() {
@@ -244,4 +275,7 @@ class MessagesViewModel : ViewModel() {
         private const val DELAY_TIME: Long = 1000
         private const val DEBOUNCE_TIME: Long = 400
     }
+
+    private fun <E> Iterable<E>.updated(index: Int, elem: E) =
+        mapIndexed { i, existing -> if (i == index) elem else existing }
 }
