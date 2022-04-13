@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.navArgs
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.LoadingData
@@ -45,8 +44,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
         if (arguments != null) {
-            val args: ProfileFragmentArgs by navArgs()
-            viewModel.ownUser.value = args.user
+            viewModel.ownUser.value = arguments?.getParcelable(USER_KEY)
             viewModel.state.value = LoadingData.FINISHED
         }
         initializeLiveDataObservers()
@@ -128,7 +126,7 @@ class ProfileFragment : Fragment() {
     }
 
     companion object {
-
+        const val USER_KEY = "USER"
         const val DELAY_TIME: Long = 1000
     }
 }

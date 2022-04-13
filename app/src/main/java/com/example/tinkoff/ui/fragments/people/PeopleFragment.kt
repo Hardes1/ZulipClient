@@ -17,6 +17,7 @@ import com.example.tinkoff.data.states.LoadingData
 import com.example.tinkoff.databinding.FragmentPeopleBinding
 import com.example.tinkoff.recyclerFeatures.adapters.PeopleRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.UserItemDecoration
+import com.example.tinkoff.ui.fragments.profile.ProfileFragment
 import timber.log.Timber
 
 class PeopleFragment : Fragment() {
@@ -31,7 +32,13 @@ class PeopleFragment : Fragment() {
 
     private fun userClickCallBack(index: Int) {
         val user = viewModel.displayedUsersList.value?.find { it.id == index }
-        val action = PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(user)
+        val action =
+            PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile().apply {
+                arguments.putParcelable(
+                    ProfileFragment.USER_KEY,
+                    user
+                )
+            }
         findNavController().navigate(
             action
         )
