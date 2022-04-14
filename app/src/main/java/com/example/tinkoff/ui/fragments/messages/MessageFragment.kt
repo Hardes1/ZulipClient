@@ -2,43 +2,43 @@ package com.example.tinkoff.ui.fragments.messages
 
 import android.os.Bundle
 import android.text.SpannableStringBuilder
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tinkoff.R
-import com.example.tinkoff.data.classes.Date
-import com.example.tinkoff.data.classes.MessageContent
-import com.example.tinkoff.data.classes.MessageContentInterface
-import com.example.tinkoff.data.classes.Reaction
-import com.example.tinkoff.data.classes.ReactionsData
-import com.example.tinkoff.data.states.SenderType
+import com.example.tinkoff.data.states.LoadingData
+import com.example.tinkoff.data.states.MessageState
 import com.example.tinkoff.databinding.FragmentMessageBinding
 import com.example.tinkoff.recyclerFeatures.adapters.MessageRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.MessageItemDecoration
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.example.tinkoff.ui.fragments.bottomSheet.BottomSheetFragment
 
-
 class MessageFragment : Fragment() {
-
 
     private var _binding: FragmentMessageBinding? = null
     private val binding: FragmentMessageBinding
         get() = _binding!!
     private val args: MessageFragmentArgs by navArgs()
-
-    private val viewModel: ReactionsViewModel by activityViewModels()
+    private val messagesViewModel: MessagesViewModel by viewModels()
+    private val reactionsViewModel: ReactionsViewModel by activityViewModels()
     private lateinit var adapter: MessageRecyclerAdapter
     private val bottomSheetDialog = BottomSheetFragment.newInstance()
-    private var messageIndex: Int = -1
-
+    private var searchItem: MenuItem? = null
+    private var refreshItem: MenuItem? = null
     private val decorator: MessageItemDecoration by lazy {
         MessageItemDecoration(
             resources.getDimensionPixelSize(R.dimen.message_content_small_recycler_distance),
@@ -46,17 +46,15 @@ class MessageFragment : Fragment() {
         )
     }
     private lateinit var layoutManager: LinearLayoutManager
-    private var messagesList: MutableList<MessageContentInterface> = mutableListOf()
-    private var copiedMessagesList: MutableList<MessageContentInterface> = mutableListOf()
-    private var counter = 0
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        setHasOptionsMenu(true)
         _binding = FragmentMessageBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,27 +67,15 @@ class MessageFragment : Fragment() {
         setChangeTextListener()
         setButtonSendClickListener()
         initializeRecyclerView()
-        observeViewModels()
+        initializeLiveDataObservers()
     }
-
 
     private fun setButtonSendClickListener() {
-
         binding.sendButton.setOnClickListener {
             val text = (binding.messageContentTextView.text ?: "").trim()
-            binding.messageContentTextView.text = SpannableStringBuilder("")
-            messagesList.add(
-                MessageContent(
-                    counter++,
-                    text.toString(),
-                    mutableListOf(),
-                    SenderType.OWN
-                )
-            )
-            updateAdapter()
+            messagesViewModel.addMessage(text)
         }
     }
-
 
     private fun setChangeTextListener() {
         binding.messageContentTextView.addTextChangedListener {
@@ -111,167 +97,146 @@ class MessageFragment : Fragment() {
         }
     }
 
-
     private fun initializeRecyclerView() {
-        messagesList = generateData()
         layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, true)
         adapter = MessageRecyclerAdapter(
-            onMessageIndexChanged,
-            {
-                messagesList = copiedMessagesList
-                binding.recyclerView.scrollToPosition(0)
-            },
-            updateElementCallBack
+            ::onSelectedPositionChanged,
+            ::updateElementCallBack
         )
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addItemDecoration(decorator)
         binding.recyclerView.layoutManager = layoutManager
-        updateAdapter()
     }
 
-
-    private fun prepareList(): MutableList<MessageContentInterface> {
-        val result: MutableList<MessageContentInterface> = mutableListOf()
-        for (element in messagesList) {
-            if (element is Date)
-                result.add(Date(element.id, element.date))
-            else if (element is MessageContent) {
-                val reactionsContent = mutableListOf<Reaction>()
-                for (reaction in element.reactions) {
-                    val usersId = mutableListOf<Int>()
-                    usersId.addAll(reaction.usersId)
-                    reactionsContent.add(Reaction(reaction.emoji, usersId))
-                }
-                result.add(
-                    MessageContent(
-                        element.id,
-                        element.content,
-                        reactionsContent,
-                        element.type
-                    )
-                )
-            }
-        }
-        return result
-    }
-
-
-    private val onMessageIndexChanged: (Int) -> Unit = { position ->
-        messageIndex = position
+    private fun onSelectedPositionChanged(id: Int) {
+        messagesViewModel.setMessageId(id)
         if (!bottomSheetDialog.isAdded) {
             bottomSheetDialog.show(parentFragmentManager, FRAGMENT_TAG)
         }
     }
 
-
-    private val updateElementCallBack: (Int, Int, Boolean) -> Unit =
-        { invertedAdapterPosition, reactionPosition, isAdd ->
-            val adapterPosition = messagesList.size - 1 - invertedAdapterPosition
-            val currentReaction =
-                (messagesList[adapterPosition] as MessageContent).reactions[reactionPosition]
-            if (isAdd) {
-                if (currentReaction.usersId.find { it == MY_ID } == null)
-                    currentReaction.usersId.add(MY_ID)
-            } else {
-                currentReaction.usersId.removeIf { it == MY_ID }
-            }
-            if (currentReaction.usersId.size == 0)
-                (messagesList[adapterPosition] as MessageContent).reactions.remove(currentReaction)
-            updateAdapter()
-        }
-
-
-    private fun updateAdapter() {
-        copiedMessagesList = prepareList()
-        adapter.updateList(copiedMessagesList)
+    private fun updateElementCallBack(id: Int, reactionPosition: Int, isAdd: Boolean) {
+        messagesViewModel.setMessageId(id)
+        messagesViewModel.reactionClickedCallBack(reactionPosition, isAdd)
     }
 
+    private fun initializeReactionsViewModelLiveData() {
+        reactionsViewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
+            messagesViewModel.tryAddReaction(reactionIndexValue)
+        }
+    }
 
-    private fun observeViewModels() {
-        viewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
-            val messageIndexValue = messageIndex
-            val reactionCondition = reactionIndexValue >= 0 &&
-                    reactionIndexValue < ReactionsData.reactionsStringList.size
-            val messageCondition = messageIndexValue >= 0 && messageIndexValue < messagesList.size
-            if (reactionCondition && messageCondition) {
-                val currentReactions =
-                    (messagesList[messagesList.size - 1 - messageIndexValue] as MessageContent)
-                        .reactions
-                val pressedReactionIndex =
-                    currentReactions.indexOfFirst { reaction ->
-                        reaction.emoji == ReactionsData.reactionsStringList[reactionIndexValue]
-                    }
-                if (pressedReactionIndex == -1) {
-                    currentReactions.add(
-                        Reaction(
-                            ReactionsData.reactionsStringList[reactionIndexValue],
-                            mutableListOf(MY_ID)
-                        )
-                    )
+    private fun initializeMessagesViewModelLiveData() {
+        initializeFragmentViewLifeData()
+        initializeRecyclerLiveData()
+    }
 
-                } else if (currentReactions[pressedReactionIndex].usersId.firstOrNull
-                    { id -> id == MY_ID } == null
-                ) {
-                    currentReactions[pressedReactionIndex].usersId.add(MY_ID)
+    private fun initializeFragmentViewLifeData() {
+        messagesViewModel.messageState.observe(viewLifecycleOwner) {
+            when (it) {
+                MessageState.FAILED -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Error sending message to server",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    messagesViewModel.initializeDisplaySubject()
                 }
-                updateAdapter()
+                MessageState.SUCCESSFUL -> {
+                    binding.messageContentTextView.text = SpannableStringBuilder("")
+                }
+                MessageState.SENDING -> {
+                }
+                else -> throw NotImplementedError()
+            }
+        }
+        messagesViewModel.loadingDataState.observe(viewLifecycleOwner) {
+            when (it) {
+                LoadingData.LOADING -> {
+                    searchItem?.isVisible = false
+                    refreshItem?.isVisible = false
+                    binding.progressBarIndicator.visibility = View.VISIBLE
+                    binding.bottomConstraintLayout.visibility = View.INVISIBLE
+                }
+                LoadingData.FINISHED -> {
+                    searchItem?.isVisible = true
+                    refreshItem?.isVisible = false
+                    binding.progressBarIndicator.visibility = View.INVISIBLE
+                    binding.bottomConstraintLayout.visibility = View.VISIBLE
+                    messagesViewModel.searchMessages("")
+                }
+                LoadingData.ERROR -> {
+                    searchItem?.isVisible = false
+                    refreshItem?.isVisible = true
+                    binding.progressBarIndicator.visibility = View.INVISIBLE
+                    binding.bottomConstraintLayout.visibility = View.INVISIBLE
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_messages_loading),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else -> throw NotImplementedError()
             }
         }
     }
 
-
-    private fun generateData(): MutableList<MessageContentInterface> {
-        val list: MutableList<MessageContentInterface> = mutableListOf()
-        list.add(Date(counter++, "1 Feb"))
-        list.add(
-            MessageContent(
-                counter++,
-                "Hello, my friend!",
-                mutableListOf(),
-                SenderType.OTHER
-            )
-        )
-        list.add(
-            MessageContent(
-                counter++, "How are you?", mutableListOf(),
-                SenderType.OTHER
-            )
-        )
-        list.add(
-            MessageContent(
-                counter++, "Why are you ignoring me???",
-                mutableListOf(),
-                SenderType.OTHER
-            )
-        )
-        list.add(
-            MessageContent(
-                counter++, "I am tired....\nGoing bad now",
-                mutableListOf(Reaction(ReactionsData.reactionsStringList[0], mutableListOf(-1))),
-                SenderType.OTHER
-            ),
-
-            )
-        list.add(
-            MessageContent(
-                counter++,
-                "Eoteogsdfkjsdfkcbvcnb hahahaha",
-                mutableListOf(),
-                SenderType.OTHER
-            )
-        )
-        list.add(
-            MessageContent(
-                counter++, "Hello, dude",
-                mutableListOf(),
-                SenderType.OWN
-            )
-        )
-        list.add(Date(counter++, "2 Feb"))
-        list.add(MessageContent(counter++, "abobaaboba", mutableListOf(), SenderType.OTHER))
-        return list
+    private fun initializeRecyclerLiveData() {
+        messagesViewModel.displayedMessagesList.observe(viewLifecycleOwner) {
+            adapter.updateList(it)
+        }
+        messagesViewModel.needToScroll.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> adapter.setChangedPositionCallBack {
+                    binding.recyclerView.smoothScrollToPosition(
+                        0
+                    )
+                }
+                false -> adapter.setChangedPositionCallBack(null)
+            }
+        }
     }
 
+    private fun initializeLiveDataObservers() {
+        initializeReactionsViewModelLiveData()
+        initializeMessagesViewModelLiveData()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        searchItem = menu.findItem(R.id.action_search)
+
+        searchItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
+                binding.bottomConstraintLayout.visibility = View.GONE
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
+                binding.bottomConstraintLayout.visibility = View.VISIBLE
+                return true
+            }
+        })
+        val searchView = searchItem?.actionView as SearchView
+        searchView.setIconifiedByDefault(true)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                messagesViewModel.searchMessages(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                messagesViewModel.searchMessages(newText)
+                return false
+            }
+        })
+        refreshItem = menu.findItem(R.id.action_refresh)
+        refreshItem?.setOnMenuItemClickListener {
+            messagesViewModel.refreshMessages(requireContext())
+            true
+        }
+        messagesViewModel.refreshMessages(requireContext())
+        super.onCreateOptionsMenu(menu, inflater)
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -282,5 +247,4 @@ class MessageFragment : Fragment() {
         private const val FRAGMENT_TAG = "TAG"
         const val MY_ID = 1
     }
-
 }

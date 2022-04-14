@@ -25,5 +25,4 @@ class MessagesDiffUtil : DiffUtil.ItemCallback<MessageContentInterface>() {
     ): Boolean {
         return oldItem == newItem
     }
-
 }

@@ -10,17 +10,16 @@ import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.StreamHeader
 import com.example.tinkoff.data.classes.StreamsInterface
 import com.example.tinkoff.data.classes.TopicHeader
-import com.example.tinkoff.databinding.StreamItemBinding
+import com.example.tinkoff.databinding.StreamRecyclerItemBinding
 import com.example.tinkoff.databinding.TopicItemBinding
 import com.example.tinkoff.recyclerFeatures.diffUtils.StreamsDiffUtil
 
 class StreamsRecyclerAdapter(
     private val selectCallBack: (Int, Boolean) -> Unit,
-    private val navigateToMessageFragmentCallBack: (String, String) -> Unit
+    private val navigateToMessageFragmentCallBack: (String, String) -> Unit,
+    private val updateListCallBack: () -> Unit
 ) :
     RecyclerView.Adapter<StreamsRecyclerAdapter.StreamsInterfaceViewHolder>() {
-
-
 
     abstract class StreamsInterfaceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         abstract fun bind(content: StreamsInterface)
@@ -29,7 +28,7 @@ class StreamsRecyclerAdapter(
     class StreamViewHolder(
         private val context: Context,
         private val selectCallBack: (Int, Boolean) -> Unit,
-        private val binding: StreamItemBinding
+        private val binding: StreamRecyclerItemBinding
     ) :
         StreamsInterfaceViewHolder(binding.root) {
         override fun bind(content: StreamsInterface) {
@@ -66,18 +65,16 @@ class StreamsRecyclerAdapter(
     private val differ = AsyncListDiffer(this, StreamsDiffUtil())
     private var list: List<StreamsInterface>
         private set(value) {
-            differ.submitList(value)
+            differ.submitList(value) { updateListCallBack() }
         }
         get() = differ.currentList
-
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StreamsInterfaceViewHolder {
         return when (viewType) {
             STREAM -> StreamViewHolder(
                 parent.context,
                 selectCallBack,
-                StreamItemBinding.inflate(
+                StreamRecyclerItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
@@ -123,6 +120,4 @@ class StreamsRecyclerAdapter(
         const val STREAM = 1
         const val TOPIC = 2
     }
-
-
 }

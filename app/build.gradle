@@ -47,4 +47,11 @@ dependencies {
     implementation "androidx.legacy:legacy-support-v4:$support"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation"
     implementation "androidx.navigation:navigation-ui-ktx:$navigation"
+    implementation "io.reactivex.rxjava2:rxandroid:$rx_android"
+    implementation "io.reactivex.rxjava2:rxjava:$rx_java"
+    implementation "io.reactivex.rxjava2:rxkotlin:$rx_kotlin"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle"
+    implementation "com.facebook.shimmer:shimmer:$shimmer"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
+    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detektFormatting"
 }

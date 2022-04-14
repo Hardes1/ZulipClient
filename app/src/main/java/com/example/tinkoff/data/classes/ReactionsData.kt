@@ -1,6 +1,5 @@
 package com.example.tinkoff.data.classes
 
-
 object ReactionsData {
     val reactionsStringList: List<String> = listOf(
         "\uD83D\uDE00",

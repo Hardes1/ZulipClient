@@ -9,7 +9,10 @@ import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.PeopleRecyclerItemBinding
 import com.example.tinkoff.recyclerFeatures.diffUtils.UsersDiffUtil
 
-class PeopleRecyclerAdapter(private val userClickCallBack: (Int) -> Unit) :
+class PeopleRecyclerAdapter(
+    private val userClickCallBack: (Int) -> Unit,
+    private val shimmerCallback: () -> Unit
+) :
     RecyclerView.Adapter<PeopleRecyclerAdapter.PeopleViewHolder>() {
 
     class PeopleViewHolder(
@@ -33,7 +36,7 @@ class PeopleRecyclerAdapter(private val userClickCallBack: (Int) -> Unit) :
     private val differ = AsyncListDiffer(this, UsersDiffUtil())
     private var list: List<User>
         private set(value) {
-            differ.submitList(value)
+            differ.submitList(value) { shimmerCallback() }
         }
         get() = differ.currentList
 
@@ -49,10 +52,7 @@ class PeopleRecyclerAdapter(private val userClickCallBack: (Int) -> Unit) :
 
     override fun getItemCount(): Int = list.size
 
-
     fun updateList(otherList: List<User>) {
         list = otherList
     }
-
-
 }

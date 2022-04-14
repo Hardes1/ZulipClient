@@ -3,53 +3,136 @@ package com.example.tinkoff.ui.fragments.people
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.MenuInflater
-
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
-import com.example.tinkoff.data.classes.User
-import com.example.tinkoff.data.states.UserStatus
+import com.example.tinkoff.data.states.LoadingData
 import com.example.tinkoff.databinding.FragmentPeopleBinding
 import com.example.tinkoff.recyclerFeatures.adapters.PeopleRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.UserItemDecoration
+import com.example.tinkoff.ui.fragments.profile.ProfileFragment
 import timber.log.Timber
 
-
 class PeopleFragment : Fragment() {
-
-
     private var _binding: FragmentPeopleBinding? = null
     private val binding: FragmentPeopleBinding
         get() = _binding!!
     private val adapter: PeopleRecyclerAdapter by lazy {
-        PeopleRecyclerAdapter(userClickCallBack)
+        PeopleRecyclerAdapter(::userClickCallBack, ::shimmerCallBack)
     }
+    private val viewModel: PeopleViewModel by viewModels()
+    private var searchItem: MenuItem? = null
 
-    private var dataList: List<User> = generateData()
-    private val userClickCallBack: (Int) -> Unit = { index ->
-        val user = dataList.find { it.id == index }
-        val action = PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile(user)
-        Timber.d("onPreNavigation called")
+    private fun userClickCallBack(index: Int) {
+        val user = viewModel.displayedUsersList.value?.find { it.id == index }
+        val action =
+            PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile().apply {
+                arguments.putParcelable(
+                    ProfileFragment.USER_KEY,
+                    user
+                )
+            }
         findNavController().navigate(
             action
         )
     }
 
+    private fun shimmerCallBack() {
+        if (viewModel.state.value != LoadingData.FINISHED)
+            viewModel.state.value = LoadingData.FINISHED
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Timber.d(getString(R.string.debug_fragment_recreated))
+    }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        setHasOptionsMenu(true)
         _binding = FragmentPeopleBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setHasOptionsMenu(true)
+        Timber.d(getString(R.string.debug_view_recreated))
+        initializeRecyclerView()
+        initializeDisplayedUsersListLiveData()
+        initializeStateLiveData()
+    }
+
+    private fun initializeDisplayedUsersListLiveData() {
+        viewModel.displayedUsersList.observe(viewLifecycleOwner) {
+            adapter.updateList(it)
+        }
+    }
+
+    private fun initializeStateLiveData() {
+        viewModel.state.observe(viewLifecycleOwner) {
+            when (it) {
+                LoadingData.LOADING, LoadingData.FINISHED -> {
+                    binding.root.displayedChild =
+                        it.ordinal
+                }
+                LoadingData.ERROR -> {
+                    binding.root.displayedChild = LoadingData.FINISHED.ordinal
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_people_loading),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else -> throw NotImplementedError()
+            }
+        }
+    }
+
+    private fun initializeIsDownloadedLiveData() {
+        viewModel.isDownloaded.observe(viewLifecycleOwner) { isDownloaded ->
+            if (isDownloaded) {
+                val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
+                viewModel.searchUsers(query)
+            } else
+                viewModel.refreshPeopleData(requireContext())
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        searchItem = menu.findItem(R.id.action_search)
+        searchItem?.isVisible = true
+        val searchView = searchItem?.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                viewModel.searchUsers(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                viewModel.searchUsers(newText)
+                return false
+            }
+        })
+        val refreshItem = menu.findItem(R.id.action_refresh)
+        refreshItem.isVisible = true
+        refreshItem.setOnMenuItemClickListener {
+            viewModel.isDownloaded.value = false
+            true
+        }
+        initializeIsDownloadedLiveData()
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun initializeRecyclerView() {
         binding.peopleRecyclerView.addItemDecoration(
             UserItemDecoration(
                 resources.getDimensionPixelSize(R.dimen.people_small_spacing_recycler_view),
@@ -57,56 +140,10 @@ class PeopleFragment : Fragment() {
             )
         )
         binding.peopleRecyclerView.adapter = adapter
-        adapter.updateList(dataList)
     }
-
-    private fun generateData(): List<User> {
-        var counter = 0
-        return listOf(
-            User(counter++, "Устинов Георгий", "abobaMail@mail.ru", UserStatus.ONLINE),
-            User(counter++, "Устинова Алёна", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Привет, как дела", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Проверяю текст", "abobaMail@mail.ru", UserStatus.ONLINE),
-            User(counter++, "Мельников Игорь", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Как же хочется прыгать", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "Откуда я знаю", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "ABOBA spirs", "abobaMail@mail.ru", UserStatus.ONLINE),
-            User(counter++, "ABOBA pirs", "abobaMail@mail.ru", UserStatus.OFFLINE),
-            User(counter++, "ABOBA poso", "abobaMail@mail.ru", UserStatus.OFFLINE)
-        )
-    }
-
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        val searchItem = menu.findItem(R.id.action_search)
-        searchItem.isVisible = true
-        val searchView = searchItem.actionView as SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                filterListByString(newText)
-                return false
-            }
-        })
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    private fun filterListByString(filter: String) {
-        val filteredList: List<User> = if (filter.isNotEmpty()) {
-            dataList.filter { it.name.contains(filter, ignoreCase = true) }
-        } else {
-            dataList.map { it.copy() }
-        }
-        adapter.updateList(filteredList)
-    }
-
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
     }
-
 }

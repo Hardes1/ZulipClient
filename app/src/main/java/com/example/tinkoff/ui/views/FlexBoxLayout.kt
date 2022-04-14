@@ -6,20 +6,12 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.ViewGroup
 import com.example.tinkoff.R
-import timber.log.Timber
 import kotlin.math.max
 
 class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     ViewGroup(context, attrs) {
-
     private val marginHorizontal: Int
     private val marginVertical: Int
-
-
-    companion object {
-        private const val MARGIN_HORIZONTAL = 10f
-        private const val MARGIN_VERTICAL = 6f
-    }
 
     init {
         val defaultHorizontalMargin = TypedValue.applyDimension(
@@ -47,8 +39,12 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         typedArray.recycle()
     }
 
-
-    fun addOrUpdateReaction(context: Context, reaction: String, quantity: Int, reactionState : Boolean) {
+    fun addOrUpdateReaction(
+        context: Context,
+        reaction: String,
+        quantity: Int,
+        reactionState: Boolean
+    ) {
         for (i in 0 until childCount - 1) {
             val child = getChildAt(i) as EmojiView
             val emojiViewText = child.text.split(" ")[0]
@@ -56,8 +52,7 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
                 child.isSelected = reactionState
                 if (quantity > 0) {
                     child.setTextAndDraw("$reaction $quantity")
-                }
-                else {
+                } else {
                     removeViewAt(i)
                     requestLayout()
                     return
@@ -73,13 +68,7 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         )
     }
 
-
-
-
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-
-
         var maxWidth = 0
         var maxHeight = 0
         if (childCount == 1) {
@@ -101,7 +90,7 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
             measureChild(child, widthMeasureSpec, heightMeasureSpec)
             when {
                 currentWidth + child.measuredWidth + marginHorizontal <=
-                        MeasureSpec.getSize(widthMeasureSpec) -> {
+                    MeasureSpec.getSize(widthMeasureSpec) -> {
                     currentWidth += child.measuredWidth + marginHorizontal
                 }
                 currentWidth + child.measuredWidth <= MeasureSpec.getSize(widthMeasureSpec) -> {
@@ -118,8 +107,6 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
             maxWidth = max(currentWidth, maxWidth)
             maxHeight = max(currentHeight, maxHeight)
             i++
-
-
         }
 
         maxWidth += paddingLeft + paddingRight
@@ -162,7 +149,6 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         }
     }
 
-
     override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
         return MarginLayoutParams(context, attrs)
     }
@@ -175,4 +161,8 @@ class FlexBoxLayout @JvmOverloads constructor(context: Context, attrs: Attribute
         return MarginLayoutParams(p)
     }
 
+    companion object {
+        private const val MARGIN_HORIZONTAL = 10f
+        private const val MARGIN_VERTICAL = 6f
+    }
 }

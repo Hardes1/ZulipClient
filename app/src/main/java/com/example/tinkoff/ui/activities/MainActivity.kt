@@ -1,7 +1,5 @@
 package com.example.tinkoff.ui.activities
 
-import android.app.Activity
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
@@ -17,8 +15,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.databinding.ActivityMainBinding
-import timber.log.Timber
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             searchItem?.collapseActionView()
             val messageInputMode: Int =
                 WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or
-                        WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN
+                    WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN
             val bottomNavViewInputMode: Int = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN
             when (destination.id) {
                 R.id.navigation_other_profile -> {
@@ -80,7 +76,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun setSoftInputMode(mode: Int) {
         window.setSoftInputMode(mode)
     }
@@ -98,15 +93,12 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-
     override fun onSupportNavigateUp(): Boolean {
-        Timber.d("navigated up")
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.search_action_menu, menu)
+        menuInflater.inflate(R.menu.actions_menu, menu)
         searchItem = menu?.findItem(R.id.action_search)
         return true
     }
@@ -115,9 +107,4 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         _binding = null
     }
-
-}
-
-fun AppCompatActivity.setActionBarTitle(title: String) {
-    supportActionBar?.title = title
 }

@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff.databinding.ReactionItemBinding
 
 class ReactionsRecyclerAdapter(
-    private val onPositionChanged : (Int) -> Unit,
+    private val onPositionChanged: (Int) -> Unit,
     private val listOfReactions: List<String>
 ) :
     RecyclerView.Adapter<ReactionsRecyclerAdapter.ReactionViewHolder>() {
@@ -20,8 +20,6 @@ class ReactionsRecyclerAdapter(
             binding.reactionTextview.setOnClickListener { onPositionChanged(adapterPosition) }
             binding.reactionTextview.text = item
         }
-
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReactionViewHolder {

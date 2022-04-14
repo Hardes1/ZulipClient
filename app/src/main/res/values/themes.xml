@@ -37,7 +37,6 @@
 
 
     <style name="NameTextView">
-        <item name="android:text">Darrel Steward</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">32sp</item>
     </style>
@@ -46,6 +45,16 @@
     <style name="Widget.App.ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="materialThemeOverlay">@style/LogoutButtonOverlay</item>
     </style>
+
+    <style name="Widget.App.ButtonShimmerStyle" parent="Widget.MaterialComponents.Button">
+        <item name="materialThemeOverlay">@style/LogoutButtonOverlayShimmer</item>
+    </style>
+
+
+    <style name="LogoutButtonOverlayShimmer">
+        <item name="colorPrimary">@color/icon_not_selected_color</item>
+    </style>
+
 
     <style name="LogoutButtonOverlay">
         <item name="colorPrimary">@color/content_layout_bg_color</item>

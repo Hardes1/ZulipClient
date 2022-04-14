@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff.R
-import com.example.tinkoff.recyclerFeatures.diffUtils.MessagesDiffUtil
 import com.example.tinkoff.data.classes.Date
 import com.example.tinkoff.data.classes.MessageContent
 import com.example.tinkoff.data.classes.MessageContentInterface
@@ -15,23 +14,28 @@ import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.databinding.DateItemBinding
 import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
+import com.example.tinkoff.recyclerFeatures.diffUtils.MessagesDiffUtil
 import com.example.tinkoff.ui.fragments.messages.MessageFragment.Companion.MY_ID
 import com.example.tinkoff.ui.views.FlexBoxLayout
 import com.google.android.material.textview.MaterialTextView
+import timber.log.Timber
 
 class MessageRecyclerAdapter(
-    private val onPositionChanged: (Int) -> Unit,
-    private val listChanged: () -> Unit,
-    private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
+    private val onSelectedPositionChanged: (messageId: Int) -> Unit,
+    private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
 ) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
 
+    abstract class MessageContentViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
+        abstract fun bind(content: MessageContentInterface)
+    }
 
     class MessageOtherViewHolder(
 
         private val onPositionChanged: (Int) -> Unit,
         private val context: Context,
-        private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
+        private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
         private val binding: MessageOtherItemBinding
     ) :
         MessageContentViewHolder(binding.root) {
@@ -40,7 +44,7 @@ class MessageRecyclerAdapter(
             val text =
                 binding.messageViewGroup.findViewById<MaterialTextView>(R.id.message_textview)
             binding.messageViewGroup.setOnClickListener {
-                onPositionChanged(adapterPosition)
+                onPositionChanged(content.id)
             }
             val flexBoxLayout =
                 binding.messageViewGroup.findViewById<FlexBoxLayout>(R.id.flex_box_layout)
@@ -62,16 +66,15 @@ class MessageRecyclerAdapter(
 
                 flexBoxLayout.getChildAt(index).setOnClickListener {
                     it.isSelected = !it.isSelected
-                    updateElementCallBack(adapterPosition, index, it.isSelected)
+                    updateElementCallBack(content.id, index, it.isSelected)
                 }
             }
             flexBoxLayout.requestLayout()
 
             flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
                 .setOnClickListener {
-                    onPositionChanged(adapterPosition)
+                    onPositionChanged(content.id)
                 }
-
 
             text.text = content.content
         }
@@ -80,7 +83,7 @@ class MessageRecyclerAdapter(
     class MessageOwnViewHolder(
         private val onPositionChanged: (Int) -> Unit,
         private val context: Context,
-        private val updateElementCallBack: (invertedAdapterPosition: Int, reactionPosition: Int, Boolean) -> Unit,
+        private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
         private val binding: MessageOwnItemBinding
     ) :
         MessageContentViewHolder(binding.root) {
@@ -88,7 +91,7 @@ class MessageRecyclerAdapter(
             require(content is MessageContent)
             binding.messageTextview.text = content.content
             binding.messageTextview.setOnClickListener {
-                onPositionChanged(adapterPosition)
+                onPositionChanged(content.id)
             }
             val flexBoxLayout = binding.flexBoxLayout
             while (flexBoxLayout.childCount > 1) {
@@ -105,17 +108,16 @@ class MessageRecyclerAdapter(
                 val index = flexBoxLayout.childCount - 2
                 flexBoxLayout.getChildAt(index).setOnClickListener {
                     it.isSelected = !it.isSelected
-                    updateElementCallBack(adapterPosition, index, it.isSelected)
+                    updateElementCallBack(content.id, index, it.isSelected)
                 }
             }
 
             flexBoxLayout.getChildAt(flexBoxLayout.childCount - 1)
                 .setOnClickListener {
-                    onPositionChanged(adapterPosition)
+                    onPositionChanged(content.id)
                 }
         }
     }
-
 
     class DateViewHolder(private val binding: DateItemBinding) :
         MessageContentViewHolder(binding.root) {
@@ -125,20 +127,18 @@ class MessageRecyclerAdapter(
         }
     }
 
-
+    private var listChangedCallBack: (() -> Unit)? = null
     private val differ = AsyncListDiffer(this, MessagesDiffUtil())
     private var list: List<MessageContentInterface>
         private set(value) {
+            Timber.d("DEBUG: list before changes: $list")
+            Timber.d("DEBUG: value is $value")
             differ.submitList(value.reversed()) {
-                listChanged
+                listChangedCallBack?.invoke()
             }
+            Timber.d("DEBUG: list after changes: $list")
         }
         get() = differ.currentList
-
-    abstract class MessageContentViewHolder(itemView: View) :
-        RecyclerView.ViewHolder(itemView) {
-        abstract fun bind(content: MessageContentInterface)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageContentViewHolder {
         return when (viewType) {
@@ -153,7 +153,7 @@ class MessageRecyclerAdapter(
             }
             MESSAGE_OTHER -> {
                 MessageOtherViewHolder(
-                    onPositionChanged,
+                    onSelectedPositionChanged,
                     parent.context,
                     updateElementCallBack,
                     MessageOtherItemBinding.inflate(
@@ -165,7 +165,7 @@ class MessageRecyclerAdapter(
             }
             MESSAGE_OWN -> {
                 MessageOwnViewHolder(
-                    onPositionChanged,
+                    onSelectedPositionChanged,
                     parent.context,
                     updateElementCallBack,
                     MessageOwnItemBinding.inflate(
@@ -185,7 +185,6 @@ class MessageRecyclerAdapter(
 
     override fun getItemCount(): Int = list.size
 
-
     override fun getItemViewType(position: Int): Int {
         val item = list[position]
         return if (item is Date) {
@@ -203,11 +202,13 @@ class MessageRecyclerAdapter(
         list = otherList
     }
 
+    fun setChangedPositionCallBack(callBack: (() -> Unit)?) {
+        listChangedCallBack = callBack
+    }
 
     companion object {
         const val DATE: Int = 1
         const val MESSAGE_OTHER: Int = 2
         const val MESSAGE_OWN: Int = 3
     }
-
 }

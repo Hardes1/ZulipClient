@@ -3,128 +3,121 @@ package com.example.tinkoff.ui.fragments.stream
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
-import com.example.tinkoff.data.classes.Stream
-import com.example.tinkoff.data.classes.StreamHeader
-import com.example.tinkoff.data.classes.StreamsInterface
-import com.example.tinkoff.data.classes.TopicHeader
+import com.example.tinkoff.data.states.LoadingData
 import com.example.tinkoff.data.states.StreamsType
-import com.example.tinkoff.databinding.FragmentStreamsBinding
+import com.example.tinkoff.databinding.FragmentStreamBinding
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
 import com.example.tinkoff.ui.fragments.streamTabs.StreamTabsFragmentDirections
 import timber.log.Timber
 
-
 class StreamFragment : Fragment() {
 
-
-    private var _binding: FragmentStreamsBinding? = null
-    private val binding: FragmentStreamsBinding
+    private var _binding: FragmentStreamBinding? = null
+    private val binding: FragmentStreamBinding
         get() = _binding!!
 
-    private lateinit var list: List<Stream>
-    private var counter = 0
-    private lateinit var type: StreamsType
+    private var searchItem: MenuItem? = null
+    private val viewModel: StreamViewModel by viewModels()
 
-    private val changeStateCallBack: (Int, Boolean) -> Unit = { id, isSelected ->
-        list.find { it.streamHeader.id == id }?.streamHeader?.isSelected = isSelected
-        adapter.updateList(prepareListForAdapter(list))
+    private fun changeStateCallBack(id: Int, isSelected: Boolean) {
+        viewModel.selectItem(id, isSelected)
     }
 
-    private val navigateToMessageFragmentCallBack: (String, String) -> Unit =
-        { appBarHeader, topicHeader ->
-            val action =
-                StreamTabsFragmentDirections.actionNavigationStreamTabsToMessageFragment(
-                    appBarHeader,
-                    topicHeader
-                )
-            findNavController().navigate(action)
-        }
+    private fun updateStreamsCallBack() {
+        if (viewModel.state.value != LoadingData.FINISHED)
+            viewModel.state.value = LoadingData.FINISHED
+    }
+
+    private fun navigateToMessageFragmentCallBack(appBarHeader: String, topicHeader: String) {
+        val action =
+            StreamTabsFragmentDirections.actionNavigationStreamTabsToMessageFragment(
+                appBarHeader,
+                topicHeader
+            )
+        findNavController().navigate(action)
+    }
 
     private val adapter: StreamsRecyclerAdapter by lazy {
-        StreamsRecyclerAdapter(changeStateCallBack, navigateToMessageFragmentCallBack)
+        StreamsRecyclerAdapter(
+            ::changeStateCallBack,
+            ::navigateToMessageFragmentCallBack,
+            ::updateStreamsCallBack
+        )
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Timber.d(getString(R.string.debug_fragment_recreated))
+    }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentStreamsBinding.inflate(inflater, container, false)
-        type = StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
+        setHasOptionsMenu(true)
+        _binding = FragmentStreamBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setHasOptionsMenu(true)
-        counter = 0
-        Timber.d("Stream type is $type")
-        if (type == StreamsType.ALL_STREAMS)
-            counter = ALL_STREAMS_MIN_ID
+        Timber.d(getString(R.string.debug_view_recreated))
+        viewModel.trySetStreamType(
+            StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
+        )
         initializeRecyclerView()
+        initializeStateLiveData()
+        initializeDisplayedStreamsListLiveData()
     }
 
+    private fun initializeIsDownloadedLiveData() {
+        viewModel.isDownloaded.observe(viewLifecycleOwner) { isDownloaded ->
+            if (isDownloaded) {
+                val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
+                viewModel.searchStreamsAndTopics(query)
+            } else
+                viewModel.refresh(requireContext())
+        }
+    }
 
-    private fun prepareListForAdapter(streams: List<Stream>): List<StreamsInterface> {
-        val list: MutableList<StreamsInterface> = mutableListOf()
-        streams.forEach { stream ->
-            list.add(stream.streamHeader.copy())
-            if (stream.streamHeader.isSelected) {
-                stream.topics.forEach { topicHeader ->
-                    list.add(topicHeader.copy())
+    private fun initializeDisplayedStreamsListLiveData() {
+        viewModel.displayedStreamsList.observe(viewLifecycleOwner) {
+            adapter.updateList(it)
+        }
+    }
+
+    private fun initializeStateLiveData() {
+        viewModel.state.observe(viewLifecycleOwner) {
+            when (it) {
+                LoadingData.LOADING, LoadingData.FINISHED -> {
+                    binding.root.displayedChild = it.ordinal
                 }
+                LoadingData.ERROR -> {
+                    binding.root.displayedChild = 1
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.error_streams_loading),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else -> throw NotImplementedError()
             }
         }
-        return list
-    }
-
-
-    private fun generateData(): List<Stream> {
-        val list: MutableList<Stream> = mutableListOf()
-        repeat(REPEAT_COUNT) {
-            val header = generateStreamHeader()
-            list.add(Stream(header, generateTopics(header.id)))
-        }
-        return list
-    }
-
-    private fun generateStreamHeader(): StreamHeader {
-        Timber.d("current header counter is $counter")
-        return StreamHeader(counter++, "$counter")
-    }
-
-    private fun generateTopics(parentId: Int): List<TopicHeader> {
-        val list: MutableList<TopicHeader> = mutableListOf()
-        val n = counter
-        repeat(n) {
-            list.add(TopicHeader(counter++, parentId, "$counter"))
-        }
-        return list
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        val item: MenuItem = menu.findItem(R.id.action_search)
-        item.isVisible = true
-
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     private fun initializeRecyclerView() {
-        list = generateData()
         binding.streamsRecyclerView.adapter = adapter
         val topicDrawable =
             ContextCompat.getDrawable(requireContext(), R.drawable.topic_item_decoration)
@@ -143,17 +136,41 @@ class StreamFragment : Fragment() {
                 streamDrawable
             )
         )
-        adapter.updateList(prepareListForAdapter(list))
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        searchItem = menu.findItem(R.id.action_search)
+        searchItem?.isVisible = true
+        val searchView = searchItem?.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                viewModel.searchStreamsAndTopics(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                viewModel.searchStreamsAndTopics(newText)
+                return false
+            }
+        })
+        val refreshItem = menu.findItem(R.id.action_refresh)
+        refreshItem.isVisible = true
+        refreshItem.setOnMenuItemClickListener {
+            viewModel.isDownloaded.value = false
+            true
+        }
+        initializeIsDownloadedLiveData()
+        super.onCreateOptionsMenu(menu, inflater)
+    }
 
     companion object {
 
-        private const val STREAMS_TYPE = "type"
-
-        private const val ALL_STREAMS_MIN_ID = 50
-        private const val REPEAT_COUNT = 3
-
+        private const val STREAMS_TYPE = "STREAM_TYPE"
         fun newInstance(type: StreamsType): StreamFragment {
             return StreamFragment().apply {
                 arguments = Bundle().apply {
@@ -162,5 +179,4 @@ class StreamFragment : Fragment() {
             }
         }
     }
-
 }
