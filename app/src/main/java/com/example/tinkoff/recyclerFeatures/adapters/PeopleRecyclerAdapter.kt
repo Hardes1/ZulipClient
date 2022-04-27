@@ -1,9 +1,14 @@
 package com.example.tinkoff.recyclerFeatures.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.PeopleRecyclerItemBinding
@@ -16,6 +21,7 @@ class PeopleRecyclerAdapter(
     RecyclerView.Adapter<PeopleRecyclerAdapter.PeopleViewHolder>() {
 
     class PeopleViewHolder(
+        private val context: Context,
         private val userClickCallBack: (Int) -> Unit,
         private val binding: PeopleRecyclerItemBinding
     ) :
@@ -26,10 +32,20 @@ class PeopleRecyclerAdapter(
             }
             binding.nameTextView.text = user.name
             binding.emailTextView.text = user.email
-            binding.onlineStatus.isEnabled = when (user.status) {
-                UserStatus.ONLINE -> true
-                UserStatus.OFFLINE -> false
-            }
+            binding.onlineStatus.setBackgroundColor(
+                ContextCompat.getColor(
+                    context,
+                    when (user.status) {
+                        UserStatus.ACTIVE -> R.color.green_online_status_color
+                        UserStatus.IDLE -> R.color.yellow_online_status_color
+                        UserStatus.OFFLINE -> R.color.red_online_status_color
+                    }
+                )
+            )
+            Glide.with(context).load(user.avatarUrl).placeholder(R.drawable.progress_animation)
+                .error(R.drawable.no_avatar)
+                .centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(binding.avatarIcon)
         }
     }
 
@@ -43,7 +59,7 @@ class PeopleRecyclerAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PeopleViewHolder {
         val binding =
             PeopleRecyclerItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PeopleViewHolder(userClickCallBack, binding)
+        return PeopleViewHolder(parent.context, userClickCallBack, binding)
     }
 
     override fun onBindViewHolder(holder: PeopleViewHolder, position: Int) {

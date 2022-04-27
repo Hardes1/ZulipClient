@@ -2,7 +2,10 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-parcelize'
+    id 'kotlin-kapt'
 }
+
+apply plugin: 'kotlinx-serialization'
 apply plugin: "io.gitlab.arturbosch.detekt"
 apply plugin: 'androidx.navigation.safeargs.kotlin'
 
@@ -54,4 +57,10 @@ dependencies {
     implementation "com.facebook.shimmer:shimmer:$shimmer"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle"
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detektFormatting"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJson"
+    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:$retrofitSerializationConverter"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitRxAdapter"
+    implementation "com.squareup.okhttp3:logging-interceptor:$loggingInterceptor"
+    implementation "com.github.bumptech.glide:glide:$glide"
+    kapt "com.github.bumptech.glide:compiler:$glide"
 }

@@ -26,8 +26,8 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/avatar_imageview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/avatar_image_view_size"
+            android:layout_height="@dimen/avatar_image_view_size"
             android:layout_marginTop="@dimen/avatar_image_view_margin_top"
             android:scaleType="fitCenter"
             app:layout_constraintEnd_toEndOf="parent"
@@ -47,64 +47,22 @@
             app:layout_constraintTop_toBottomOf="@id/avatar_imageview"
             tools:text="Darrel Steward" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/status_constraint_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/name_textview">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/state_textview"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/call_user_status"
-                android:textColor="@color/state_text_color"
-                android:textSize="17sp"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="@id/status_constraint_layout"
-                app:layout_constraintEnd_toStartOf="@id/online_status_textview"
-                app:layout_constraintStart_toStartOf="@id/status_constraint_layout"
-                app:layout_constraintTop_toTopOf="@id/status_constraint_layout"
-                tools:text="In a meeting" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/online_status_textview"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/online_status_text_view_margin_start"
+                android:layout_marginTop="@dimen/online_status_margin_top"
+                android:gravity="center_horizontal"
                 android:textColor="@drawable/profile_online_status_selector"
                 android:textSize="15sp"
-                app:layout_constraintBottom_toBottomOf="@+id/state_textview"
-                app:layout_constraintEnd_toEndOf="@id/status_constraint_layout"
-                app:layout_constraintStart_toEndOf="@id/state_textview"
+                app:layout_constraintEnd_toEndOf="@id/avatar_imageview"
+                app:layout_constraintTop_toBottomOf="@id/name_textview"
+                app:layout_constraintStart_toStartOf="@id/avatar_imageview"
                 tools:text="online" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logout_button"
-            style="@style/Widget.App.ButtonStyle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/log_out_horizontal_margin_button"
-            android:layout_marginEnd="@dimen/log_out_horizontal_margin_button"
-            android:layout_marginBottom="@dimen/log_out_vertical_margin_button"
-            android:fontFamily="@font/inter"
-            android:paddingTop="@dimen/log_out_vertical_padding_button"
-            android:paddingBottom="@dimen/log_out_vertical_padding_button"
-            android:text="@string/logout_button_text"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="@dimen/logout_button_text_size"
-            android:visibility="invisible"
-            app:cornerRadius="@dimen/logout_button_corner_radius"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
 
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </ViewSwitcher>

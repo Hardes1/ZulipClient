@@ -4,25 +4,28 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.tinkoff.R
-import com.example.tinkoff.data.classes.Date
 import com.example.tinkoff.data.classes.MessageContent
 import com.example.tinkoff.data.classes.MessageContentInterface
+import com.example.tinkoff.data.classes.MessageDate
 import com.example.tinkoff.data.states.SenderType
 import com.example.tinkoff.databinding.DateItemBinding
 import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
+import com.example.tinkoff.network.client.Repository.MY_ID
 import com.example.tinkoff.recyclerFeatures.diffUtils.MessagesDiffUtil
-import com.example.tinkoff.ui.fragments.messages.MessageFragment.Companion.MY_ID
 import com.example.tinkoff.ui.views.FlexBoxLayout
+import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
-import timber.log.Timber
 
 class MessageRecyclerAdapter(
     private val onSelectedPositionChanged: (messageId: Int) -> Unit,
-    private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
+    private val updateElementCallBack: (messageId: Int, reactionPosition: Int, isAdd: Boolean, emoji: View) -> Unit,
 ) :
     RecyclerView.Adapter<MessageRecyclerAdapter.MessageContentViewHolder>() {
 
@@ -35,7 +38,7 @@ class MessageRecyclerAdapter(
 
         private val onPositionChanged: (Int) -> Unit,
         private val context: Context,
-        private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
+        private val updateElementCallBack: (messageId: Int, reactionPosition: Int, isAdd: Boolean, emoji: View) -> Unit,
         private val binding: MessageOtherItemBinding
     ) :
         MessageContentViewHolder(binding.root) {
@@ -43,12 +46,21 @@ class MessageRecyclerAdapter(
             require(content is MessageContent)
             val text =
                 binding.messageViewGroup.findViewById<MaterialTextView>(R.id.message_textview)
+            val name =
+                binding.messageViewGroup.findViewById<MaterialTextView>(R.id.nickname_textview)
+            val avatar = binding.messageViewGroup.findViewById<ShapeableImageView>(R.id.avatar_icon)
+            Glide
+                .with(context)
+                .load(content.avatarUrl)
+                .placeholder(R.drawable.progress_animation)
+                .error(R.drawable.no_avatar)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into(avatar)
             binding.messageViewGroup.setOnClickListener {
                 onPositionChanged(content.id)
             }
             val flexBoxLayout =
                 binding.messageViewGroup.findViewById<FlexBoxLayout>(R.id.flex_box_layout)
-
             while (flexBoxLayout.childCount > 1) {
                 flexBoxLayout.removeViewAt(0)
             }
@@ -57,7 +69,7 @@ class MessageRecyclerAdapter(
                 val state = element.usersId.indexOfFirst { it == MY_ID } == -1
                 flexBoxLayout.addOrUpdateReaction(
                     context,
-                    element.emoji,
+                    element.emojiCode,
                     element.usersId.size,
                     !state
                 )
@@ -65,8 +77,8 @@ class MessageRecyclerAdapter(
                 val index = flexBoxLayout.childCount - 2
 
                 flexBoxLayout.getChildAt(index).setOnClickListener {
-                    it.isSelected = !it.isSelected
-                    updateElementCallBack(content.id, index, it.isSelected)
+                    it.isEnabled = false
+                    updateElementCallBack(content.id, index, !it.isSelected, it)
                 }
             }
             flexBoxLayout.requestLayout()
@@ -75,21 +87,25 @@ class MessageRecyclerAdapter(
                 .setOnClickListener {
                     onPositionChanged(content.id)
                 }
-
-            text.text = content.content
+            text.text =
+                HtmlCompat.fromHtml(content.content, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+                    .trim()
+            name.text = content.senderName
         }
     }
 
     class MessageOwnViewHolder(
         private val onPositionChanged: (Int) -> Unit,
         private val context: Context,
-        private val updateElementCallBack: (messageId: Int, reactionPosition: Int, Boolean) -> Unit,
+        private val updateElementCallBack: (messageId: Int, reactionPosition: Int, isAdd: Boolean, emoji: View) -> Unit,
         private val binding: MessageOwnItemBinding
     ) :
         MessageContentViewHolder(binding.root) {
         override fun bind(content: MessageContentInterface) {
             require(content is MessageContent)
-            binding.messageTextview.text = content.content
+            binding.messageTextview.text =
+                HtmlCompat.fromHtml(content.content, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+                    .trim()
             binding.messageTextview.setOnClickListener {
                 onPositionChanged(content.id)
             }
@@ -101,14 +117,14 @@ class MessageRecyclerAdapter(
             for (element in content.reactions) {
                 flexBoxLayout.addOrUpdateReaction(
                     context,
-                    element.emoji,
+                    element.emojiCode,
                     element.usersId.size,
                     element.usersId.indexOfFirst { it == MY_ID } != -1
                 )
                 val index = flexBoxLayout.childCount - 2
                 flexBoxLayout.getChildAt(index).setOnClickListener {
-                    it.isSelected = !it.isSelected
-                    updateElementCallBack(content.id, index, it.isSelected)
+                    it.isEnabled = false
+                    updateElementCallBack(content.id, index, !it.isSelected, it)
                 }
             }
 
@@ -122,7 +138,7 @@ class MessageRecyclerAdapter(
     class DateViewHolder(private val binding: DateItemBinding) :
         MessageContentViewHolder(binding.root) {
         override fun bind(content: MessageContentInterface) {
-            require(content is Date)
+            require(content is MessageDate)
             binding.dateText.text = content.date
         }
     }
@@ -131,12 +147,9 @@ class MessageRecyclerAdapter(
     private val differ = AsyncListDiffer(this, MessagesDiffUtil())
     private var list: List<MessageContentInterface>
         private set(value) {
-            Timber.d("DEBUG: list before changes: $list")
-            Timber.d("DEBUG: value is $value")
             differ.submitList(value.reversed()) {
                 listChangedCallBack?.invoke()
             }
-            Timber.d("DEBUG: list after changes: $list")
         }
         get() = differ.currentList
 
@@ -187,14 +200,15 @@ class MessageRecyclerAdapter(
 
     override fun getItemViewType(position: Int): Int {
         val item = list[position]
-        return if (item is Date) {
+        return if (item is MessageDate) {
             DATE
         } else {
             val newItem = item as MessageContent
-            if (newItem.type == SenderType.OWN)
+            if (newItem.type == SenderType.OWN) {
                 MESSAGE_OWN
-            else
+            } else {
                 MESSAGE_OTHER
+            }
         }
     }
 

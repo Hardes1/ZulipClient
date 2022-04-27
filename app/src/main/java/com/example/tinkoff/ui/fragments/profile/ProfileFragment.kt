@@ -8,14 +8,16 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.LoadingData
 import com.example.tinkoff.data.states.UserStatus
 import com.example.tinkoff.databinding.FragmentProfileBinding
-import com.example.tinkoff.ui.fragments.messages.MessageFragment
 import timber.log.Timber
 
 class ProfileFragment : Fragment() {
@@ -55,13 +57,15 @@ class ProfileFragment : Fragment() {
             when (it) {
                 LoadingData.LOADING, LoadingData.FINISHED -> {
                     refreshItem?.isVisible = false
-                    if (binding.root.displayedChild != it.ordinal)
+                    if (binding.root.displayedChild != it.ordinal) {
                         binding.root.displayedChild = it.ordinal
+                    }
                 }
                 LoadingData.ERROR -> {
                     refreshItem?.isVisible = true
-                    if (binding.root.displayedChild != LoadingData.FINISHED.ordinal)
+                    if (binding.root.displayedChild != LoadingData.FINISHED.ordinal) {
                         binding.root.displayedChild = LoadingData.FINISHED.ordinal
+                    }
                     Toast.makeText(
                         requireContext(),
                         getString(R.string.error_profile_loading),
@@ -74,38 +78,59 @@ class ProfileFragment : Fragment() {
 
         viewModel.ownUser.observe(viewLifecycleOwner) { user ->
             initializeUser(
-                user,
-                when (user.id) {
-                    MessageFragment.MY_ID -> View.VISIBLE
-                    else -> View.INVISIBLE
-                }
+                user
             )
         }
     }
 
-    private fun initializeUser(user: User, exitButtonVisibility: Int) {
+    private fun initializeUser(user: User) {
         binding.nameTextview.text = user.name
-        binding.logoutButton.visibility = exitButtonVisibility
-        binding.avatarImageview.setImageResource(user.drawableId)
-        binding.stateTextview.apply {
-            visibility = View.VISIBLE
-        }
+        downloadImageByUrl(user.avatarUrl)
         when (user.status) {
-            UserStatus.ONLINE -> {
+            UserStatus.ACTIVE -> {
                 binding.onlineStatusTextview.apply {
                     text =
                         resources.getString(R.string.user_online_text)
-                    isEnabled = true
+                    setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.green_online_status_color
+                        )
+                    )
                 }
             }
             UserStatus.OFFLINE -> {
                 binding.onlineStatusTextview.apply {
                     text =
                         resources.getString(R.string.user_offline_text)
-                    isEnabled = false
+                    setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.red_online_status_color
+                        )
+                    )
+                }
+            }
+            UserStatus.IDLE -> {
+                binding.onlineStatusTextview.apply {
+                    text = resources.getString(R.string.user_idle_text)
+                    setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.yellow_online_status_color
+                        )
+                    )
                 }
             }
         }
+    }
+
+    private fun downloadImageByUrl(url: String?) {
+        Timber.d("called glide")
+        Glide.with(requireContext()).load(url).placeholder(R.drawable.progress_animation)
+            .error(R.drawable.no_avatar)
+            .centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL)
+            .into(binding.avatarImageview)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -115,8 +140,9 @@ class ProfileFragment : Fragment() {
             viewModel.refreshProfile(requireContext())
             true
         }
-        if (arguments == null)
+        if (arguments == null) {
             viewModel.refreshProfile(requireContext())
+        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -127,6 +153,5 @@ class ProfileFragment : Fragment() {
 
     companion object {
         const val USER_KEY = "USER"
-        const val DELAY_TIME: Long = 1000
     }
 }

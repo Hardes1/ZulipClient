@@ -15,7 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.data.states.LoadingData
-import com.example.tinkoff.data.states.StreamsType
+import com.example.tinkoff.data.states.StreamType
 import com.example.tinkoff.databinding.FragmentStreamBinding
 import com.example.tinkoff.recyclerFeatures.adapters.StreamsRecyclerAdapter
 import com.example.tinkoff.recyclerFeatures.decorations.StreamItemDecoration
@@ -29,6 +29,7 @@ class StreamFragment : Fragment() {
         get() = _binding!!
 
     private var searchItem: MenuItem? = null
+    private lateinit var streamLoadingErrorToast: Toast
     private val viewModel: StreamViewModel by viewModels()
 
     private fun changeStateCallBack(id: Int, isSelected: Boolean) {
@@ -75,7 +76,12 @@ class StreamFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
         viewModel.trySetStreamType(
-            StreamsType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
+            StreamType.values()[requireArguments().getInt(STREAMS_TYPE, 0)]
+        )
+        streamLoadingErrorToast = Toast.makeText(
+            requireContext(),
+            getString(R.string.error_streams_loading),
+            Toast.LENGTH_SHORT
         )
         initializeRecyclerView()
         initializeStateLiveData()
@@ -87,8 +93,9 @@ class StreamFragment : Fragment() {
             if (isDownloaded) {
                 val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
                 viewModel.searchStreamsAndTopics(query)
-            } else
-                viewModel.refresh(requireContext())
+            } else {
+                viewModel.refresh()
+            }
         }
     }
 
@@ -106,11 +113,8 @@ class StreamFragment : Fragment() {
                 }
                 LoadingData.ERROR -> {
                     binding.root.displayedChild = 1
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.error_streams_loading),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    streamLoadingErrorToast.cancel()
+                    streamLoadingErrorToast.show()
                 }
                 else -> throw NotImplementedError()
             }
@@ -144,6 +148,7 @@ class StreamFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        Timber.d("create menu called")
         searchItem = menu.findItem(R.id.action_search)
         searchItem?.isVisible = true
         val searchView = searchItem?.actionView as SearchView
@@ -171,7 +176,7 @@ class StreamFragment : Fragment() {
     companion object {
 
         private const val STREAMS_TYPE = "STREAM_TYPE"
-        fun newInstance(type: StreamsType): StreamFragment {
+        fun newInstance(type: StreamType): StreamFragment {
             return StreamFragment().apply {
                 arguments = Bundle().apply {
                     putInt(STREAMS_TYPE, type.ordinal)

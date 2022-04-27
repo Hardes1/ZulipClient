@@ -1,6 +1,6 @@
 package com.example.tinkoff.data.states
 
-enum class StreamsType {
+enum class StreamType {
     SUBSCRIBED,
     ALL_STREAMS
 }

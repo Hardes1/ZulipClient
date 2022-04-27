@@ -35,7 +35,7 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_message"
-        android:name="com.example.tinkoff.ui.fragments.messages.MessageFragment"
+        android:name="com.example.tinkoff.ui.fragments.messages.MessagesFragment"
         android:label="fragment_message"
         tools:layout="@layout/fragment_message" >
         <argument

@@ -2,7 +2,8 @@
 
 buildscript {
     dependencies {
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.4.1"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:2.4.2"
+        classpath "org.jetbrains.kotlin:kotlin-serialization:1.6.20"
     }
 }
 
@@ -31,13 +32,14 @@ tasks.named("detekt").configure {
 }
 
 ext {
+    glide = '4.9.0'
     timber = '4.7.1'
     coreKtx = '1.7.0'
     material = '1.5.0'
     appCompat = '1.4.1'
     constraintLayout = '2.1.3'
     fragmentKtx = '1.4.1'
-    navigation = '2.4.1'
+    navigation = '2.4.2'
     support = '1.0.0'
     rx_android = "2.1.1"
     rx_java = '2.2.21'
@@ -45,6 +47,11 @@ ext {
     lifecycle = '2.4.1'
     shimmer = "0.5.0"
     detektFormatting = "1.20.0-RC2"
+    retrofit = "2.9.0"
+    loggingInterceptor = "4.9.3"
+    kotlinxSerializationJson = "1.3.2"
+    retrofitRxAdapter = "2.9.0"
+    retrofitSerializationConverter = "0.8.0"
 }
 
 task clean(type: Delete) {

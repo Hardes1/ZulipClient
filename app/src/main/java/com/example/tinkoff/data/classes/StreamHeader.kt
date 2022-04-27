@@ -1,4 +1,16 @@
 package com.example.tinkoff.data.classes
 
-data class StreamHeader(val id: Int, val name: String, var isSelected: Boolean = false) :
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+
+@Serializable
+data class StreamHeader(
+    @SerialName("stream_id")
+    val id: Int,
+    @SerialName("name")
+    val name: String,
+    @Transient
+    var isSelected: Boolean = false
+) :
     StreamsInterface

@@ -95,4 +95,6 @@
     <dimen name="topic_name_text_view_margin_start">33dp</dimen>
     <dimen name="topic_name_text_view_margin_top">9dp</dimen>
     <dimen name="topic_name_text_view_margin_bottom">9dp</dimen>
+    <dimen name="online_status_margin_top">12dp</dimen>
+    <dimen name="avatar_image_view_size">180dp</dimen>
 </resources>

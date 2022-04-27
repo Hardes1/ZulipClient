@@ -14,14 +14,13 @@
         android:layout_marginStart="15dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/icon_preview" />
+        app:shapeAppearanceOverlay="@style/ShapeableImageViewAvatar" />
 
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/online_status"
         android:layout_width="@dimen/online_status_width"
         android:layout_height="@dimen/online_status_height"
-        android:background="@drawable/online_status_selector"
         app:layout_constraintBottom_toBottomOf="@id/avatar_icon"
         app:layout_constraintEnd_toEndOf="@id/avatar_icon"
         app:shapeAppearanceOverlay="@style/OnlineStatusView" />
