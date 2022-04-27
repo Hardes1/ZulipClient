@@ -17,6 +17,7 @@
         <entry key="app/src/main/res/drawable/message_own_bg.xml" value="0.241" />
         <entry key="app/src/main/res/drawable/online_status_selector.xml" value="0.104" />
         <entry key="app/src/main/res/drawable/profile_online_status_selector.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/progress_animation.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/rounder_shimmer_item.xml" value="0.241" />
         <entry key="app/src/main/res/drawable/square_shimmer_item.xml" value="0.158" />
         <entry key="app/src/main/res/drawable/stream_header_selector.xml" value="0.18" />
@@ -28,7 +29,7 @@
         <entry key="app/src/main/res/layout/fragment_message.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_message2.xml" value="0.26794871794871794" />
         <entry key="app/src/main/res/layout/fragment_people.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_stream.xml" value="0.2517094017094017" />
         <entry key="app/src/main/res/layout/fragment_streams.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_streams_tabs.xml" value="0.1" />

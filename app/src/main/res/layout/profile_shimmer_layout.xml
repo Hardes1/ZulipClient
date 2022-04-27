@@ -33,60 +33,19 @@
         app:layout_constraintTop_toBottomOf="@id/avatar_view_shimmer"
         tools:text="Darrel Steward" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/status_constraint_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/name_view_shimmer">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/state_view_shimmer"
-            android:layout_width="@dimen/state_view_shimmer_width"
-            android:layout_height="@dimen/state_view_shimmer_height"
-            android:layout_marginTop="@dimen/state_view_shimmer_top"
-            android:visibility="visible"
-            android:background="@color/icon_not_selected_color"
-            app:layout_constraintBottom_toBottomOf="@id/status_constraint_layout"
-            app:layout_constraintEnd_toStartOf="@id/online_status_view_shimmer"
-            app:layout_constraintStart_toStartOf="@id/status_constraint_layout"
-            app:layout_constraintTop_toTopOf="@id/status_constraint_layout"
-            tools:text="In a meeting" />
 
         <View
             android:id="@+id/online_status_view_shimmer"
             android:layout_width="@dimen/online_status_view_shimmer_width"
             android:layout_height="@dimen/online_status_view_shimmer_height"
-            android:layout_marginStart="25dp"
+            android:layout_marginTop="@dimen/online_status_margin_top"
             android:background="@color/icon_not_selected_color"
-            app:layout_constraintBottom_toBottomOf="@id/state_view_shimmer"
-            app:layout_constraintEnd_toEndOf="@id/status_constraint_layout"
-            app:layout_constraintStart_toEndOf="@id/state_view_shimmer"
+            app:layout_constraintTop_toBottomOf="@id/name_view_shimmer"
+            app:layout_constraintEnd_toEndOf="@id/avatar_view_shimmer"
+            app:layout_constraintStart_toStartOf="@id/avatar_view_shimmer"
             tools:text="online" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/logout_button_shimmer"
-        style="@style/Widget.App.ButtonShimmerStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/log_out_horizontal_margin_button"
-        android:layout_marginEnd="@dimen/log_out_horizontal_margin_button"
-        android:layout_marginBottom="@dimen/log_out_vertical_margin_button"
-        android:fontFamily="@font/inter"
-        android:paddingTop="@dimen/log_out_vertical_padding_button"
-        android:paddingBottom="@dimen/log_out_vertical_padding_button"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="@dimen/logout_button_text_size"
-        android:visibility="visible"
-        app:cornerRadius="@dimen/logout_button_corner_radius"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

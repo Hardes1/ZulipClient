@@ -4,14 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/avatar_icon"
         android:layout_width="@dimen/icon_width_height"
         android:layout_height="@dimen/icon_width_height"
         android:layout_marginStart="@dimen/icon_start_margin"
-        android:src="@drawable/icon_preview"
         android:scaleType="fitCenter"
-        android:contentDescription="@string/avatar_description" />
+        android:contentDescription="@string/avatar_description"
+        app:shapeAppearanceOverlay="@style/ShapeableImageViewAvatar"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/message_content"

@@ -11,8 +11,9 @@ class StreamsDiffUtil : DiffUtil.ItemCallback<StreamsInterface>() {
             oldItem.id == newItem.id
         } else if (oldItem is StreamHeader && newItem is StreamHeader)
             oldItem.id == newItem.id
-        else
+        else {
             false
+        }
     }
 
     override fun areContentsTheSame(oldItem: StreamsInterface, newItem: StreamsInterface): Boolean {

@@ -29,6 +29,7 @@ class PeopleFragment : Fragment() {
     }
     private val viewModel: PeopleViewModel by viewModels()
     private var searchItem: MenuItem? = null
+    private lateinit var peopleLoadingErrorToast: Toast
 
     private fun userClickCallBack(index: Int) {
         val user = viewModel.displayedUsersList.value?.find { it.id == index }
@@ -66,6 +67,11 @@ class PeopleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d(getString(R.string.debug_view_recreated))
+        peopleLoadingErrorToast = Toast.makeText(
+            requireContext(),
+            getString(R.string.error_people_loading),
+            Toast.LENGTH_SHORT
+        )
         initializeRecyclerView()
         initializeDisplayedUsersListLiveData()
         initializeStateLiveData()
@@ -86,11 +92,8 @@ class PeopleFragment : Fragment() {
                 }
                 LoadingData.ERROR -> {
                     binding.root.displayedChild = LoadingData.FINISHED.ordinal
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.error_people_loading),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    peopleLoadingErrorToast.cancel()
+                    peopleLoadingErrorToast.show()
                 }
                 else -> throw NotImplementedError()
             }
@@ -103,11 +106,12 @@ class PeopleFragment : Fragment() {
                 val query = (searchItem?.actionView as SearchView?)?.query?.toString() ?: ""
                 viewModel.searchUsers(query)
             } else
-                viewModel.refreshPeopleData(requireContext())
+                viewModel.refreshPeopleData()
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        Timber.d("people menu created")
         searchItem = menu.findItem(R.id.action_search)
         searchItem?.isVisible = true
         val searchView = searchItem?.actionView as SearchView

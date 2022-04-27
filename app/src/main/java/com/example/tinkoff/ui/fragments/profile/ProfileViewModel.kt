@@ -6,13 +6,12 @@ import androidx.lifecycle.ViewModel
 import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.LoadingData
-import com.example.tinkoff.network.Repository
+import com.example.tinkoff.network.client.Repository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 class ProfileViewModel : ViewModel() {
     val ownUser: MutableLiveData<User> = MutableLiveData()
@@ -23,16 +22,27 @@ class ProfileViewModel : ViewModel() {
         disposable?.dispose()
         if (state.value != LoadingData.FINISHED) {
             state.value = LoadingData.LOADING
-            disposable = Repository.generatePersonalUserData(context)
-                .delay(ProfileFragment.DELAY_TIME, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.computation())
+            disposable = Repository.getOwnUser()
+                .subscribeOn(Schedulers.io()).flatMap { user ->
+                    Repository.getOnlineUserStatus(user.id).map {
+                        User(
+                            user.id,
+                            user.name,
+                            user.email,
+                            it.presence.aggregated.status,
+                            user.avatarUrl,
+                            user.isBot
+                        )
+                    }
+                }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onSuccess = { value ->
                         ownUser.value = value
                         state.value = LoadingData.FINISHED
                     },
-                    onError = {
+                    onError = { e ->
+                        Timber.e(e, "Error during gettin info about own user")
                         state.value = LoadingData.ERROR
                         Timber.d(context.getString(R.string.error_profile_loading))
                     }

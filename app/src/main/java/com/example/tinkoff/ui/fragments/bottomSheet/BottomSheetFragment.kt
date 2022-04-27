@@ -40,7 +40,10 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
             viewModel.setReactionIndex(it)
             dismiss()
         }
-        reactionsRecyclerAdapter = ReactionsRecyclerAdapter(onPositionChanged, ReactionsData.reactionsStringList)
+        reactionsRecyclerAdapter =
+            ReactionsRecyclerAdapter(
+                onPositionChanged,
+                ReactionsData.reactionsStringList.map { it.second })
         binding.recyclerView.adapter = reactionsRecyclerAdapter
     }
 

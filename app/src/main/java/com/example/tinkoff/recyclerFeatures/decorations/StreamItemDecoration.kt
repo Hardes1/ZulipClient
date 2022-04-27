@@ -42,12 +42,13 @@ class StreamItemDecoration(
             } else if (positionType == StreamsRecyclerAdapter.TOPIC) {
                 if (position < adapter.itemCount - 1 &&
                     adapter.getItemViewType(position + 1) == StreamsRecyclerAdapter.TOPIC
-                )
+                ) {
                     outRect.bottom = smallSpacing
-                else if (position < adapter.itemCount - 1 &&
+                } else if (position < adapter.itemCount - 1 &&
                     adapter.getItemViewType(position + 1) == StreamsRecyclerAdapter.STREAM
-                )
+                ) {
                     outRect.bottom = bigSpacing
+                }
             }
         }
     }

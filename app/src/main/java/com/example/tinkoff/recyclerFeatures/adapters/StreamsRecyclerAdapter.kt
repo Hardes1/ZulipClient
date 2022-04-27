@@ -106,10 +106,11 @@ class StreamsRecyclerAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (list[position] is StreamHeader)
+        return if (list[position] is StreamHeader) {
             STREAM
-        else
+        } else {
             TOPIC
+        }
     }
 
     fun updateList(otherList: List<StreamsInterface>) {

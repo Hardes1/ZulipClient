@@ -61,9 +61,15 @@ class StreamTabsFragment : Fragment() {
     private fun initializeTabLayout() {
         TabLayoutMediator(binding.tabLayout, binding.viewPager2) { tab, position ->
             tab.text = when (position) {
-                SUBSCRIBED -> getString(R.string.subscribed_header)
-                ALL_STREAMS -> getString(R.string.all_streams_header)
-                else -> throw NotImplementedError(getString(R.string.error_tab_layout))
+                SUBSCRIBED -> {
+                    getString(R.string.subscribed_header)
+                }
+                ALL_STREAMS -> {
+                    getString(R.string.all_streams_header)
+                }
+                else -> {
+                    throw NotImplementedError(getString(R.string.error_tab_layout))
+                }
             }
         }.attach()
     }

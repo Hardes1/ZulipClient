@@ -27,15 +27,22 @@ import com.example.tinkoff.recyclerFeatures.decorations.MessageItemDecoration
 import com.example.tinkoff.ui.activities.ReactionsViewModel
 import com.example.tinkoff.ui.fragments.bottomSheet.BottomSheetFragment
 
-class MessageFragment : Fragment() {
+class MessagesFragment : Fragment() {
 
     private var _binding: FragmentMessageBinding? = null
     private val binding: FragmentMessageBinding
         get() = _binding!!
-    private val args: MessageFragmentArgs by navArgs()
-    private val messagesViewModel: MessagesViewModel by viewModels()
+    private val args: MessagesFragmentArgs by navArgs()
+    private val messagesViewModel: MessagesViewModel by viewModels() {
+        MessagesViewModelFactory(
+            args.appBarHeader,
+            args.topicHeader
+        )
+    }
     private val reactionsViewModel: ReactionsViewModel by activityViewModels()
     private lateinit var adapter: MessageRecyclerAdapter
+    private lateinit var toastSendingMessageError: Toast
+    private lateinit var toastUpdatingReactionError: Toast
     private val bottomSheetDialog = BottomSheetFragment.newInstance()
     private var searchItem: MenuItem? = null
     private var refreshItem: MenuItem? = null
@@ -64,6 +71,18 @@ class MessageFragment : Fragment() {
         require(activity is AppCompatActivity)
         (activity as AppCompatActivity).supportActionBar?.title =
             resources.getString(R.string.stream_header, args.appBarHeader)
+        toastSendingMessageError =
+            Toast.makeText(
+                requireContext(),
+                R.string.error_message_sending,
+                Toast.LENGTH_SHORT
+            )
+        toastUpdatingReactionError =
+            Toast.makeText(
+                requireContext(),
+                R.string.error_reaction_updating,
+                Toast.LENGTH_SHORT
+            )
         setChangeTextListener()
         setButtonSendClickListener()
         initializeRecyclerView()
@@ -115,14 +134,14 @@ class MessageFragment : Fragment() {
         }
     }
 
-    private fun updateElementCallBack(id: Int, reactionPosition: Int, isAdd: Boolean) {
+    private fun updateElementCallBack(id: Int, reactionPosition: Int, isAdd: Boolean, emoji : View) {
         messagesViewModel.setMessageId(id)
-        messagesViewModel.reactionClickedCallBack(reactionPosition, isAdd)
+        messagesViewModel.updateReactionByClick(reactionPosition, isAdd, emoji)
     }
 
     private fun initializeReactionsViewModelLiveData() {
         reactionsViewModel.reactionIndex.observe(viewLifecycleOwner) { reactionIndexValue ->
-            messagesViewModel.tryAddReaction(reactionIndexValue)
+            messagesViewModel.updateReactionByBottomSheet(reactionIndexValue)
         }
     }
 
@@ -135,17 +154,21 @@ class MessageFragment : Fragment() {
         messagesViewModel.messageState.observe(viewLifecycleOwner) {
             when (it) {
                 MessageState.FAILED -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Error sending message to server",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    messagesViewModel.initializeDisplaySubject()
+                    binding.sendButton.background = ContextCompat.getDrawable(
+                        requireContext(), R.drawable.ic_send
+                    )
+                    binding.sendButton.isEnabled = true
+                    toastSendingMessageError.cancel()
+                    toastSendingMessageError.show()
                 }
                 MessageState.SUCCESSFUL -> {
                     binding.messageContentTextView.text = SpannableStringBuilder("")
                 }
                 MessageState.SENDING -> {
+                    binding.sendButton.background = ContextCompat.getDrawable(
+                        requireContext(), R.drawable.progress_image
+                    )
+                    binding.sendButton.isEnabled = false
                 }
                 else -> throw NotImplementedError()
             }
@@ -177,6 +200,24 @@ class MessageFragment : Fragment() {
                     ).show()
                 }
                 else -> throw NotImplementedError()
+            }
+        }
+        messagesViewModel.updatingReactionState.observe(viewLifecycleOwner) {
+            when (it) {
+                LoadingData.LOADING -> {
+                    binding.progressBarIndicator.visibility = View.VISIBLE
+                }
+                LoadingData.FINISHED -> {
+                    binding.progressBarIndicator.visibility = View.INVISIBLE
+                }
+                LoadingData.ERROR -> {
+                    toastUpdatingReactionError.cancel()
+                    toastUpdatingReactionError.show()
+                    binding.progressBarIndicator.visibility = View.INVISIBLE
+                }
+                else -> {
+                    throw NotImplementedError()
+                }
             }
         }
     }
@@ -231,10 +272,10 @@ class MessageFragment : Fragment() {
         })
         refreshItem = menu.findItem(R.id.action_refresh)
         refreshItem?.setOnMenuItemClickListener {
-            messagesViewModel.refreshMessages(requireContext())
+            messagesViewModel.refreshMessages()
             true
         }
-        messagesViewModel.refreshMessages(requireContext())
+        messagesViewModel.refreshMessages()
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -245,6 +286,5 @@ class MessageFragment : Fragment() {
 
     companion object {
         private const val FRAGMENT_TAG = "TAG"
-        const val MY_ID = 1
     }
 }

@@ -1,12 +1,11 @@
 package com.example.tinkoff.ui.fragments.people
 
-import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.tinkoff.R
 import com.example.tinkoff.data.classes.User
 import com.example.tinkoff.data.states.LoadingData
-import com.example.tinkoff.network.Repository
+import com.example.tinkoff.network.client.Client
+import com.example.tinkoff.network.client.Repository
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers.mainThread
 import io.reactivex.disposables.CompositeDisposable
@@ -25,19 +24,34 @@ class PeopleViewModel : ViewModel() {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private val subject: PublishSubject<String> = PublishSubject.create()
 
-    fun refreshPeopleData(context: Context) {
+    fun refreshPeopleData() {
         if (isDownloaded.value == false) {
             compositeDisposable.clear()
             state.value = LoadingData.LOADING
-            Repository.tryGenerateUsersData().subscribeOn(Schedulers.computation())
-                .delay(DELAY_TIME, TimeUnit.MILLISECONDS).observeOn(mainThread())
+            Repository.getAllUsers().subscribeOn(Schedulers.io())
+                .flatMap { data ->
+                    data.users.filter { !it.isBot && it.id != Repository.MY_ID }.map { user ->
+                        Client.usersService.getUserOnlineStatus(user.id).map {
+                            User(
+                                user.id,
+                                user.name,
+                                user.email,
+                                it.presence.aggregated.status,
+                                user.avatarUrl,
+                                user.isBot
+                            )
+                        }
+                    }.zipSingles()
+                }
+                .observeOn(mainThread())
                 .subscribeBy(
                     onSuccess = { users ->
                         actualUsersList = users
-                        initializeDisplaySubject(context)
+                        initializeDisplaySubject()
                         isDownloaded.value = true
                     },
-                    onError = {
+                    onError = { e ->
+                        Timber.e(e, "Error during refreshing people")
                         state.value = LoadingData.ERROR
                     }
                 ).addTo(compositeDisposable)
@@ -65,7 +79,7 @@ class PeopleViewModel : ViewModel() {
             })
     }
 
-    private fun initializeDisplaySubject(context: Context) {
+    private fun initializeDisplaySubject() {
         subject.apply {
             observeOn(Schedulers.computation()).map {
                 it.trim()
@@ -76,15 +90,22 @@ class PeopleViewModel : ViewModel() {
                     onNext = {
                         displayedUsersList.value = it
                     },
-                    onError = {
-                        Timber.d(context.getString(R.string.error_people_loading))
+                    onError = { e ->
+                        Timber.e(e, "Error during initialize display subject")
                     },
                 ).addTo(compositeDisposable)
         }
     }
 
     companion object {
-        private const val DELAY_TIME: Long = 2500
         private const val DEBOUNCE_TIME: Long = 500
+    }
+}
+
+fun <T> List<Single<T>>.zipSingles(): Single<List<T>> {
+    if (this.isEmpty()) return Single.just(emptyList())
+    return Single.zip(this) {
+        @Suppress("UNCHECKED_CAST")
+        return@zip (it as Array<T>).toList()
     }
 }

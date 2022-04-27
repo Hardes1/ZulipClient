@@ -1,3 +1,15 @@
 package com.example.tinkoff.data.classes
 
-data class TopicHeader(val id: Int, val streamId: Int, val name: String) : StreamsInterface
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+
+@Serializable
+data class TopicHeader(
+    @SerialName("max_id")
+    val id: Int,
+    @Transient
+    val streamId: Int = -1,
+    @SerialName("name")
+    val name: String
+) : StreamsInterface

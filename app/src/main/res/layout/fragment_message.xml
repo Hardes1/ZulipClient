@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_bg_black"
-    tools:context=".ui.fragments.messages.MessageFragment">
+    tools:context=".ui.fragments.messages.MessagesFragment">
 
 
     <com.google.android.material.textview.MaterialTextView
@@ -70,8 +70,8 @@
 
         <ImageButton
             android:id="@+id/send_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginTop="@dimen/send_button_margin_vertical"
             android:layout_marginEnd="@dimen/send_button_margin_end"
             android:layout_marginBottom="@dimen/send_button_margin_vertical"
@@ -90,7 +90,7 @@
         android:layout_height="@dimen/progress_bar_indicator_height"
         android:indeterminate="true"
         android:visibility="invisible"
-        app:indicatorColor="@color/topic_color"
+        app:indicatorColor="@color/green_online_status_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
