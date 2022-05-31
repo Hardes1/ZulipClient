@@ -10,7 +10,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/bottom_sheet_layout_height"
     android:background="@drawable/bottom_sheet"
-    tools:context=".ui.fragments.bottomSheet.BottomSheetFragment">
+    tools:context=".presentation.fragments.bottomSheet.BottomSheetFragment">
 
     <ImageView
         android:id = "@+id/plank"

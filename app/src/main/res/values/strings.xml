@@ -27,7 +27,7 @@
     <string name="debug_view_recreated">View recreated.</string>
     <string name="error_streams_loading">Error happened during loading streams. Try again.</string>
     <string name="error_people_loading">Error happened during loading contacts. Try again.</string>
-    <string name="error_messages_loading">Error happened during loading topics messages. Try again.</string>
+    <string name="error_messages_loading">Error happened during loading topic messages. Try again.</string>
     <string name="error_message_sending">Error happened during sending message. Try again.</string>
     <string name="error_profile_loading">Error during loading user profile. Try again.</string>
     <string name="error_reaction_updating">Error during updating a reaction. Try again.</string>

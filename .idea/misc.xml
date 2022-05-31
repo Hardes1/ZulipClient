@@ -33,6 +33,7 @@
         <entry key="app/src/main/res/layout/fragment_stream.xml" value="0.2517094017094017" />
         <entry key="app/src/main/res/layout/fragment_streams.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_streams_tabs.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/message_other_item.xml" value="0.2517094017094017" />
         <entry key="app/src/main/res/layout/people_recycler_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/people_shimmer_item.xml" value="0.12182971014492754" />
         <entry key="app/src/main/res/layout/people_shimmer_layout.xml" value="0.2572463768115942" />

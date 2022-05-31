@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:inAnimation="@anim/view_switcher_in_animation"
     android:outAnimation="@anim/view_switcher_out_animation"
-    tools:context=".ui.fragments.people.PeopleFragment">
+    tools:context=".presentation.fragments.people.PeopleFragment">
 
 
     <com.facebook.shimmer.ShimmerFrameLayout
