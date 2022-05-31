@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:inAnimation="@anim/view_switcher_in_animation"
     android:outAnimation="@anim/view_switcher_out_animation"
-    tools:context=".ui.fragments.stream.StreamFragment">
+    tools:context=".presentation.fragments.stream.StreamFragment">
 
 
     <com.facebook.shimmer.ShimmerFrameLayout

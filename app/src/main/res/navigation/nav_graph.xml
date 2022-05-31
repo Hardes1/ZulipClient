@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/navigation_people"
-        android:name="com.example.tinkoff.ui.fragments.people.PeopleFragment"
+        android:name="com.example.tinkoff.presentation.fragments.people.PeopleFragment"
         android:label="@string/people_fragment_name"
         tools:layout="@layout/fragment_people">
         <action
@@ -16,12 +16,12 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_profile"
-        android:name="com.example.tinkoff.ui.fragments.profile.ProfileFragment"
+        android:name="com.example.tinkoff.presentation.fragments.profile.ProfileFragment"
         android:label=" "
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/navigation_stream_tabs"
-        android:name="com.example.tinkoff.ui.fragments.streamTabs.StreamTabsFragment"
+        android:name="com.example.tinkoff.presentation.fragments.streamTabs.StreamTabsFragment"
         android:label="@string/streams_fragment_name">
         <action
             android:id="@+id/action_navigation_stream_tabs_to_messageFragment"
@@ -29,17 +29,17 @@
     </fragment>
     <fragment
         android:id="@+id/navigation_other_profile"
-        android:name="com.example.tinkoff.ui.fragments.profile.ProfileFragment"
+        android:name="com.example.tinkoff.presentation.fragments.profile.ProfileFragment"
         android:label="@string/profile_fragment_name"
         tools:layout="@layout/fragment_profile">
     </fragment>
     <fragment
         android:id="@+id/navigation_message"
-        android:name="com.example.tinkoff.ui.fragments.messages.MessagesFragment"
+        android:name="com.example.tinkoff.presentation.fragments.messages.MessagesFragment"
         android:label="fragment_message"
         tools:layout="@layout/fragment_message" >
         <argument
-            android:name="appBarHeader"
+            android:name="streamHeader"
             app:argType="string"
             android:defaultValue=" " />
         <argument
