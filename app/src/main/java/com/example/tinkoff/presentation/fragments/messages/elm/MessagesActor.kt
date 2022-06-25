@@ -1,9 +1,7 @@
 package com.example.tinkoff.presentation.fragments.messages.elm
 
 import com.example.tinkoff.model.repositories.MessagesRepository
-import com.example.tinkoff.model.repositoriesImplementation.MessagesRepositoryImpl
 import com.example.tinkoff.model.states.DataSource
-import com.example.tinkoff.model.storagesImplementation.MessagesStorageImpl
 import com.example.tinkoff.presentation.classes.MessageContent
 import com.example.tinkoff.presentation.classes.ReactionsData
 import io.reactivex.Observable
@@ -12,12 +10,10 @@ import vivid.money.elmslie.core.Actor
 import vivid.money.elmslie.core.switcher.Switcher
 import vivid.money.elmslie.core.switcher.observable
 
-class MessagesActor : Actor<MessagesCommand, MessagesEvent> {
-    private val filterSwitcher = Switcher()
-    private val repository: MessagesRepository by lazy {
-        MessagesRepositoryImpl(MessagesStorageImpl())
-    }
-
+class MessagesActor(
+    private val filterSwitcher: Switcher,
+    private val repository: MessagesRepository
+) : Actor<MessagesCommand, MessagesEvent> {
     override fun execute(command: MessagesCommand): Observable<MessagesEvent> {
         return when (command) {
             is MessagesCommand.FilterMessages -> {

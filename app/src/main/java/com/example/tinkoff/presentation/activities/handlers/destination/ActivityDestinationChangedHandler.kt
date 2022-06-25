@@ -2,6 +2,6 @@ package com.example.tinkoff.presentation.activities.handlers.destination
 
 import androidx.navigation.NavDestination
 
-interface DestinationChangedHandlerInterface {
+interface ActivityDestinationChangedHandler {
     fun handleState(destination: NavDestination)
 }

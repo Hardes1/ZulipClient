@@ -1,7 +1,6 @@
 package com.example.tinkoff.presentation.recyclerFeatures.adapters
 
 import android.content.Context
-import android.os.Message
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,7 @@ import com.example.tinkoff.R
 import com.example.tinkoff.databinding.DateItemBinding
 import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
-import com.example.tinkoff.model.network.repositories.ApiRepository.Companion.MY_ID
+import com.example.tinkoff.model.network.repositories.RepositoryInformation.MY_ID
 import com.example.tinkoff.model.states.SenderType
 import com.example.tinkoff.presentation.classes.MessageContent
 import com.example.tinkoff.presentation.classes.MessageContentInterface
@@ -23,12 +22,6 @@ import com.example.tinkoff.presentation.recyclerFeatures.diffUtils.MessagesDiffU
 import com.example.tinkoff.presentation.views.FlexBoxLayout
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
-import io.reactivex.Scheduler
-import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 
 class MessageRecyclerAdapter(
     private val onSelectedPositionChanged: (messageId: Int) -> Unit,

@@ -1,19 +1,18 @@
 package com.example.tinkoff.presentation.fragments.people.elm
 
 import com.example.tinkoff.model.repositories.UsersRepository
-import com.example.tinkoff.model.repositoriesImplementation.UsersRepositoryImpl
 import com.example.tinkoff.model.states.DataSource
 import io.reactivex.Observable
 import vivid.money.elmslie.core.Actor
 import vivid.money.elmslie.core.switcher.Switcher
 import vivid.money.elmslie.core.switcher.observable
+import javax.inject.Inject
 
-class UsersActor : Actor<UsersCommand, UsersEvent.Internal> {
-    private val filterSwitcher = Switcher()
-    private val dataSwitcher = Switcher()
-    private val repository: UsersRepository by lazy {
-        UsersRepositoryImpl
-    }
+class UsersActor @Inject constructor(
+    private val repository: UsersRepository,
+    private val filterSwitcher: Switcher,
+    private val dataSwitcher: Switcher
+) : Actor<UsersCommand, UsersEvent.Internal> {
 
     override fun execute(command: UsersCommand): Observable<UsersEvent.Internal> {
         return when (command) {

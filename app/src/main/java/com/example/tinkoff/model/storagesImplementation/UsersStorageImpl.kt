@@ -4,8 +4,9 @@ import com.example.tinkoff.model.storages.UsersStorage
 import com.example.tinkoff.presentation.classes.User
 import io.reactivex.Completable
 import io.reactivex.Single
+import javax.inject.Inject
 
-class UsersStorageImpl : UsersStorage {
+class UsersStorageImpl @Inject constructor() : UsersStorage {
     override var usersList: List<User> = emptyList()
 
     override fun needToDownload(): Single<Boolean> {

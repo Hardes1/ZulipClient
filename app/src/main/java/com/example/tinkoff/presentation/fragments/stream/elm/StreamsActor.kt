@@ -1,19 +1,16 @@
 package com.example.tinkoff.presentation.fragments.stream.elm
 
 import com.example.tinkoff.model.repositories.StreamsRepository
-import com.example.tinkoff.model.repositoriesImplementation.StreamsRepositoryImpl
 import com.example.tinkoff.model.states.DataSource
-import com.example.tinkoff.model.storagesImplementation.StreamsStorageImpl
 import io.reactivex.Observable
 import vivid.money.elmslie.core.Actor
 import vivid.money.elmslie.core.switcher.Switcher
 import vivid.money.elmslie.core.switcher.observable
 
-class StreamsActor : Actor<StreamsCommand, StreamsEvent> {
-    private val filterSwitcher = Switcher()
-    private val repository: StreamsRepository by lazy {
-        StreamsRepositoryImpl(StreamsStorageImpl())
-    }
+class StreamsActor(
+    private val filterSwitcher: Switcher,
+    private val repository: StreamsRepository
+) : Actor<StreamsCommand, StreamsEvent> {
 
     override fun execute(command: StreamsCommand): Observable<StreamsEvent> {
         return when (command) {

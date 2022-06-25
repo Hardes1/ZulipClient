@@ -5,7 +5,10 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tinkoff.presentation.recyclerFeatures.adapters.MessageRecyclerAdapter
 
-class MessageItemDecoration(private val smallSpacing: Int, private val bigSpacing: Int) :
+class MessageItemDecoration(
+    private val smallSpacing: Int,
+    private val bigSpacing: Int
+) :
     RecyclerView.ItemDecoration() {
     override fun getItemOffsets(
         outRect: Rect,

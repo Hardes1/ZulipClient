@@ -23,6 +23,7 @@
         <entry key="app/src/main/res/drawable/stream_header_selector.xml" value="0.18" />
         <entry key="app/src/main/res/drawable/stream_item_decoration.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/streams_selector.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/topic_item_decoration.xml" value="0.28" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.15" />
         <entry key="app/src/main/res/layout/activity_second.xml" value="0.15" />
         <entry key="app/src/main/res/layout/blank_fragment.xml" value="0.1585144927536232" />

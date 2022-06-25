@@ -1,21 +1,16 @@
 package com.example.tinkoff.model.storagesImplementation
 
 import android.icu.text.SimpleDateFormat
-import com.example.tinkoff.model.network.repositories.ApiRepository
-import com.example.tinkoff.model.states.SenderType
 import com.example.tinkoff.model.storages.MessagesStorage
 import com.example.tinkoff.presentation.classes.MessageContent
 import com.example.tinkoff.presentation.classes.MessageContentInterface
 import com.example.tinkoff.presentation.classes.MessageDate
-import com.example.tinkoff.presentation.classes.Reaction
-import com.example.tinkoff.presentation.classes.ReactionsData
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.internal.operators.completable.CompletableFromAction
-import timber.log.Timber
 import java.sql.Date
+import javax.inject.Inject
 
-class MessagesStorageImpl : MessagesStorage {
+class MessagesStorageImpl @Inject constructor() : MessagesStorage {
     override var messagesList: List<MessageContent> = emptyList()
     override var filterString: String = ""
     override var messageId: Int = -1
@@ -106,7 +101,7 @@ class MessagesStorageImpl : MessagesStorage {
     }
 
     companion object {
-        private const val MILLISECONDS_MULTIPLIER : Long = 1000
+        private const val MILLISECONDS_MULTIPLIER: Long = 1000
         private const val DATE_PATTERN = "d MMM yyyy"
         private const val YEAR_SPACE = 5
     }

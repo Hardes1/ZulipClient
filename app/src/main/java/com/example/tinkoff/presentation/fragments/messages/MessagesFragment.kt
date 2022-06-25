@@ -1,5 +1,6 @@
 package com.example.tinkoff.presentation.fragments.messages
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -18,9 +19,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tinkoff.R
 import com.example.tinkoff.databinding.FragmentMessageBinding
 import com.example.tinkoff.model.states.LoadingData
+import com.example.tinkoff.presentation.activities.MainActivity
 import com.example.tinkoff.presentation.activities.ReactionsViewModel
 import com.example.tinkoff.presentation.classes.MessageContent
 import com.example.tinkoff.presentation.fragments.bottomSheet.BottomSheetFragment
+import com.example.tinkoff.presentation.fragments.messages.di.DaggerMessagesComponent
 import com.example.tinkoff.presentation.fragments.messages.elm.MessagesEffect
 import com.example.tinkoff.presentation.fragments.messages.elm.MessagesEvent
 import com.example.tinkoff.presentation.fragments.messages.elm.MessagesState
@@ -28,9 +31,9 @@ import com.example.tinkoff.presentation.fragments.messages.elm.MessagesStoreFact
 import com.example.tinkoff.presentation.recyclerFeatures.adapters.MessageRecyclerAdapter
 import com.example.tinkoff.presentation.recyclerFeatures.decorations.MessageItemDecoration
 import com.example.tinkoff.presentation.recyclerFeatures.listeners.MessageScrollListener
-import timber.log.Timber
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
+import javax.inject.Inject
 
 class MessagesFragment : ElmFragment<MessagesEvent, MessagesEffect, MessagesState>() {
     private var _binding: FragmentMessageBinding? = null
@@ -45,15 +48,30 @@ class MessagesFragment : ElmFragment<MessagesEvent, MessagesEffect, MessagesStat
     private val bottomSheetDialog = BottomSheetFragment.newInstance()
     private var searchItem: MenuItem? = null
     private var refreshItem: MenuItem? = null
+
+    private lateinit var layoutManager: LinearLayoutManager
+    private val scrollListener: MessageScrollListener by lazy {
+        MessageScrollListener(layoutManager, adapter, ::getNewMessages)
+    }
+
     private val decorator: MessageItemDecoration by lazy {
         MessageItemDecoration(
             resources.getDimensionPixelSize(R.dimen.message_content_small_recycler_distance),
             resources.getDimensionPixelSize(R.dimen.message_content_big_recycler_distance)
         )
     }
-    private lateinit var layoutManager: LinearLayoutManager
-    private val scrollListener: MessageScrollListener by lazy {
-        MessageScrollListener(layoutManager, adapter, ::getNewMessages)
+
+    @Inject
+    lateinit var factory: MessagesStoreFactory
+
+    override fun onAttach(context: Context) {
+        DaggerMessagesComponent.factory()
+            .create(
+                (requireActivity() as MainActivity)
+                    .getMainActivityComponent()
+            )
+            .inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -193,7 +211,7 @@ class MessagesFragment : ElmFragment<MessagesEvent, MessagesEffect, MessagesStat
     }
 
     override fun createStore(): Store<MessagesEvent, MessagesEffect, MessagesState> {
-        return MessagesStoreFactory().provide()
+        return factory.provide()
     }
 
     override val initEvent: MessagesEvent

@@ -1,6 +1,5 @@
 package com.example.tinkoff.model.repositories
 
-import com.example.tinkoff.model.network.api.MessagesListJson
 import com.example.tinkoff.model.states.DataSource
 import com.example.tinkoff.model.storages.UpdateElement
 import com.example.tinkoff.presentation.classes.MessageContentInterface

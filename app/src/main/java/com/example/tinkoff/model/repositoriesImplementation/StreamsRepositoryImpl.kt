@@ -1,7 +1,9 @@
 package com.example.tinkoff.model.repositoriesImplementation
 
+import com.example.tinkoff.model.network.repositories.StreamsApiRepository
 import com.example.tinkoff.model.network.repositories.zipSingles
 import com.example.tinkoff.model.repositories.StreamsRepository
+import com.example.tinkoff.model.room.repositories.StreamsRoomRepository
 import com.example.tinkoff.model.states.DataSource
 import com.example.tinkoff.model.states.StreamType
 import com.example.tinkoff.model.storages.StreamsStorage
@@ -11,9 +13,17 @@ import com.example.tinkoff.presentation.classes.StreamsInterface
 import com.example.tinkoff.presentation.classes.TopicHeader
 import io.reactivex.Completable
 import io.reactivex.Single
-import timber.log.Timber
+import javax.inject.Inject
 
-class StreamsRepositoryImpl(private val storage: StreamsStorage) : StreamsRepository {
+class StreamsRepositoryImpl @Inject constructor() : StreamsRepository {
+    @Inject
+    lateinit var api: StreamsApiRepository
+
+    @Inject
+    lateinit var room: StreamsRoomRepository
+
+    @Inject
+    lateinit var storage: StreamsStorage
     override fun selectStreamsById(id: Int, isSelected: Boolean): Single<List<StreamsInterface>> {
         return storage.selectStreamById(id, isSelected)
             .andThen(
@@ -32,14 +42,15 @@ class StreamsRepositoryImpl(private val storage: StreamsStorage) : StreamsReposi
     private fun getStreamsFromInternet(type: StreamType): Single<List<StreamsInterface>> {
         return (
             if (type == StreamType.SUBSCRIBED) {
-                DataRepositoriesImpl.api.getSubscribedStreams()
+                api.getSubscribedStreams()
             } else {
-                DataRepositoriesImpl.api.getAllStreams()
-            })
+                api.getAllStreams()
+            }
+            )
             .flatMap {
                 val allStreamsList = it.streams
                 val result = allStreamsList.map { header ->
-                    DataRepositoriesImpl.api.getTopicsOfTheStream(header.id)
+                    api.getTopicsOfTheStream(header.id)
                 }
                     .zipSingles().flatMap { topics ->
                         Single.just(
@@ -77,7 +88,7 @@ class StreamsRepositoryImpl(private val storage: StreamsStorage) : StreamsReposi
                 storage.setShouldLoadFromInternet(false)
             )
             .andThen(
-                updateStreams(type)
+                updateTopicsAndStreamsInDatabase(type)
             )
             .andThen(
                 storage.getCurrentStreams()
@@ -92,7 +103,6 @@ class StreamsRepositoryImpl(private val storage: StreamsStorage) : StreamsReposi
                 storage.getCurrentStreams()
             }
         }
-
     }
 
     private fun getStreamsFromDataBase(type: StreamType): Single<List<StreamsInterface>> {
@@ -115,7 +125,6 @@ class StreamsRepositoryImpl(private val storage: StreamsStorage) : StreamsReposi
             )
     }
 
-
     override fun getFilteredStreams(filter: String): Single<List<StreamsInterface>> {
         return storage.setFilter(filter)
             .andThen(storage.getCurrentStreams())
@@ -125,13 +134,13 @@ class StreamsRepositoryImpl(private val storage: StreamsStorage) : StreamsReposi
         val types = mutableListOf(currentType)
         if (currentType == StreamType.ALL_STREAMS)
             types.add(StreamType.SUBSCRIBED)
-        return DataRepositoriesImpl.room.getStreamsByType(
+        return room.getStreamsByType(
             types
         )
     }
 
     private fun getTopicsByStream(ids: List<Int>): Single<List<TopicHeader>> {
-        return DataRepositoriesImpl.room.getTopicsByStreamId(ids)
+        return room.getTopicsByStreamId(ids)
     }
 
     private fun updateTopicsAndStreamsInDatabase(type: StreamType): Completable {
@@ -159,28 +168,27 @@ class StreamsRepositoryImpl(private val storage: StreamsStorage) : StreamsReposi
 
     private fun updateStreams(streamType: StreamType): Completable {
         return storage.getAllStreamsId().flatMapCompletable { streams ->
-            DataRepositoriesImpl.room.updateStreamsByTypeAndIndex(
+            room.updateStreamsByTypeAndIndex(
                 streamType,
                 streams
             )
         }
-
     }
 
     private fun insertStreams(type: StreamType): Completable {
         return storage.getAllStreamsRoom(type).flatMapCompletable { streams ->
-            DataRepositoriesImpl.room.insertStreams(streams)
+            room.insertStreams(streams)
         }
     }
 
     private fun insertTopics(): Completable {
         return storage.getAllTopicsRoom().flatMapCompletable { topics ->
-            DataRepositoriesImpl.room.insertTopics(topics)
+            room.insertTopics(topics)
         }
     }
 
     private fun deleteStreams(type: StreamType): Completable {
-        return DataRepositoriesImpl.room.deleteStreamsByType(type)
+        return room.deleteStreamsByType(type)
     }
 
     override fun getStreamsFromSource(

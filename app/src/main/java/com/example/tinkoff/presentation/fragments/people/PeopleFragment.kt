@@ -1,5 +1,6 @@
 package com.example.tinkoff.presentation.fragments.people
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -13,7 +14,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.tinkoff.R
 import com.example.tinkoff.databinding.FragmentPeopleBinding
 import com.example.tinkoff.model.states.LoadingData
+import com.example.tinkoff.presentation.activities.MainActivity
 import com.example.tinkoff.presentation.classes.User
+import com.example.tinkoff.presentation.fragments.people.di.DaggerUsersComponent
 import com.example.tinkoff.presentation.fragments.people.elm.UsersEffect
 import com.example.tinkoff.presentation.fragments.people.elm.UsersEvent
 import com.example.tinkoff.presentation.fragments.people.elm.UsersState
@@ -24,6 +27,7 @@ import com.example.tinkoff.presentation.recyclerFeatures.decorations.UserItemDec
 import timber.log.Timber
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
+import javax.inject.Inject
 
 class PeopleFragment : ElmFragment<UsersEvent, UsersEffect, UsersState>() {
     private var _binding: FragmentPeopleBinding? = null
@@ -36,6 +40,16 @@ class PeopleFragment : ElmFragment<UsersEvent, UsersEffect, UsersState>() {
     private var state: UsersState = UsersState()
     private lateinit var peopleLoadingErrorToast: Toast
 
+    private val itemDecoration: UserItemDecoration by lazy {
+        UserItemDecoration(
+            resources.getDimensionPixelSize(R.dimen.people_small_spacing_recycler_view),
+            resources.getDimensionPixelSize(R.dimen.people_big_spacing_recycler_view)
+        )
+    }
+
+    @Inject
+    lateinit var factory: UsersStoreFactory
+
     private fun userClickCallBack(user: User) {
         val action =
             PeopleFragmentDirections.actionNavigationPeopleToNavigationOtherProfile().apply {
@@ -47,6 +61,16 @@ class PeopleFragment : ElmFragment<UsersEvent, UsersEffect, UsersState>() {
         findNavController().navigate(
             action
         )
+    }
+
+    override fun onAttach(context: Context) {
+        DaggerUsersComponent.factory()
+            .create(
+                (requireActivity() as MainActivity)
+                    .getMainActivityComponent()
+            )
+            .inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,10 +133,7 @@ class PeopleFragment : ElmFragment<UsersEvent, UsersEffect, UsersState>() {
 
     private fun initializeRecyclerView() {
         binding.peopleRecyclerView.addItemDecoration(
-            UserItemDecoration(
-                resources.getDimensionPixelSize(R.dimen.people_small_spacing_recycler_view),
-                resources.getDimensionPixelSize(R.dimen.people_big_spacing_recycler_view)
-            )
+            itemDecoration
         )
         binding.peopleRecyclerView.adapter = adapter
     }
@@ -121,7 +142,7 @@ class PeopleFragment : ElmFragment<UsersEvent, UsersEffect, UsersState>() {
         get() = UsersEvent.UI.InitUsers
 
     override fun createStore(): Store<UsersEvent, UsersEffect, UsersState> {
-        return UsersStoreFactory().provide()
+        return factory.provide()
     }
 
     override fun render(state: UsersState) {
