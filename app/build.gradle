@@ -66,10 +66,10 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"
-
-
     implementation "com.github.vivid-money.elmslie:elmslie-core:$elmsilie"
     implementation "com.github.vivid-money.elmslie:elmslie-android:$elmsilie"
     implementation "com.github.vivid-money.elmslie:elmslie-rxjava-2:$elmsilie"
-
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+    implementation "com.google.dagger:dagger:$dagger_version"
+    kapt "com.google.dagger:dagger-android-processor:$dagger_version"
 }

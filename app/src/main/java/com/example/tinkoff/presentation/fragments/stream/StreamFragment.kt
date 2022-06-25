@@ -1,5 +1,6 @@
 package com.example.tinkoff.presentation.fragments.stream
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -15,6 +16,8 @@ import com.example.tinkoff.R
 import com.example.tinkoff.databinding.FragmentStreamBinding
 import com.example.tinkoff.model.states.LoadingData
 import com.example.tinkoff.model.states.StreamType
+import com.example.tinkoff.presentation.activities.MainActivity
+import com.example.tinkoff.presentation.fragments.stream.di.DaggerStreamsComponent
 import com.example.tinkoff.presentation.fragments.stream.elm.StreamsEffect
 import com.example.tinkoff.presentation.fragments.stream.elm.StreamsEvent
 import com.example.tinkoff.presentation.fragments.stream.elm.StreamsState
@@ -25,6 +28,7 @@ import com.example.tinkoff.presentation.recyclerFeatures.decorations.StreamItemD
 import timber.log.Timber
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
+import javax.inject.Inject
 
 class StreamFragment : ElmFragment<StreamsEvent, StreamsEffect, StreamsState>() {
     private var _binding: FragmentStreamBinding? = null
@@ -33,6 +37,10 @@ class StreamFragment : ElmFragment<StreamsEvent, StreamsEffect, StreamsState>() 
     private var searchItem: MenuItem? = null
     private var refreshItem: MenuItem? = null
     private lateinit var streamLoadingErrorToast: Toast
+
+    @Inject
+    lateinit var factory: StreamsStoreFactory
+
     private val streamType: StreamType by lazy {
         StreamType.values()[
             requireArguments().getInt(
@@ -60,6 +68,16 @@ class StreamFragment : ElmFragment<StreamsEvent, StreamsEffect, StreamsState>() 
             ::changeStateCallBack,
             ::navigateToMessageFragmentCallBack,
         )
+    }
+
+    override fun onAttach(context: Context) {
+        DaggerStreamsComponent.factory()
+            .create(
+                (requireActivity() as MainActivity)
+                    .getMainActivityComponent()
+            )
+            .inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -156,7 +174,7 @@ class StreamFragment : ElmFragment<StreamsEvent, StreamsEffect, StreamsState>() 
     }
 
     override fun createStore(): Store<StreamsEvent, StreamsEffect, StreamsState> {
-        return StreamsStoreFactory().provide()
+        return factory.provide()
     }
 
     override fun handleEffect(effect: StreamsEffect) {

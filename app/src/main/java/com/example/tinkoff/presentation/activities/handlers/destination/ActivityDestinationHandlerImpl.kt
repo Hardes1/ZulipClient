@@ -10,12 +10,12 @@ import androidx.navigation.NavDestination
 import com.example.tinkoff.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class ActivityDestinationHandler(
+class ActivityDestinationHandlerImpl(
     private val navView: BottomNavigationView,
     private val context: Context,
     private val window: Window,
     private val supportActionBar: androidx.appcompat.app.ActionBar?
-) : DestinationChangedHandlerInterface {
+) : ActivityDestinationChangedHandler {
     override fun handleState(destination: NavDestination) {
         val messageInputMode: Int =
             WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE or

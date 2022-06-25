@@ -1,5 +1,6 @@
 package com.example.tinkoff.presentation.fragments.profile
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -15,7 +16,9 @@ import com.example.tinkoff.R
 import com.example.tinkoff.databinding.FragmentProfileBinding
 import com.example.tinkoff.model.states.LoadingData
 import com.example.tinkoff.model.states.UserStatus
+import com.example.tinkoff.presentation.activities.MainActivity
 import com.example.tinkoff.presentation.classes.User
+import com.example.tinkoff.presentation.fragments.profile.di.DaggerUserComponent
 import com.example.tinkoff.presentation.fragments.profile.elm.UserEffect
 import com.example.tinkoff.presentation.fragments.profile.elm.UserEvent
 import com.example.tinkoff.presentation.fragments.profile.elm.UserState
@@ -23,6 +26,7 @@ import com.example.tinkoff.presentation.fragments.profile.elm.UserStoreFactory
 import timber.log.Timber
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
+import javax.inject.Inject
 
 class ProfileFragment : ElmFragment<UserEvent, UserEffect, UserState>() {
 
@@ -31,6 +35,19 @@ class ProfileFragment : ElmFragment<UserEvent, UserEffect, UserState>() {
         get() = _binding!!
     private var refreshItem: MenuItem? = null
     private var refreshItemVisibility: Boolean = false
+
+    @Inject
+    lateinit var factory: UserStoreFactory
+
+    override fun onAttach(context: Context) {
+        DaggerUserComponent.factory()
+            .create(
+                (requireActivity() as MainActivity)
+                    .getMainActivityComponent()
+            )
+            .inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -118,8 +135,9 @@ class ProfileFragment : ElmFragment<UserEvent, UserEffect, UserState>() {
             return UserEvent.UI.InitUser(arguments?.getParcelable(USER_KEY))
         }
 
-    override fun createStore(): Store<UserEvent, UserEffect, UserState> =
-        UserStoreFactory().provide()
+    override fun createStore(): Store<UserEvent, UserEffect, UserState> {
+        return factory.provide()
+    }
 
     override fun render(state: UserState) {
         initializeUser(state.user)

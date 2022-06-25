@@ -54,6 +54,7 @@ ext {
     retrofitRxAdapter = "2.9.0"
     retrofitSerializationConverter = "0.8.0"
     elmsilie = "2.0.0"
+    dagger_version = "2.28.3"
 }
 
 task clean(type: Delete) {

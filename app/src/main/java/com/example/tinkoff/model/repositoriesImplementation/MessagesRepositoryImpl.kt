@@ -3,25 +3,33 @@ package com.example.tinkoff.model.repositoriesImplementation
 import com.example.tinkoff.model.network.api.MessagesListJson
 import com.example.tinkoff.model.network.api.QueryJson
 import com.example.tinkoff.model.network.api.ReactionJson
-import com.example.tinkoff.model.network.repositories.ApiRepository
+import com.example.tinkoff.model.network.repositories.MessagesApiRepository
+import com.example.tinkoff.model.network.repositories.RepositoryInformation
 import com.example.tinkoff.model.repositories.MessagesRepository
+import com.example.tinkoff.model.room.repositories.MessagesRoomRepository
 import com.example.tinkoff.model.states.DataSource
 import com.example.tinkoff.model.states.SenderType
 import com.example.tinkoff.model.storages.MessagesStorage
-import com.example.tinkoff.model.storagesImplementation.MessagesStorageImpl
 import com.example.tinkoff.presentation.classes.MessageContent
 import com.example.tinkoff.presentation.classes.MessageContentInterface
 import com.example.tinkoff.presentation.classes.Reaction
 import com.example.tinkoff.presentation.classes.ReactionFilter
 import com.example.tinkoff.presentation.classes.ReactionsData
-import com.example.tinkoff.presentation.fragments.messages.elm.MessagesEvent
 import io.reactivex.Completable
 import io.reactivex.Single
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import timber.log.Timber
+import javax.inject.Inject
 
-class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRepository {
+class MessagesRepositoryImpl @Inject constructor() : MessagesRepository {
+    @Inject
+    lateinit var api: MessagesApiRepository
+
+    @Inject
+    lateinit var room: MessagesRoomRepository
+
+    @Inject
+    lateinit var storage: MessagesStorage
     override fun setLastClickedMessageId(id: Int): Completable {
         return storage.setLastClickedMessageId(id)
     }
@@ -43,7 +51,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
         streamHeader: String,
         topicHeader: String
     ): Single<List<MessageContentInterface>> {
-        return DataRepositoriesImpl.room.getMessagesByStreamAndTopic(
+        return room.getMessagesByStreamAndTopic(
             streamHeader,
             topicHeader
         )
@@ -118,7 +126,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
         topicHeader: String,
         list: List<MessageContentInterface>
     ): Completable {
-        return DataRepositoriesImpl.room.insertMessages(
+        return room.insertMessages(
             list.filterIsInstance<MessageContent>(),
             streamHeader,
             topicHeader
@@ -129,7 +137,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
         streamHeader: String,
         topicHeader: String
     ): Completable {
-        return DataRepositoriesImpl.room.deleteMessagesByStreamAndTopic(
+        return room.deleteMessagesByStreamAndTopic(
             streamHeader,
             topicHeader
         )
@@ -145,7 +153,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
         val topicRequest = QueryJson(TOPICS_NAME, topicHeader)
         val preRequest = listOf(streamRequest, topicRequest)
         val json = Json.encodeToString(preRequest)
-        return DataRepositoriesImpl.api.getMessages(
+        return api.getMessages(
             sortingType,
             quantity,
             AFTER_MESSAGES,
@@ -189,7 +197,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
                 message.avatarUrl,
                 reactions,
                 when (message.senderId) {
-                    ApiRepository.MY_ID -> {
+                    RepositoryInformation.MY_ID -> {
                         SenderType.OWN
                     }
                     else -> {
@@ -219,7 +227,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
         topicHeader: String,
         message: String
     ): Single<List<MessageContentInterface>> {
-        return DataRepositoriesImpl.api.sendMessage(
+        return api.sendMessage(
             streamHeader,
             topicHeader,
             message
@@ -248,7 +256,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
                     reaction.emojiCode == ReactionsData.reactionsStringList[reactionIndexValue].second
                 }
             if (reactionPosition == -1 || currentReactions[reactionPosition].usersId.firstOrNull
-                { id -> id == ApiRepository.MY_ID } == null
+                { id -> id == RepositoryInformation.MY_ID } == null
             ) {
                 addReaction(
                     actualMessageId,
@@ -263,20 +271,21 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
                 )
             }.flatMap {
                 updateMessageReactionInDatabase(actualMessageId)
-                    .andThen(Single.fromCallable {
-                        it
-                    })
+                    .andThen(
+                        Single.fromCallable {
+                            it
+                        }
+                    )
             }
         }
     }
-
 
     private fun removeReaction(
         actualMessageId: Int,
         reactionIndexValue: Int,
         indexInMessages: Int,
     ): Single<List<MessageContentInterface>> {
-        return DataRepositoriesImpl.api.removeReaction(
+        return api.removeReaction(
             actualMessageId,
             ReactionsData.reactionsStringList[reactionIndexValue].first
         )
@@ -296,7 +305,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
         reactionIndexValue: Int,
         indexInMessages: Int,
     ): Single<List<MessageContentInterface>> {
-        return DataRepositoriesImpl.api.addReaction(
+        return api.addReaction(
             actualMessageId,
             ReactionsData.reactionsStringList[reactionIndexValue].first
         ).flatMapCompletable {
@@ -315,7 +324,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
         return storage.getAllMessagesList().flatMapCompletable { allMessagesList ->
             val reactions = allMessagesList.find { actualMessageId == it.id }?.reactions
             require(reactions != null)
-            DataRepositoriesImpl.room.updateMessageReactions(
+            room.updateMessageReactions(
                 actualMessageId,
                 reactions
             )
@@ -348,7 +357,6 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
             .andThen(
                 storage.getCurrentMessages()
             )
-
     }
 
     private fun addReactionToStorage(
@@ -366,7 +374,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
                 val actualReactions = currentReactions + Reaction(
                     ReactionsData.reactionsStringList[reactionIndexValue].first,
                     ReactionsData.reactionsStringList[reactionIndexValue].second,
-                    listOf(ApiRepository.MY_ID)
+                    listOf(RepositoryInformation.MY_ID)
                 )
                 messagesList =
                     messagesList.updated(
@@ -376,14 +384,14 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
                         )
                     )
             } else if (currentReactions[reactionPosition].usersId.firstOrNull
-                { id -> id == ApiRepository.MY_ID } == null
+                { id -> id == RepositoryInformation.MY_ID } == null
             ) {
                 val actualReactions = currentReactions.updated(
                     reactionPosition,
                     currentReactions[reactionPosition]
                         .copy(
                             usersId =
-                            currentReactions[reactionPosition].usersId + ApiRepository.MY_ID
+                            currentReactions[reactionPosition].usersId + RepositoryInformation.MY_ID
                         )
                 )
                 messagesList = messagesList.updated(
@@ -396,7 +404,6 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
             storage.updateList(messagesList)
         }
     }
-
 
     private fun removeReactionToStorage(
         reactionIndexValue: Int,
@@ -413,7 +420,7 @@ class MessagesRepositoryImpl(private val storage: MessagesStorage) : MessagesRep
                 }
             val currentReaction = currentReactions[reactionPosition]
             val reactionsWithoutMyId =
-                currentReaction.usersId.filter { it != ApiRepository.MY_ID }
+                currentReaction.usersId.filter { it != RepositoryInformation.MY_ID }
             val actualReactions = currentMessage.reactions.updated(
                 reactionPosition,
                 currentReaction.copy(usersId = reactionsWithoutMyId)

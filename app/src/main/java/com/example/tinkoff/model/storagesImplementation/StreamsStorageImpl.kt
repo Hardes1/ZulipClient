@@ -8,8 +8,9 @@ import com.example.tinkoff.presentation.classes.Stream
 import com.example.tinkoff.presentation.classes.StreamsInterface
 import io.reactivex.Completable
 import io.reactivex.Single
+import javax.inject.Inject
 
-class StreamsStorageImpl : StreamsStorage {
+class StreamsStorageImpl @Inject constructor() : StreamsStorage {
     override var streamsList: List<Stream> = emptyList()
     override var needToLoad: Boolean = true
     override var filteredString: String = ""
@@ -99,7 +100,6 @@ class StreamsStorageImpl : StreamsStorage {
             streamsList.isEmpty()
         }
     }
-
 
     override fun selectStreamById(id: Int, isSelected: Boolean): Completable {
         return Completable.fromAction {

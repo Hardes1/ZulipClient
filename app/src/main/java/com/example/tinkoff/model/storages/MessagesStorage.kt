@@ -11,10 +11,10 @@ interface MessagesStorage : UpdateElement {
     var messageId: Int
     fun isCacheEmpty(): Single<Boolean>
     fun prepareMessagesForDisplay(list: List<MessageContent>): Single<List<MessageContentInterface>>
-    fun setFilter(filter: String) : Completable
+    fun setFilter(filter: String): Completable
     fun convertDateToString(timestamp: Long): String
-    fun updateList(list: List<MessageContent>) : Completable
+    fun updateList(list: List<MessageContent>): Completable
     fun getCurrentMessages(): Single<List<MessageContentInterface>>
     fun getAllMessagesList(): Single<List<MessageContent>>
-    fun setLastClickedMessageId(id: Int) : Completable
+    fun setLastClickedMessageId(id: Int): Completable
 }

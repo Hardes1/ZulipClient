@@ -1,16 +1,19 @@
 package com.example.tinkoff.model.repositoriesImplementation
 
-import com.example.tinkoff.model.network.repositories.ApiRepository
+import com.example.tinkoff.model.network.repositories.RepositoryInformation
+import com.example.tinkoff.model.network.repositories.UsersApiRepository
 import com.example.tinkoff.model.network.repositories.zipSingles
 import com.example.tinkoff.model.repositories.UsersRepository
 import com.example.tinkoff.model.storages.UsersStorage
-import com.example.tinkoff.model.storagesImplementation.UsersStorageImpl
 import com.example.tinkoff.presentation.classes.User
 import io.reactivex.Single
+import javax.inject.Inject
 
-object UsersRepositoryImpl : UsersRepository {
-
-    override val storage: UsersStorage = UsersStorageImpl()
+class UsersRepositoryImpl @Inject constructor() : UsersRepository {
+    @Inject
+    lateinit var api: UsersApiRepository
+    @Inject
+    lateinit var storage: UsersStorage
 
     override fun init(): Single<List<User>> {
         return storage.needToDownload().flatMap { needToDownload ->
@@ -26,9 +29,9 @@ object UsersRepositoryImpl : UsersRepository {
     }
 
     override fun getUsersFromInternet(): Single<List<User>> {
-        return DataRepositoriesImpl.api.getAllUsers().flatMap { data ->
-            data.users.filter { !it.isBot && it.id != ApiRepository.MY_ID }.map { user ->
-                DataRepositoriesImpl.api.getOnlineUserStatus(user.id).map {
+        return api.getAllUsers().flatMap { data ->
+            data.users.filter { !it.isBot && it.id != RepositoryInformation.MY_ID }.map { user ->
+                api.getOnlineUserStatus(user.id).map {
                     User(
                         user.id,
                         user.name,
