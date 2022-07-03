@@ -1,7 +1,7 @@
 package com.example.tinkoff.model.repositoriesImplementation
 
 import com.example.tinkoff.model.network.repositories.StreamsApiRepository
-import com.example.tinkoff.model.network.repositories.zipSingles
+import com.example.tinkoff.model.network.repositoriesImplementation.zipSingles
 import com.example.tinkoff.model.repositories.StreamsRepository
 import com.example.tinkoff.model.room.repositories.StreamsRoomRepository
 import com.example.tinkoff.model.states.DataSource

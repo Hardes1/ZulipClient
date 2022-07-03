@@ -4,9 +4,10 @@ import com.example.tinkoff.model.network.api.MessagesListJson
 import com.example.tinkoff.model.network.api.QueryJson
 import com.example.tinkoff.model.network.api.ReactionJson
 import com.example.tinkoff.model.network.repositories.MessagesApiRepository
-import com.example.tinkoff.model.network.repositories.RepositoryInformation
+import com.example.tinkoff.model.network.repositoriesImplementation.RepositoryInformation
 import com.example.tinkoff.model.repositories.MessagesRepository
 import com.example.tinkoff.model.room.repositories.MessagesRoomRepository
+import com.example.tinkoff.model.room.repositoriesImplementation.MessagesRoomRepositoryImpl
 import com.example.tinkoff.model.states.DataSource
 import com.example.tinkoff.model.states.SenderType
 import com.example.tinkoff.model.storages.MessagesStorage

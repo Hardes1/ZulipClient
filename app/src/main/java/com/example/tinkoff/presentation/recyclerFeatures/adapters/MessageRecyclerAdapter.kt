@@ -13,7 +13,7 @@ import com.example.tinkoff.R
 import com.example.tinkoff.databinding.DateItemBinding
 import com.example.tinkoff.databinding.MessageOtherItemBinding
 import com.example.tinkoff.databinding.MessageOwnItemBinding
-import com.example.tinkoff.model.network.repositories.RepositoryInformation.MY_ID
+import com.example.tinkoff.model.network.repositoriesImplementation.RepositoryInformation.MY_ID
 import com.example.tinkoff.model.states.SenderType
 import com.example.tinkoff.presentation.classes.MessageContent
 import com.example.tinkoff.presentation.classes.MessageContentInterface

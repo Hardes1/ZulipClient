@@ -1,8 +1,8 @@
 package com.example.tinkoff.model.repositoriesImplementation
 
-import com.example.tinkoff.model.network.repositories.RepositoryInformation
 import com.example.tinkoff.model.network.repositories.UsersApiRepository
-import com.example.tinkoff.model.network.repositories.zipSingles
+import com.example.tinkoff.model.network.repositoriesImplementation.RepositoryInformation
+import com.example.tinkoff.model.network.repositoriesImplementation.zipSingles
 import com.example.tinkoff.model.repositories.UsersRepository
 import com.example.tinkoff.model.storages.UsersStorage
 import com.example.tinkoff.presentation.classes.User
