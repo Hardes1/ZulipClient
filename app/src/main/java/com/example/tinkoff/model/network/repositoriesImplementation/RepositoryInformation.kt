@@ -1,4 +1,4 @@
-package com.example.tinkoff.model.network.repositories
+package com.example.tinkoff.model.network.repositoriesImplementation
 
 import io.reactivex.Single
 
